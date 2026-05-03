@@ -1,0 +1,14 @@
+# Laravel
+backend/vendor
+backend/node_modules
+backend/.env
+backend/storage/*.key
+
+# Python
+frontend/venv/
+frontend/__pycache__/
+*.pyc
+
+# General
+.env
+.DS_Store
