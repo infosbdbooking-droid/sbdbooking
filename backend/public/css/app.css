@@ -1,0 +1,316 @@
+/* ========================================================
+   Root & Base Styles
+======================================================== */
+:root {
+  color-scheme: light !important;
+}
+
+html {
+  background-color: #F2F3F5 !important;
+  color: black !important;
+}
+
+body {
+  background-color: #F2F3F5 !important;
+  font-weight: 100 !important;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+aside {
+  background-color: white !important;
+}
+/* ========================================================
+   Hide Side navbar before page ready 
+======================================================== */
+[x-cloak] { display: none; }
+
+/* ========================================================
+   Select2 Custom Styling
+======================================================== */
+.select2.border-red-500 .select2-selection {
+  border-color: #f87171 !important;
+}
+
+/* ========================================================
+   Transitions
+======================================================== */
+html.transition,
+html.transition *,
+html.transition *:before,
+html.transition *:after {
+  transition: all 0.2s ease-in-out !important;
+  transition-delay: 0 !important;
+}
+/* ========================================================
+   Google Translate Overrides
+======================================================== */
+.goog-te-banner-frame,
+.skiptranslate,
+.goog-logo-link,
+.goog-te-gadget img {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+.goog-te-gadget {
+  font-size: 0 !important;
+}
+
+.goog-te-gadget .goog-te-combo {
+  margin: 0 !important;
+}
+
+/* ========================================================
+   Animations
+======================================================== */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse {
+  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0.3; transform: scale(0.8); }
+}
+
+.star {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  width: 2px;
+  height: 2px;
+  pointer-events: none;
+  animation: twinkle 4s infinite, float 15s infinite ease-in-out;
+}
+
+/* ========================================================
+   DataTables Custom Styling
+======================================================== */
+div.dt-processing {
+  top: 70%;
+}
+
+div.dt-processing > div:last-child > div {
+  background: blue !important;
+}
+
+table.dataTable > thead > tr > th,
+table.dataTable > thead > tr > td {
+  border-bottom: 0px !important;
+}
+
+table thead th {
+  background-color: rgb(59 130 246) !important;
+  color: white !important;
+  text-align: center !important;
+}
+
+div.dt-container .dt-length,
+div.dt-container .dt-search,
+div.dt-container .dt-info,
+div.dt-container .dt-processing,
+div.dt-container .dt-paging {
+  color: black !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button.current,
+div.dt-container .dt-paging .dt-paging-button.current:hover {
+  color: white !important;
+  border: 1px solid rgba(0, 0, 0, 0.3) !important;
+  background-color: blue !important;
+}
+
+.dt-type-numeric,
+.dt-type-date {
+  text-align: center !important;
+}
+
+/* ========================================================
+   jConfirm Dialogs
+======================================================== */
+.jconfirm-box {
+  background-color: white !important;
+  color: black !important;
+}
+
+.confirm-yes-btn {
+  background-color: blue;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.confirm-no-btn {
+  background-color: #e5e7eb;
+  color: #1f2937;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+/* ========================================================
+   Typeahead
+======================================================== */
+.twitter-typeahead {
+  width: 100% !important;
+}
+
+.tt-menu {
+  width: 100% !important;
+  background-color: #fff !important;
+  border: 1px solid #1440b8 !important;
+  border-radius: 0.25rem !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+  margin-top: -1px !important;
+}
+
+.tt-suggestion {
+  padding: 8px 12px !important;
+  color: #333 !important;
+}
+
+.tt-suggestion:hover,
+.tt-cursor {
+  background-color: #F3F4F6 !important;
+}
+
+/* ========================================================
+   Highcharts
+======================================================== */
+.highcharts-label text {
+  fill: #1F2937 !important;
+  color: #1F2937 !important;
+}
+
+/* ========================================================
+   Select2 Custom Styling
+======================================================== */
+.select2-container .select2-selection {
+  background-color: #F9FAFB !important;
+  border: 1px solid #D1D5DB !important;
+  border-radius: 0.375rem !important;
+}
+
+.select2-container--default .select2-selection--single {
+  height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 10px !important;
+  background-color: #F9FAFB !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 38px !important;
+  padding-left: 12px !important;
+  color: #111827 !important;
+  font-size: 0.875rem !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 38px !important;
+}
+
+.select2-container--default .select2-results__option--highlighted {
+  background-color: #1067b9 !important;
+  color: #fff !important;
+}
+
+.select2-container--default .select2-selection--multiple {
+  min-height: 40px !important;
+  padding: 2px 8px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+  padding: 0 !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background-color: #E5E7EB !important;
+  border: 1px solid #D1D5DB !important;
+  border-radius: 0.25rem !important;
+  margin: 3px 5px 3px 0 !important;
+  padding: 2px 6px !important;
+  font-size: 0.875rem !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection,
+.select2-container--default.select2-container--open .select2-selection {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
+  outline: none !important;
+}
+
+.select2-container--open .select2-selection--single {
+  border-color: #141fb8 !important;
+  box-shadow: 0 0 0 3px rgba(109, 126, 219, 0.5) !important;
+}
+
+.select2-dropdown {
+  border-color: #D1D5DB !important;
+  border-radius: 0.375rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  border: 1px solid #D1D5DB !important;
+  border-radius: 0.25rem !important;
+  padding: 6px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__placeholder,
+.select2-container--default .select2-selection--multiple .select2-selection__placeholder {
+  color: #6B7280 !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+  cursor: default;
+  padding-left: 15px !important;
+}
+
+/* ========================================================
+   Validation/Error Styles
+======================================================== */
+.error-message {
+  background-color: #ffe5e5;
+  color: #d9534f;
+  font-size: 0.875rem;
+  padding: 8px 12px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.is-invalid {
+  border-color: #dc3545 !important;
+  background-color: #fff5f5;
+}
+
+/* ========================================================
+   Flatpickr
+======================================================== */
+.flatpickr-wrapper {
+  width: 100% !important;
+  display: block !important;
+}
+
+.flatpickr-input {
+  width: 100% !important;
+}
+/* DATA TABLE PAGINATION CUSTOUM STYLE */
+.dt-paging-button.current{
+  border-radius: 15px !important;
+  background-color: #c6d0ff !important;
+}

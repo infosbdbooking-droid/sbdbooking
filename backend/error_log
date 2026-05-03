@@ -1,0 +1,4 @@
+[29-Mar-2025 12:34:15 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home/fyupmdez/public_html/qatarservices/index.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/fyupmdez/public_html/qatarservices/index.php on line 18
