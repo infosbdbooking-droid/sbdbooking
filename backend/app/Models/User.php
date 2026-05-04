@@ -6,7 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\roles;
+use App\Models\Roles;
 // use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -46,7 +46,7 @@ class User extends Authenticatable
 
     public function roles()
     {
-        return $this->belongsTo(roles::class, 'role_id');
+        return $this->belongsTo(Roles::class, 'role_id');
     }
 
 }

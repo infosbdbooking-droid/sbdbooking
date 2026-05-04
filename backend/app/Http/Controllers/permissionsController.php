@@ -19,9 +19,7 @@ class PermissionsController extends Controller
                         'data' => []
                     ], 201);
                 }
-                return DataTables::of($data)
-                                if ($request->ajax()) {
-                    ->make(true);
+                return DataTables::of($data)->make(true);
             }
         } catch (\Exception $e) {
             return response()->json([
@@ -41,7 +39,7 @@ class PermissionsController extends Controller
             ]);
             if ($validator->fails()) {
                 return response()->json([
-                    class PermissionsController extends Controller
+                    'success' => false,
                     'errors' => $validator->errors()
                 ], 422);
             }
