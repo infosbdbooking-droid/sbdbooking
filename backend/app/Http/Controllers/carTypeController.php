@@ -7,7 +7,7 @@ use Yajra\DataTables\DataTables;
 use App\Models\carType;
 use Illuminate\Support\Facades\Storage;
 
-class carTypeController extends Controller
+class CarTypeController extends Controller
 {
     // Get all categories
     public function index(Request $request)

@@ -5,7 +5,7 @@ use App\Models\permissions;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use App\Models\roles;
-class rolesController extends Controller
+class RolesController extends Controller
 {
     #Index 
     public function index(Request $request)
@@ -57,7 +57,7 @@ class rolesController extends Controller
     public function store(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+        class RolesController extends Controller
                 'title' => 'required|string|max:255',
                 'permissions' => 'required|array',
             ]);

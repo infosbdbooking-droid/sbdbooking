@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\Car;
 
-class carController extends Controller
+class CarController extends Controller
 {
     // List all cars
     public function index()

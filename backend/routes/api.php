@@ -2,10 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\api\carController;
-use App\Http\Controllers\api\customerController;
-use App\Http\Controllers\api\settingsController;
-use App\Http\Controllers\api\CabOrderController;
+use App\Http\Controllers\Api\CarController;
+use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\SettingsController;
+use App\Http\Controllers\Api\CabOrderController;
 use App\Http\Controllers\ChargeCalculationController;
 
 
@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Public Car endpoints (read-only)
 Route::prefix('v1')->group(function () {
     Route::post('/loginOrRegister', [CustomerController::class, 'loginOrRegister']);
-    Route::get('/settings', [settingsController::class, 'index']);
+    Route::get('/settings', [SettingsController::class, 'index']);
     Route::get('/cars', [CarController::class, 'index']);
     Route::post('/carDetails', [CarController::class, 'carDetails']);
 

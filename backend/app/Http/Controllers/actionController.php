@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
-class actionController extends Controller
+class ActionController extends Controller
 {
 
     public function signIn(Request $request)

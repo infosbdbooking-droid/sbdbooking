@@ -12,7 +12,7 @@ use App\Models\sector;
 use App\Models\orders;
 
 use Yajra\DataTables\DataTables;
-class ordersController extends Controller
+class OrdersController extends Controller
 {
 
 

@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use App\Models\permissions;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
-class permissionsController extends Controller
+class PermissionsController extends Controller
 {
     // Get all permissions
     public function index(Request $request)
@@ -20,7 +20,7 @@ class permissionsController extends Controller
                     ], 201);
                 }
                 return DataTables::of($data)
-                    ->addIndexColumn()
+                                if ($request->ajax()) {
                     ->make(true);
             }
         } catch (\Exception $e) {
@@ -41,7 +41,7 @@ class permissionsController extends Controller
             ]);
             if ($validator->fails()) {
                 return response()->json([
-                    'success' => false,
+                    class PermissionsController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }

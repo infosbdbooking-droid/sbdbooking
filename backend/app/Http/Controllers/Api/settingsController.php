@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\settings;
 
-class settingsController extends Controller
+class SettingsController extends Controller
 {
     public function index()
     {

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
-class userController extends Controller
+class UserController extends Controller
 {
     #Get Data
     public function index(Request $request)
