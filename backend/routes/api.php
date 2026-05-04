@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\carController;
-use App\Http\Controllers\api\CustomerController;
+use App\Http\Controllers\api\customerController;
 use App\Http\Controllers\api\settingsController;
 use App\Http\Controllers\api\CabOrderController;
 use App\Http\Controllers\ChargeCalculationController;
