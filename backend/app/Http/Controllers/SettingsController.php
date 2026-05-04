@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\settings;
+use App\Models\Settings;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -11,7 +11,7 @@ class SettingsController extends Controller
     public function index()
     {
         try {
-            $settings = settings::first();
+            $settings = Settings::first();
 
             if ($settings) {
                 return response()->json([

@@ -8,7 +8,6 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\RolesController;
-use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\CarTypeController;
 use App\Http\Controllers\CabOrderWebController;
 
@@ -27,20 +26,6 @@ Route::prefix('panel')->group(function () {
 
         # Logout
         Route::get('/signout', [ActionController::class, 'logout']);
-        # Orders
-        Route::prefix('orders')->group(function () {
-            Route::get('/', function () {return view('orders.add'); })->name('orders');
-            Route::post('/businessStore', [OrdersController::class, 'businessStore'])->name('orders.businessStore');
-                    Route::get('/getBusinessRegion', [OrdersController::class, 'getBusinessRegion'])->name('orders.getBusinessRegion');
-                    Route::post('/getBranchCode', [OrdersController::class, 'getBranchCode'])->name('orders.getBranchCode');
-                    Route::get('/category', [OrdersController::class, 'getCategory'])->name('orders.getCategory');
-                    Route::post('/getSubCategory', [OrdersController::class, 'getSubCategory'])->name('orders.getSubCategory');
-                    Route::get('/getServiceType', [OrdersController::class, 'getServiceType'])->name('orders.getServiceType');
-                    Route::post('/getServiceFrequency', [OrdersController::class, 'getServiceFrequency'])->name('orders.getServiceFrequency');
-                    Route::get('/getSector', [OrdersController::class, 'getSector'])->name('orders.getSector');
-                    Route::post('/serviceStore', [OrdersController::class, 'serviceStore'])->name('orders.serviceStore');
-                    Route::post('/store', [OrdersController::class, 'store'])->name('orders.store');
-        });
 
         # Cab Orders (Bookings)
         Route::prefix('cab-orders')->group(function () {

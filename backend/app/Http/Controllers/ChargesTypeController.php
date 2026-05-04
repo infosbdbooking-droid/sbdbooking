@@ -1,10 +1,10 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\permissions;
+use App\Models\Permissions;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
-use App\Models\chargesType;
+use App\Models\ChargesType;
 use Illuminate\Support\Facades\Storage;
 
 class ChargesTypeController extends Controller
@@ -14,7 +14,7 @@ class ChargesTypeController extends Controller
     {
         try {
             if ($request->ajax()) {
-                $data = chargesType::query()
+                $data = ChargesType::query()
                 ->orderBy('id', 'desc');
                 if ($data->count() === 0) {
                     return response()->json([
@@ -48,7 +48,7 @@ class ChargesTypeController extends Controller
                 ], 422);
             }
 
-            $category = new chargesType();
+            $category = new ChargesType();
             $category->charges_type = request('charges_type');
             $category->save();
 
@@ -68,7 +68,7 @@ class ChargesTypeController extends Controller
     public function edit($id)
     {
         try {
-            $category = chargesType::findOrFail($id);
+            $category = ChargesType::findOrFail($id);
             return response()->json($category);
         } catch (\Exception $e) {
             return response()->json([
@@ -93,7 +93,7 @@ class ChargesTypeController extends Controller
                 ], 422);
             }
 
-            $chargesType = chargesType::findOrFail($id);
+            $chargesType = ChargesType::findOrFail($id);
             $chargesType->charges_type = $request->charges_type;
             $chargesType->save();
 
@@ -112,7 +112,7 @@ class ChargesTypeController extends Controller
     public function changeStatus(Request $request, $id)
     {
         try {
-            $chargesType = chargesType::findOrFail($id);
+            $chargesType = ChargesType::findOrFail($id);
             $chargesType->status = $request->status;
             $chargesType->save();
 
@@ -133,7 +133,7 @@ class ChargesTypeController extends Controller
     public function destroy($id)
     {
         try {
-            $chargesType = chargesType::findOrFail($id);
+            $chargesType = ChargesType::findOrFail($id);
             $chargesType->delete();
             return response()->json([
                 'success' => true,

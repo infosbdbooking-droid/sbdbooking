@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
-use App\Models\settings;
+use App\Models\Settings;
 
 class SettingsController extends Controller
 {

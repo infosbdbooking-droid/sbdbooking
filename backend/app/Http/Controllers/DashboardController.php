@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\CabOrder;
 use App\Models\Car;
 use App\Models\User;
-use App\Models\roles;
+use App\Models\Roles;
 use Carbon\Carbon;
 
 class DashboardController extends Controller

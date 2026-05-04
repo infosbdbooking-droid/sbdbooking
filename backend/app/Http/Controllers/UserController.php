@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\roles;
+use App\Models\Roles;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\DataTables;
@@ -42,7 +42,7 @@ class UserController extends Controller
     public function getRole()
     {
         try {
-            $roles = roles::pluck('title', 'id');
+            $roles = Roles::pluck('title', 'id');
             return response()->json($roles, 200);
         } catch (\Exception $e) {
             return response()->json([

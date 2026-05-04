@@ -1,25 +1,35 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
-use App\Models\permissions;
+use App\Models\Permissions;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
-class PermissionsController extends Controller
+use App\Models\Roles;
+class RolesController extends Controller
 {
-    // Get all permissions
+    #Index 
     public function index(Request $request)
     {
         try {
             if ($request->ajax()) {
-                $data = permissions::query();
-                if ($data->count() === 0) {
+                $roles = Roles::with('permissions')->select('id', 'title');
+                if ($roles->count() === 0) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'No permissions found.',
+                        'message' => 'No roles found.',
                         'data' => []
-                    ], 201);
+                    ], 200);
                 }
-                return DataTables::of($data)->make(true);
+                return DataTables::of($roles)
+                    ->addColumn('permissions', function ($role) {
+                        return $role->permissions->pluck('title')->join(', ');
+                    })
+
+                    ->addColumn('actions', function ($role) {
+                        return '';
+                    })
+                    ->rawColumns(['permissions'])
+                    ->make(true);
             }
         } catch (\Exception $e) {
             return response()->json([
@@ -28,14 +38,28 @@ class PermissionsController extends Controller
             ], 500);
         }
     }
+    #Get Permissions 
+    public function getPermissionsList()
+    {
+        try {
+            $permissions = Permissions::pluck('title', 'id');
+            return response()->json($permissions, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later.',
+            ], 500);
+        }
 
 
-    // Update Permissions
+    }
+    #Store 
     public function store(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
+                'permissions' => 'required|array',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -43,40 +67,45 @@ class PermissionsController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-            $permissions = new permissions();
-            $permissions->title = $request->title;
-
-            $permissions->save();
+            $role = new Roles();
+            $role->title = $request->title;
+            $role->save();
+            $role->permissions()->sync($request->permissions);
             return response()->json([
                 'success' => true,
-                'message' => 'Permissions Add successfully'
+                'message' => 'Role created successfully!',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong. Please try again later.',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
+    #Edit 
     public function edit($id)
     {
         try {
-            $permission = permissions::findOrFail($id);
-            return response()->json($permission);
+            $role = Roles::with('permissions')->findOrFail($id);
+            return response()->json([
+                'id' => $role->id,
+                'title' => $role->title,
+                'permissions' => $role->permissions->pluck('id')->toArray(),
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong. Please try again later.',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
+    #Update 
     public function update(Request $request, $id)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
+                'permissions' => 'required|array',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -84,40 +113,41 @@ class PermissionsController extends Controller
                     'errors' => $validator->errors()
                 ], 422);
             }
-            $permission = permissions::findOrFail($id);
-            $permission->update([
-                'title' => $request->title
-            ]);
+
+            $role = Roles::findOrFail($id);
+            $role->update(['title' => $request->title]);
+            $role->permissions()->sync($request->permissions);
+
             return response()->json([
                 'success' => true,
-                'message' => 'Permission updated successfully.'
-            ], 201);
+                'message' => 'Role updated successfully.'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong. Please try again later.',
-                'error' => $e->getMessage()
             ], 500);
         }
-
     }
-
+    #Delete 
     public function destroy($id)
     {
         try {
-            $permission = permissions::findOrFail($id);
-            $permission->delete();
+            $role = Roles::findOrFail($id);
+            $role->permissions()->detach();
+            $role->delete();
+
             return response()->json([
                 'success' => true,
-                'message' => 'Permission deleted successfully.'
-            ], 201);
+                'message' => 'Role deleted successfully.'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong. Please try again later.',
-                'error' => $e->getMessage()
             ], 500);
         }
     }
+
 }
 ?>
