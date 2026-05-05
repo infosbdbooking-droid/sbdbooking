@@ -671,7 +671,7 @@
            e.preventDefault();
            const form = this;
            const formData = new FormData(form);
-           const url = isEditing ? `{{ url('car') }}/${editingId}` : $(form).attr('action');
+           const url = isEditing ? `{{ route('car.update', ':id') }}`.replace(':id', editingId) : $(form).attr('action');
            if (isEditing) formData.append('_method', 'PUT');
    
            $.ajax({
@@ -788,7 +788,7 @@
        $('#table tbody').on('click', '.edit-btn', function () {
            editingId = $(this).data('id');
            isEditing = true;
-           $.get(`{{ url('car') }}/${editingId}/edit`, function (response) {
+           $.get(`{{ route('car.edit', ':id') }}`.replace(':id', editingId), function (response) {
                if (response.success) {
                    const data = response.data;
                    $('#dataForm')[0].reset();
