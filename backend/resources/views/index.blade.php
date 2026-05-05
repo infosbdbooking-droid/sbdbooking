@@ -115,33 +115,49 @@
 
     // Form Validation & Submit
     $("#signInForm").on("submit", function (e) {
-
       e.preventDefault(); // always stop default
 
       let form = $(this);
+      let submitBtn = form.find('.signinBtn');
+      let originalBtnText = submitBtn.text();
+
+      // Basic client-side validation
+      if (!$("#email").val() || (!useOtp && !$("#password").val()) || (useOtp && !$("#otp").val())) {
+          if (typeof $.toastr !== 'undefined') $.toastr.error("Please fill in all required fields."); 
+          else alert("Please fill in all required fields.");
+          return;
+      }
+
+      let ajaxUrl = useOtp ? "/login-otp" : form.attr("action");
 
       $.ajax({
         type: "POST",
-        url: form.attr("action"),
+        url: ajaxUrl,
         data: form.serialize(),
         headers: {
           'X-Requested-With': 'XMLHttpRequest',
           'Accept': 'application/json'
         },
+        beforeSend: function () {
+          submitBtn.html('<span class="animate-spin inline-block w-4 h-4 border-t-2 border-white rounded-full mr-2"></span> Processing...').prop('disabled', true);
+        },
         success: function (res) {
           if (res.success) {
+            if (typeof $.toastr !== 'undefined') $.toastr.success(res.message || "Authentication successful");
             window.location.href = res.redirect;
           } else {
-            alert(res.message);
+            if (typeof $.toastr !== 'undefined') $.toastr.error(res.message); else alert(res.message);
+            submitBtn.html(originalBtnText).prop('disabled', false);
           }
         },
         error: function (xhr) {
-
+          submitBtn.html(originalBtnText).prop('disabled', false);
+          
+          let msg = "Login failed. Please try again.";
           if (xhr.responseJSON && xhr.responseJSON.message) {
-            alert(xhr.responseJSON.message);
-          } else {
-            alert("Login failed");
+            msg = xhr.responseJSON.message;
           }
+          if (typeof $.toastr !== 'undefined') $.toastr.error(msg); else alert(msg);
         }
       });
 

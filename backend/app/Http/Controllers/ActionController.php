@@ -26,25 +26,40 @@ class ActionController extends Controller
                 ->first();
 
             if (!$user || !Hash::check($password, $user->password)) {
-
-                $msg = 'Invalid credentials';
-
-                if ($request->expectsJson()) {
+                $errorMsg = 'Invalid credentials. Please check your email and password.';
+                
+                if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
-                        'success' => false,
-                        'message' => $msg
+                        'success' => false, 
+                        'message' => $errorMsg
                     ], 401);
                 }
-
-                return back()->withErrors(['message' => $msg]);
+                
+                return back()->withErrors(['message' => $errorMsg])->withInput();
             }
 
             Auth::login($user);
             $this->storeSession($request, $user);
 
-            if ($request->expectsJson()) {
+            // Restore permissions logic which is required for access!
+            $permissionTitles = DB::table('permission_role')
+                ->join('permissions', 'permission_role.permission_id', '=', 'permissions.id')
+                ->where('permission_role.role_id', $user->role_id)
+                ->pluck('permissions.title')
+                ->toArray();
+
+            $request->session()->put('permission_titles', $permissionTitles);
+
+            DB::table('login_logs')->insert([
+                'user_id'    => $user->id,
+                'ip_address' => $request->ip(),
+                'logged_in_at' => now()
+            ]);
+
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => true,
+                    'message' => 'Authentication successful',
                     'redirect' => route('dashboard')
                 ]);
             }
@@ -52,15 +67,16 @@ class ActionController extends Controller
             return redirect()->route('dashboard');
 
         } catch (\Exception $e) {
-
-            if ($request->expectsJson()) {
+            $errorMsg = 'Server error: ' . $e->getMessage();
+            
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Server error'
+                    'message' => 'Something went wrong. Please try again later.'
                 ], 500);
             }
-
-            return back()->withErrors(['message' => 'Server error']);
+            
+            return back()->withErrors(['message' => $errorMsg])->withInput();
         }
     }
 
