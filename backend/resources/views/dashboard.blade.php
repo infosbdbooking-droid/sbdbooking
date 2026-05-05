@@ -121,14 +121,7 @@
     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <h2 class="text-lg font-bold text-gray-800 mb-6">Quick Actions</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <a href="{{ route('orders') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-blue-100 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition group">
-                <i class="fas fa-plus-circle text-2xl mb-2"></i>
-                <span class="text-sm font-semibold">Create Booking</span>
-            </a>
-            <a href="{{ route('kmPrice') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-green-100 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition group">
-                <i class="fas fa-route text-2xl mb-2"></i>
-                <span class="text-sm font-semibold">Add New Trip</span>
-            </a>
+
             <a href="{{ route('car') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border border-purple-100 bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white transition group">
                 <i class="fas fa-car-side text-2xl mb-2"></i>
                 <span class="text-sm font-semibold">Add New Car</span>
