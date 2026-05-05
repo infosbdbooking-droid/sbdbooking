@@ -16,7 +16,7 @@ class CarController extends Controller
         $cars = Car::where('status', 1)->get();
         $cars->transform(function ($car) {
             $car->car_photos = $car->car_photos
-                ? asset('storage/app/public/images/car/' . $car->car_photos)
+                ? asset('public/images/car/' . $car->car_photos)
                 : null;
             return $car;
         });
@@ -54,7 +54,7 @@ class CarController extends Controller
                 ], 200);
             }
             $car->car_photos = $car->car_photos
-                ? asset('storage/app/public/images/car/' . $car->car_photos)
+                ? asset('public/images/car/' . $car->car_photos)
                 : null;
             // FETCH CHARGES (GROUPED BY charges_type_id)
             $charges = \DB::table('car_charges')

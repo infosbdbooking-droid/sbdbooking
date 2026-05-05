@@ -16,7 +16,7 @@ class SettingsController extends Controller
             $settings = Settings::first();
             if ($settings) {
                 $settings->logo = $settings->logo
-                    ? asset('storage/app/public/images/logo/' . $settings->logo)
+                    ? asset('public/images/logo/' . $settings->logo)
                     : null;
                 return response()->json([
                     'success' => true,

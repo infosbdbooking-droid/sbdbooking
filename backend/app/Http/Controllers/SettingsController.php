@@ -74,15 +74,15 @@ class SettingsController extends Controller
             $settings->twitter = $request->twitter;
             $settings->instagram = $request->instagram;
             $settings->linkedin = $request->linkedin;
-          
 
-             if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
-                if ($settings->logo && Storage::exists('storage/app/public/images/category' . $settings->logo)) {
-                    Storage::delete('storage/app/public/images/logo' . $settings->logo);
+
+            if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
+                if ($settings->logo && Storage::exists('public/images/logo' . $settings->logo)) {
+                    Storage::delete('public/images/logo' . $settings->logo);
                 }
                 $logo = $request->file('logo');
                 $logoName = 'logo-' . uniqid() . '.' . $logo->getClientOriginalExtension();
-                $logo->move(public_path('storage/app/public/images/logo'), $logoName);
+                $logo->move(public_path('public/images/logo'), $logoName);
                 $settings->logo = $logoName;
             }
 
