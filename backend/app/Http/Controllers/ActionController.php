@@ -26,76 +26,65 @@ class ActionController extends Controller
                 ->first();
 
             if (!$user || !Hash::check($password, $user->password)) {
-                $errorMsg = 'The provided credentials do not match our records.';
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json(['success' => false, 'message' => $errorMsg], 401);
+
+                $msg = 'Invalid credentials';
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $msg
+                    ], 401);
                 }
-                return back()->withErrors(['message' => $errorMsg])->withInput();
+
+                return back()->withErrors(['message' => $msg]);
             }
 
-            // Standard Laravel Auth login to ensure Auth::user() works elsewhere
             Auth::login($user);
-            
             $this->storeSession($request, $user);
 
-            $permissionTitles = DB::table('permission_role')
-                ->join('permissions', 'permission_role.permission_id', '=', 'permissions.id')
-                ->where('permission_role.role_id', $user->role_id)
-                ->pluck('permissions.title')
-                ->toArray();
-
-            $request->session()->put('permission_titles', $permissionTitles);
-
-            DB::table('login_logs')->insert([
-                'user_id'    => $user->id,
-                'ip_address' => $request->ip(),
-                'logged_in_at' => now()
-            ]);
-
-            // Handle AJAX Request
-            if ($request->ajax() || $request->wantsJson()) {
+            if ($request->expectsJson()) {
                 return response()->json([
-                    'success'  => true,
-                    'message'  => 'Authentication successful',
-                    'redirect' => route('dashboard'),
-                    'user'     => $user
+                    'success' => true,
+                    'redirect' => route('dashboard')
                 ]);
             }
 
-            // Handle Normal Form Request
-            return redirect()->route('dashboard')->with('success', 'Authentication successful');
+            return redirect()->route('dashboard');
 
         } catch (\Exception $e) {
-            if ($request->ajax() || $request->wantsJson()) {
+
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Something went wrong. Please try again later.',
-                    'error' => $e->getMessage()
+                    'message' => 'Server error'
                 ], 500);
             }
-            return back()->withErrors(['message' => 'Something went wrong: ' . $e->getMessage()])->withInput();
+
+            return back()->withErrors(['message' => 'Server error']);
         }
     }
 
-      # STORE USER SESSION DATA
-      protected function storeSession(Request $request, user $user){
-        try{
+    # STORE USER SESSION DATA
+    protected function storeSession(Request $request, user $user)
+    {
+        try {
             # Store session data
             $sessionData = [
-                'logged_id'         => $user->id,
-                'logged_in'         => true,
-                'last_activity'     => time()
+                'logged_id' => $user->id,
+                'logged_in' => true,
+                'last_activity' => time()
             ];
-            foreach($sessionData as $key => $value){
+            foreach ($sessionData as $key => $value) {
                 $request->session()->put($key, $value);
             }
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             \Log::error('Session storage error: ' . $e->getMessage());
             throw $e;
         }
     }
-      # LOGOUT
-      public function logout(){
+    # LOGOUT
+    public function logout()
+    {
         Session::flush();
         return redirect('/');
     }
