@@ -114,93 +114,37 @@
     });
 
     // Form Validation & Submit
-    $('#signInForm').validate({
-      rules: {
-        email: { required: true, email: true },
-        password: { required: !useOtp },
-        otp: { required: useOtp, minlength: 6, maxlength: 6 }
-      },
-      messages: {
-        email: {
-          required: "Email is required",
-          email: "Please enter a valid email address"
+    $("#signInForm").on("submit", function (e) {
+
+      e.preventDefault(); // always stop default
+
+      let form = $(this);
+
+      $.ajax({
+        type: "POST",
+        url: form.attr("action"),
+        data: form.serialize(),
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
         },
-        password: { required: "Password is required" },
-        otp: { required: "OTP is required" }
-      },
-      errorClass: "text-red-600 font-semibold text-sm mt-1", // brighter red + bold
-      errorElement: "div",
-      highlight: function (element) {
-        $(element).addClass('border-red-500');
-      },
-      unhighlight: function (element) {
-        $(element).removeClass('border-red-500');
-      },
-      submitHandler: function (form) {
+        success: function (res) {
+          if (res.success) {
+            window.location.href = res.redirect;
+          } else {
+            alert(res.message);
+          }
+        },
+        error: function (xhr) {
 
-        const email = $("#email").val();
-
-        if (useOtp) {
-          const otp = $("#otp").val();
-
-          $.ajax({
-            type: "POST",
-            url: "/login-otp", // correct route डालना
-            data: {
-              _token: "{{ csrf_token() }}",
-              email: email,
-              otp: otp
-            },
-            beforeSend: function () {
-              $(".signinBtn").html('Processing...').prop('disabled', true);
-            },
-            success: function (response) {
-              window.location.href = response.redirect;
-            },
-            error: function (xhr) {
-              alert(xhr.responseJSON?.message || "Invalid OTP");
-            },
-            complete: function () {
-              $(".signinBtn").html('Login').prop('disabled', false);
-            }
-          });
-
-        } else {
-          // Password Login via AJAX
-          const $submitBtn = $(".signinBtn");
-          $.ajax({
-            type: "POST",
-            url: $(form).attr('action'),
-            data: $(form).serialize(),
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest',
-              'Accept': 'application/json'
-            },
-            beforeSend: function () {
-              $submitBtn.html('<span class="animate-spin inline-block w-4 h-4 border-t-2 border-white rounded-full mr-2"></span> Processing...').prop('disabled', true);
-            },
-            success: function (response) {
-              if (response.success) {
-                if (typeof toastr !== 'undefined') toastr.success(response.message);
-                window.location.href = response.redirect;
-              } else {
-                if (typeof toastr !== 'undefined') toastr.error(response.message);
-                else alert(response.message);
-                $submitBtn.html('Login').prop('disabled', false);
-              }
-            },
-            error: function (xhr) {
-              let msg = 'Something went wrong!';
-              if (xhr.responseJSON && xhr.responseJSON.message) {
-                msg = xhr.responseJSON.message;
-              }
-              if (typeof toastr !== 'undefined') toastr.error(msg);
-              else alert(msg);
-              $submitBtn.html('Login').prop('disabled', false);
-            }
-          });
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            alert(xhr.responseJSON.message);
+          } else {
+            alert("Login failed");
+          }
         }
-      }
+      });
+
     });
   });
 </script>
