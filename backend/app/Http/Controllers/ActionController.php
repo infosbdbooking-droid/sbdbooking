@@ -27,14 +27,14 @@ class ActionController extends Controller
 
             if (!$user || !Hash::check($password, $user->password)) {
                 $errorMsg = 'Invalid credentials. Please check your email and password.';
-                
+
                 if ($request->ajax() || $request->wantsJson()) {
                     return response()->json([
-                        'success' => false, 
+                        'success' => false,
                         'message' => $errorMsg
                     ], 401);
                 }
-                
+
                 return back()->withErrors(['message' => $errorMsg])->withInput();
             }
 
@@ -51,7 +51,7 @@ class ActionController extends Controller
             $request->session()->put('permission_titles', $permissionTitles);
 
             DB::table('login_logs')->insert([
-                'user_id'    => $user->id,
+                'user_id' => $user->id,
                 'ip_address' => $request->ip(),
                 'logged_in_at' => now()
             ]);
@@ -68,14 +68,14 @@ class ActionController extends Controller
 
         } catch (\Exception $e) {
             $errorMsg = 'Server error: ' . $e->getMessage();
-            
+
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Something went wrong. Please try again later.'
                 ], 500);
             }
-            
+
             return back()->withErrors(['message' => $errorMsg])->withInput();
         }
     }
