@@ -166,8 +166,39 @@
           });
 
         } else {
-          // ✅ NORMAL SUBMIT (IMPORTANT)
-          form.submit();
+          // Password Login via AJAX
+          const $submitBtn = $(".signinBtn");
+          $.ajax({
+            type: "POST",
+            url: $(form).attr('action'),
+            data: $(form).serialize(),
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'Accept': 'application/json'
+            },
+            beforeSend: function () {
+              $submitBtn.html('<span class="animate-spin inline-block w-4 h-4 border-t-2 border-white rounded-full mr-2"></span> Processing...').prop('disabled', true);
+            },
+            success: function (response) {
+              if (response.success) {
+                if (typeof toastr !== 'undefined') toastr.success(response.message);
+                window.location.href = response.redirect;
+              } else {
+                if (typeof toastr !== 'undefined') toastr.error(response.message);
+                else alert(response.message);
+                $submitBtn.html('Login').prop('disabled', false);
+              }
+            },
+            error: function (xhr) {
+              let msg = 'Something went wrong!';
+              if (xhr.responseJSON && xhr.responseJSON.message) {
+                msg = xhr.responseJSON.message;
+              }
+              if (typeof toastr !== 'undefined') toastr.error(msg);
+              else alert(msg);
+              $submitBtn.html('Login').prop('disabled', false);
+            }
+          });
         }
       }
     });

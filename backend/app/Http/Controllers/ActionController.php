@@ -26,7 +26,11 @@ class ActionController extends Controller
                 ->first();
 
             if (!$user || !Hash::check($password, $user->password)) {
-                return back()->withErrors(['message' => 'The provided credentials do not match our records.'])->withInput();
+                $errorMsg = 'The provided credentials do not match our records.';
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json(['success' => false, 'message' => $errorMsg], 401);
+                }
+                return back()->withErrors(['message' => $errorMsg])->withInput();
             }
 
             // Standard Laravel Auth login to ensure Auth::user() works elsewhere
@@ -48,9 +52,27 @@ class ActionController extends Controller
                 'logged_in_at' => now()
             ]);
 
-            return redirect()->route('dashboard');
+            // Handle AJAX Request
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success'  => true,
+                    'message'  => 'Authentication successful',
+                    'redirect' => route('dashboard'),
+                    'user'     => $user
+                ]);
+            }
+
+            // Handle Normal Form Request
+            return redirect()->route('dashboard')->with('success', 'Authentication successful');
 
         } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong. Please try again later.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
             return back()->withErrors(['message' => 'Something went wrong: ' . $e->getMessage()])->withInput();
         }
     }
