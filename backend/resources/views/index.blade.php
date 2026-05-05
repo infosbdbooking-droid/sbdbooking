@@ -161,33 +161,8 @@
             }
           });
         } else {
-          $.ajax({
-            type: 'POST',
-            url: $(form).attr('action'),
-            data: $(form).serialize(),
-            beforeSend: function () {
-              $(".signinBtn").html('<span class="animate-spin inline-block w-4 h-4 border-t-2 border-white rounded-full mr-2"></span> Processing...').prop('disabled', true);
-            },
-            success: function (response) {
-              if (response.success) {
-                form.reset();
-                $.toastr.success(response.message);
-                window.location.href = response.redirect;
-              } else {
-                $.toastr.error(response.message);
-              }
-            },
-            error: function (xhr) {
-              let msg = 'Something went wrong!';
-              if (xhr.responseJSON) {
-                msg = xhr.responseJSON.message || msg;
-              }
-              $.toastr.error(msg);
-            },
-            complete: function () {
-              $(".signinBtn").html('Login').prop('disabled', false);
-            }
-          });
+          // Standard form submission for password-based login
+          form.submit();
         }
       }
     });

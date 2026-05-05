@@ -20,31 +20,18 @@ class ActionController extends Controller
         try {
             $email = $request->input('email');
             $password = $request->input('password');
-            $user = user::where(function ($query) use ($email) {
-                $query->where('email', $email);
-            })
+
+            $user = User::where('email', $email)
                 ->where('status', '1')
                 ->first();
-            if (!$user) {
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'The provided credentials do not match our records.'
-                    ], 201);
-                }
+
+            if (!$user || !Hash::check($password, $user->password)) {
                 return back()->withErrors(['message' => 'The provided credentials do not match our records.'])->withInput();
             }
 
-            # Password Verification
-            if (!Hash::check($password, $user->password)) {
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'The provided credentials do not match our records.'
-                    ], 201);
-                }
-                return back()->withErrors(['message' => 'The provided credentials do not match our records.'])->withInput();
-            }
+            // Standard Laravel Auth login to ensure Auth::user() works elsewhere
+            Auth::login($user);
+            
             $this->storeSession($request, $user);
 
             $permissionTitles = DB::table('permission_role')
@@ -52,7 +39,6 @@ class ActionController extends Controller
                 ->where('permission_role.role_id', $user->role_id)
                 ->pluck('permissions.title')
                 ->toArray();
-          
 
             $request->session()->put('permission_titles', $permissionTitles);
 
@@ -62,26 +48,10 @@ class ActionController extends Controller
                 'logged_in_at' => now()
             ]);
 
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success'  => true,
-                    'message'  => 'Authentication successful',
-                    'redirect' => route('dashboard'),
-                    'user'     => $user
-                ]);
-            }
-
-            return redirect()->route('dashboard')->with('success', 'Authentication successful');
+            return redirect()->route('dashboard');
 
         } catch (\Exception $e) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Something went wrong. Please try again later.',
-                    'error' => $e->getMessage()
-                ], 500);
-            }
-            return back()->withErrors(['message' => 'Something went wrong. Please try again later.'])->withInput();
+            return back()->withErrors(['message' => 'Something went wrong: ' . $e->getMessage()])->withInput();
         }
     }
 
