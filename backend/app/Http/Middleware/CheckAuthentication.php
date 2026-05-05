@@ -5,7 +5,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
-use App\Models\settings;
+use App\Models\Settings;
 use App\Models\User;
 
 class CheckAuthentication
@@ -36,7 +36,7 @@ class CheckAuthentication
             Session::put('permission_titles', $permissionTitles);
         }
 
-        $setting = settings::first();
+        $setting = Settings::first();
         Session::put('logged_id', $user->id);
         Session::put('logged_name', $user->name);
         if ($setting && $setting->logo) {
