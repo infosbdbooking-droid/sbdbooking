@@ -55,7 +55,7 @@
                     </div>
                     <!-- Submit Button -->
                     <div class="mt-6">
-                        <button type="submit" class="w-full bg-teal-600 text-white rounded-lg py-3 text-lg">Login</button>
+                        <button type="submit" class="signinBtn w-full bg-teal-600 text-white rounded-lg py-3 text-lg">Login</button>
                     </div>
                 </div>
             </form>
@@ -161,10 +161,10 @@
             }
           });
         } else {
-          // Password-based login (your existing logic)
-          $(form).ajaxSubmit({
+          $.ajax({
             type: 'POST',
             url: $(form).attr('action'),
+            data: $(form).serialize(),
             beforeSend: function () {
               $(".signinBtn").html('<span class="animate-spin inline-block w-4 h-4 border-t-2 border-white rounded-full mr-2"></span> Processing...').prop('disabled', true);
             },
