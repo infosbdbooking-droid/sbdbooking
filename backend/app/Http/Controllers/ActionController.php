@@ -26,18 +26,24 @@ class ActionController extends Controller
                 ->where('status', '1')
                 ->first();
             if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'The provided credentials do not match our records.'
-                ], 201);
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The provided credentials do not match our records.'
+                    ], 201);
+                }
+                return back()->withErrors(['message' => 'The provided credentials do not match our records.'])->withInput();
             }
 
             # Password Verification
             if (!Hash::check($password, $user->password)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'The provided credentials do not match our records.'
-                ], 201);
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'The provided credentials do not match our records.'
+                    ], 201);
+                }
+                return back()->withErrors(['message' => 'The provided credentials do not match our records.'])->withInput();
             }
             $this->storeSession($request, $user);
 
@@ -56,19 +62,26 @@ class ActionController extends Controller
                 'logged_in_at' => now()
             ]);
 
-            return response()->json([
-                'success'  => true,
-                'message'  => 'Authentication successful',
-                'redirect' => route('dashboard'),
-                'user'     => $user
-            ]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success'  => true,
+                    'message'  => 'Authentication successful',
+                    'redirect' => route('dashboard'),
+                    'user'     => $user
+                ]);
+            }
+
+            return redirect()->route('dashboard')->with('success', 'Authentication successful');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong. Please try again later.',
-                'error' => $e->getMessage()
-            ], 500);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Something went wrong. Please try again later.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            return back()->withErrors(['message' => 'Something went wrong. Please try again later.'])->withInput();
         }
     }
 
