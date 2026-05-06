@@ -1,4 +1,4 @@
-<section class="container mx-auto px-4 py-12 mt-32 sm:mt-16">
+<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-6 md:mt-4">
   <div class="text-center mb-8">
     <h2 class="text-2xl font-bold text-black">Popular Rental Cars</h2>
     <p class="mt-1 text-gray-600 text-sm">
@@ -6,42 +6,73 @@
     </p>
   </div>
 
-  <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
     {% for car in cars %}
-    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex flex-col justify-between hover:shadow-md transition-shadow duration-300">
-
-      <div>
-        <!-- ❌ Small car / Minivan line REMOVED -->
-
-        <h3 class="text-base font-semibold text-gray-900">
-          {{ car.car_name }} 
-        </h3>
-
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm flex flex-col hover:shadow-xl transition-all duration-300 group overflow-hidden h-full">
+      
+      <!-- Top Section: Image -->
+      <div class="relative overflow-hidden h-44 bg-gray-50">
         <img
           src="{{ car.car_photos }}"
-          alt="Car Image"
-          class="w-full h-28 object-contain my-2"
+          alt="{{ car.car_name }}"
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         >
-
-        <div class="flex items-center text-gray-600 text-xs space-x-3 mb-2">
-          <span>👥 {{ car.max_passengers }}</span>
-          <span>🧳 {{ car.max_bags }}</span>
-          <span>🚘 {{ 'AC' if car.is_ac == 1 else 'Non-AC' }}</span>
+        <!-- Badge Overlay -->
+        <div class="absolute top-3 left-3">
+            <span class="bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-lg">
+                Top Rated
+            </span>
         </div>
       </div>
 
-      <div class="flex items-center justify-between text-sm">
-        <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5">
-          <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.17-3.292z"/></svg>
-          <strong>{{ car.rating_value }}</strong>/5 · {{ car.rating_count }} reviews
-        </span>
-        <a
-          href="{{ url_for('car_detail', car_id=car.id) }}"
-          class="inline-block bg-[#eb2e2e] text-white px-3 py-1.5 text-xs rounded hover:bg-[#d82626] transition"
-        >
-          View deal
-        </a>
+      <!-- Bottom Section: Info -->
+      <div class="p-5 flex flex-col flex-1">
+        <div class="mb-4">
+          <h3 class="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors">
+            {{ car.car_name }} 
+          </h3>
+          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+            Reliable & Comfortable
+          </p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-3 gap-2 mb-6">
+          <div class="bg-gray-50 rounded-lg p-2 text-center border border-gray-100">
+            <span class="block text-gray-400 text-[10px] mb-0.5"><i class="fa-solid fa-users"></i></span>
+            <span class="text-xs font-bold text-gray-700">{{ car.max_passengers }} Seats</span>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-2 text-center border border-gray-100">
+            <span class="block text-gray-400 text-[10px] mb-0.5"><i class="fa-solid fa-suitcase"></i></span>
+            <span class="text-xs font-bold text-gray-700">{{ car.max_bags }} Bags</span>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-2 text-center border border-gray-100">
+            <span class="block text-gray-400 text-[10px] mb-0.5"><i class="fa-solid fa-snowflake"></i></span>
+            <span class="text-xs font-bold text-gray-700">{{ 'AC' if car.is_ac == 1 else 'Non-AC' }}</span>
+          </div>
+        </div>
+
+        <div class="mt-auto flex items-center justify-between">
+          <div class="flex items-center gap-1">
+            <div class="flex text-amber-400 text-[10px]">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+            </div>
+            <span class="text-[11px] font-black text-gray-800">{{ car.rating_value }}</span>
+          </div>
+          
+          <a
+            href="{{ url_for('car_detail', car_id=car.id) }}"
+            class="bg-[#d84e55] text-white px-6 py-2.5 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-[#b03d42] transition-all duration-300 shadow-md hover:shadow-red-500/30 flex items-center gap-2"
+          >
+            Book Now
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </a>
+        </div>
       </div>
 
     </div>

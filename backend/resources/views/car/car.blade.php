@@ -239,29 +239,11 @@
                                             Charge Unit
                                         </label>
                                         <select name="car_charges[charge_unit][]"
-                                            class="w-full border border-gray-300 rounded px-3 py-2">
+                                            class="charge_unit w-full border border-gray-300 rounded px-3 py-2">
                                             <option value="0">Flat</option>
                                             <option value="1">Per KM</option>
                                             <option value="2">Per Hour</option>
-                                        </select>
-                                    </div>
-                                    <!-- Free Waiting -->
-                                    <div>
-                                        <label class="text-xs font-medium text-gray-600 mb-1 block">
-                                            Free Waiting Minutes
-                                        </label>
-                                        <input type="number" name="car_charges[free_wait_minutes][]"
-                                            class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 5">
-                                    </div>
-                                    <!-- Waiting Charge Unit -->
-                                    <div>
-                                        <label class="text-xs font-medium text-gray-600 mb-1 block">
-                                            Waiting Charge Unit
-                                        </label>
-                                        <select name="car_charges[wait_charge_unit][]"
-                                            class="w-full border border-gray-300 rounded px-3 py-2">
-                                            <option value="0">Per Minute</option>
-                                            <option value="1">Per Hour</option>
+                                            <option value="3">Per Day</option>
                                         </select>
                                     </div>
                                     <!-- Min KM -->
@@ -594,21 +576,9 @@
                                    <option value="0">Flat</option>
                                    <option value="1">Per KM</option>
                                    <option value="2">Per Hour</option>
+                                   <option value="3">Per Day</option>
                                </select>
                            </div>
-                           <div>
-                               <label class="text-xs font-medium text-gray-600 mb-1 block">Free Wait (min)</label>
-                               <input type="number" name="car_charges[free_wait_minutes][]"
-                                   class="w-full border rounded px-3 py-2"
-                                   placeholder="e.g. 5">
-                           </div>
-                           <div>
-                               <label class="text-xs font-medium text-gray-600 mb-1 block">Wait Charge Unit</label>
-                               <select name="car_charges[wait_charge_unit][]"
-                                   class="w-full border rounded px-3 py-2">
-                                   <option value="0">Per Minute</option>
-                                   <option value="1">Per Hour</option>
-                               </select>
                            </div>
                            <div>
                                <label class="text-xs font-medium text-gray-600 mb-1 block">Min KM</label>
@@ -638,18 +608,31 @@
                 });
             });
 
+            $(document).on('input', 'input[name="car_charges[title][]"]', function() {
+                $(this).data('manual-edit', true);
+            });
+
             function autoSetChargeTitle(row) {
+                const titleInput = row.find('input[name="car_charges[title][]"]');
+                
+                // If the user has manually typed something, don't overwrite it automatically
+                if (titleInput.data('manual-edit')) return;
+
                 const unit = row.find('select[name="car_charges[charge_unit][]"]').val();
-                const typeText = row.find('.charges_type_select option:selected').text();
+                let typeText = row.find('.charges_type_select option:selected').text();
+                
+                if (!typeText || typeText.includes('Select Charge Type')) return;
+
+                // Clean up: "Per KM Charges" -> "Per KM"
+                typeText = typeText.replace(/ Charges$/i, '');
+
                 let title = '';
-                if (unit == 0) title = typeText + ' Charge';        // Flat
+                if (unit == 0) title = typeText;                     // Flat (e.g. "Driver Allowance")
                 if (unit == 1) title = 'Extra KM Charge';           // Per KM
                 if (unit == 2) title = 'Hourly Charge';             // Per Hour
-                const titleInput = row.find('input[name="car_charges[title][]"]');
-                // set only if empty (admin can override)
-                if (!titleInput.val()) {
-                    titleInput.val(title);
-                }
+                if (unit == 3) title = 'Daily Charge';              // Per Day
+                
+                titleInput.val(title);
             }
 
             $(document).on('change', '.charge_unit, .charges_type_select', function () {
@@ -911,22 +894,13 @@
                                                </div>
                                                <div>
                                                    <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Unit</label>
-                                                   <select name="car_charges[charge_unit][]" class="w-full border border-gray-300 rounded px-3 py-2">
+                                                   <select name="car_charges[charge_unit][]" class="charge_unit w-full border border-gray-300 rounded px-3 py-2">
                                                        <option value="0">Flat</option>
                                                        <option value="1">Per KM</option>
                                                        <option value="2">Per Hour</option>
+                                                       <option value="3">Per Day</option>
                                                    </select>
                                                </div>
-                                               <div>
-                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Free Waiting Minutes</label>
-                                                   <input type="number" name="car_charges[free_wait_minutes][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 5" value="${escapeHtml(charge.free_wait_minutes)}">
-                                               </div>
-                                               <div>
-                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Waiting Charge Unit</label>
-                                                   <select name="car_charges[wait_charge_unit][]" class="w-full border border-gray-300 rounded px-3 py-2">
-                                                       <option value="0">Per Minute</option>
-                                                       <option value="1">Per Hour</option>
-                                                   </select>
                                                </div>
                                                <div>
                                                    <label class="text-xs font-medium text-gray-600 mb-1 block">Minimum KM</label>

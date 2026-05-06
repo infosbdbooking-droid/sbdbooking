@@ -6,7 +6,7 @@ $(document).ready(function () {
         if ($.toastr && typeof $.toastr[type] === 'function') {
             $.toastr[type](message, title);
         } else {
-            console.error("Toastr helper failed:", {title, message, type});
+            console.error("Toastr helper failed:", { title, message, type });
             // Fallback to simple alert if toastr fails
             alert(title + ": " + message);
         }
@@ -39,6 +39,14 @@ $(document).ready(function () {
             profileImage = "/static/images/default-avatar.jpg";
         }
         $("#profileImage").attr("src", profileImage);
+
+        // ✅ Pre-fill booking form fields (if they exist on the page)
+        if ($("#custName").length > 0 && !$("#custName").val()) {
+            $("#custName").val(user.name);
+        }
+        if ($("#custPhone").length > 0 && !$("#custPhone").val()) {
+            $("#custPhone").val(user.mobile);
+        }
     })();
     // ==============================
     // OPEN LOGIN MODAL (ONLY IF NOT LOGGED IN)
@@ -65,38 +73,70 @@ $(document).ready(function () {
     $("#loginBtn").on("click", function () {
         let mobile = $("#mobileInput").val().trim();
         let password = $("#passwordInput").val().trim();
+        let name = $("#nameInput").val() ? $("#nameInput").val().trim() : "";
+
         if (mobile.length !== 10) {
-            $.toastr.error("Enter a valid 10-digit mobile number");
+            showToast("Error", "Enter a valid 10-digit mobile number", "error");
             return;
         }
         if (password.length < 6) {
-            $.toastr.error("Password must be at least 6 characters");
+            showToast("Error", "Password must be at least 6 characters", "error");
             return;
         }
+
+        // If name field is visible but empty
+        if ($("#nameInputWrapper").is(":visible") && !name) {
+            showToast("Warning", "Please enter your full name to register", "warning");
+            return;
+        }
+
+        const btn = $(this);
+        const originalText = btn.text();
+        btn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Processing...').prop('disabled', true);
+
         $.ajax({
-            url: "/login", // Flask route
+            url: "/login",
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({
                 mobile: mobile,
-                password: password
+                password: password,
+                name: name
             }),
             success: function (res) {
-                if (res.status !== 1) {
-                    $.toastr.error(res.message || "Login failed");
+                if (res.status === 2) {
+                    // New User Detected -> Clean UI and ask for Name
+                    $("#mobileInput").addClass("hidden").hide();
+                    $("#passwordInput").addClass("hidden").hide();
+                    $("#nameInputWrapper").removeClass("hidden").show();
+                    
+                    $("#loginSubtitle").text("Almost there! What should we call you?");
+                    $("#loginBtn").text("Complete Registration");
+                    
+                    showToast("New User", "Please enter your name to finish setup.", "info");
+                    btn.html("Complete Registration").prop('disabled', false);
                     return;
                 }
+
+                if (res.status !== 1) {
+                    showToast("Login Failed", res.message || "Invalid credentials", "error");
+                    btn.html(originalText).prop('disabled', false);
+                    return;
+                }
+
                 // ✅ Store token & user data
                 localStorage.setItem("customer_token", res.token);
                 localStorage.setItem("customer_data", JSON.stringify(res.data));
-                $.toastr.success(res.message || "Login successful 🎉");
+                showToast("Success", res.message || "Registration Successful 🎉", "success");
                 $("#loginModal").addClass("hidden");
+                
                 setTimeout(() => {
                     location.reload();
                 }, 800);
             },
             error: function () {
-                $.toastr.error("Server error. Please try again.");
+                showToast("Error", "Server error. Please try again.", "error");
+                btn.html(originalText).prop('disabled', false);
             }
         });
     });
@@ -125,17 +165,17 @@ $(document).ready(function () {
     });
 
     $("#datePicker").flatpickr({
-      altInput: true,
-      altFormat: "d M, Y",    
-      dateFormat: "Y-m-d",    
-      defaultDate: "today",
-      minDate: "today",
-      disableMobile: "true"    
+        altInput: true,
+        altFormat: "d M, Y",
+        dateFormat: "Y-m-d",
+        defaultDate: "today",
+        minDate: "today",
+        disableMobile: "true"
     });
 
-  /* =====================================================
-   GLOBAL MAP VARS
-    ===================================================== */
+    /* =====================================================
+     GLOBAL MAP VARS
+      ===================================================== */
     let map, directionsService, directionsRenderer;
     let pickupAutocomplete, dropAutocomplete;
     let pickupCircle = null;
@@ -145,96 +185,96 @@ $(document).ready(function () {
        HELPERS
     ===================================================== */
     function getDistanceKm(lat1, lng1, lat2, lng2) {
-      const R = 6371;
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLng = (lng2 - lng1) * Math.PI / 180;
-      const a =
-        Math.sin(dLat / 2) ** 2 +
-        Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLng / 2) ** 2;
-      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * Math.PI / 180) *
+            Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLng / 2) ** 2;
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
     }
 
     function isSameLocation(lat1, lng1, lat2, lng2) {
-      if (!lat1 || !lat2) return false;
-      return (
-        Math.abs(lat1 - lat2) < 0.0001 &&
-        Math.abs(lng1 - lng2) < 0.0001
-      );
+        if (!lat1 || !lat2) return false;
+        return (
+            Math.abs(lat1 - lat2) < 0.0001 &&
+            Math.abs(lng1 - lng2) < 0.0001
+        );
     }
 
     /* =====================================================
        TRIP BUTTON LOGIC
     ===================================================== */
     $(".tripBtn").on("click", function () {
-      $(".tripBtn").removeClass("bg-gray-900 text-white");
-      $(this).addClass("bg-gray-900 text-white");
+        $(".tripBtn").removeClass("bg-gray-900 text-white");
+        $(this).addClass("bg-gray-900 text-white");
 
-      const tripType = $(this).data("trip");
-      $("#trip_type").val(tripType);
+        const tripType = $(this).data("trip");
+        $("#trip_type").val(tripType);
 
-      if (tripType === "round") {
-        $("#returnBlock").removeClass("hidden");
-        $("#returnLocationOption").removeClass("hidden");
-      } else {
-        resetReturnSection();
-      }
+        if (tripType === "round") {
+            $("#returnBlock").removeClass("hidden");
+            $("#returnLocationOption").removeClass("hidden");
+        } else {
+            resetReturnSection();
+        }
 
-      if (window.CAR_DATA) {
-        renderFareBreakdown(window.CAR_DATA);
-      }
+        if (window.CAR_DATA) {
+            renderFareBreakdown(window.CAR_DATA);
+        }
     });
     /* =====================================================
        RETURN LOCATION RADIO
     ===================================================== */
     $("input[name='return_location_type']").on("change", function () {
-      if ($(this).val() === "custom") {
-        $("#customReturnLocation").removeClass("hidden");
-      } else {
-        // SAME AS PICKUP & DROP SELECTED
-        resetReturnSection(true);
-        drawRoute(); // redraw one-way / same-location logic
-      }
+        if ($(this).val() === "custom") {
+            $("#customReturnLocation").removeClass("hidden");
+        } else {
+            // SAME AS PICKUP & DROP SELECTED
+            resetReturnSection(true);
+            drawRoute(); // redraw one-way / same-location logic
+        }
     });
 
     /* =====================================================
        RESET RETURN SECTION (IMPORTANT FIX)
     ===================================================== */
     function resetReturnSection(keepTrip = false) {
-      $("#customReturnLocation").addClass("hidden");
+        $("#customReturnLocation").addClass("hidden");
 
-      $("#returnDate, #returnTime").val("");
-      $("#return_pickup, #return_drop").val("");
-      $("#return_pickup_lat, #return_pickup_lng").val("");
-      $("#return_drop_lat, #return_drop_lng").val("");
+        $("#returnDate, #returnTime").val("");
+        $("#return_pickup, #return_drop").val("");
+        $("#return_pickup_lat, #return_pickup_lng").val("");
+        $("#return_drop_lat, #return_drop_lng").val("");
 
-      if (!keepTrip) {
-        $("#returnBlock").addClass("hidden");
-        $("#returnLocationOption").addClass("hidden");
-        $("input[name='return_location_type'][value='same']").prop("checked", true);
-      }
+        if (!keepTrip) {
+            $("#returnBlock").addClass("hidden");
+            $("#returnLocationOption").addClass("hidden");
+            $("input[name='return_location_type'][value='same']").prop("checked", true);
+        }
 
-      $("#tripDetails").addClass("hidden").html("");
+        $("#tripDetails").addClass("hidden").html("");
 
-      if (pickupCircle) pickupCircle.setMap(null);
-      if (dropCircle) dropCircle.setMap(null);
+        if (pickupCircle) pickupCircle.setMap(null);
+        if (dropCircle) dropCircle.setMap(null);
     }
 
     /* =====================================================
        MAP INIT
     ===================================================== */
     function initRouteMap() {
-      map = new google.maps.Map(document.getElementById("routeMap"), {
-        center: { lat: 28.6139, lng: 77.2090 },
-        zoom: 11
-      });
+        map = new google.maps.Map(document.getElementById("routeMap"), {
+            center: { lat: 28.6139, lng: 77.2090 },
+            zoom: 11
+        });
 
-      directionsService = new google.maps.DirectionsService();
-      directionsRenderer = new google.maps.DirectionsRenderer({
-        map: map,
-        suppressMarkers: false
-      });
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({
+            map: map,
+            suppressMarkers: false
+        });
     }
 
     /* =====================================================
@@ -242,44 +282,61 @@ $(document).ready(function () {
     ===================================================== */
     function drawRoute() {
 
-      const A_lat = parseFloat($("#pickup_lat").val());
-      const A_lng = parseFloat($("#pickup_lng").val());
-      const B_lat = parseFloat($("#drop_lat").val());
-      const B_lng = parseFloat($("#drop_lng").val());
+        const A_lat = parseFloat($("#pickup_lat").val());
+        const A_lng = parseFloat($("#pickup_lng").val());
+        const B_lat = parseFloat($("#drop_lat").val());
+        const B_lng = parseFloat($("#drop_lng").val());
 
-      if (!A_lat || !B_lat) return;
+        if (!A_lat || !B_lat) return;
 
-      directionsService.route({
-        origin: { lat: A_lat, lng: A_lng },
-        destination: { lat: B_lat, lng: B_lng },
-        travelMode: google.maps.TravelMode.DRIVING
-      }, function (result, status) {
+        directionsService.route({
+            origin: { lat: A_lat, lng: A_lng },
+            destination: { lat: B_lat, lng: B_lng },
+            travelMode: google.maps.TravelMode.DRIVING
+        }, function (result, status) {
 
-        if (status !== "OK") return;
+            if (status !== "OK") return;
 
-        directionsRenderer.setDirections(result);
+            directionsRenderer.setDirections(result);
 
-        const oneWayKm  = result.routes[0].legs[0].distance.value / 1000;
-        const totalKm   = oneWayKm * 2;
+            const tripType = $("#trip_type").val();
+            const oneWayKm = result.routes[0].legs[0].distance.value / 1000;
+            const totalKm = (tripType === "oneway") ? oneWayKm : (oneWayKm * 2);
 
-        // UI
-        $("#distanceKm").text(totalKm.toFixed(2));
-        $("#distance_value").val(totalKm.toFixed(2));
+            // UI
+            $("#distanceKm").text(totalKm.toFixed(2));
+            $("#distance_value").val(totalKm.toFixed(2));
 
-        // 🔥 PRICING LOGIC
-        $("#range_km").val(oneWayKm.toFixed(2));      // Pickup → Drop
-        $("#billable_km").val(totalKm.toFixed(2));   // A → B → A
+            // ✅ Update Travel Time (Duration)
+            if (result.routes[0].legs.length > 0) {
+                const oneWaySeconds = result.routes[0].legs[0].duration.value;
+                const totalSeconds = (tripType === "oneway") ? oneWaySeconds : (oneWaySeconds * 2);
+                
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                
+                let durationStr = "";
+                if (hours > 0) durationStr += `${hours} hr `;
+                durationStr += `${minutes} mins`;
+                
+                $("#travelTime").text("Approx. " + durationStr);
+            }
 
-        $("#tripDetails").removeClass("hidden").html(`
+            $("#range_km").val(oneWayKm.toFixed(2));      // Pickup → Drop
+            $("#billable_km").val(totalKm.toFixed(2));   // A → B → A
+
+            $("#tripDetails").removeClass("hidden").html(`
           <div class="font-semibold mb-1">Trip Distance Details</div>
           <div class="flex justify-between">
             <span>Pickup → Drop</span>
             <strong>${oneWayKm.toFixed(2)} km</strong>
           </div>
+          ${tripType === "oneway" ? "" : `
           <div class="flex justify-between">
             <span>Return (empty cab)</span>
             <strong>${oneWayKm.toFixed(2)} km</strong>
           </div>
+          `}
           <hr class="my-2">
           <div class="flex justify-between font-semibold">
             <span>Total Distance</span>
@@ -287,10 +344,10 @@ $(document).ready(function () {
           </div>
         `);
 
-        if (window.CAR_DATA) {
-          renderFareBreakdown(window.CAR_DATA);
-        }
-      });
+            if (window.CAR_DATA) {
+                renderFareBreakdown(window.CAR_DATA);
+            }
+        });
     }
 
 
@@ -300,81 +357,99 @@ $(document).ready(function () {
        DRAW FULL ROUND TRIP (A → B → C → D → A)
     ===================================================== */
     function drawFullRoundTrip() {
-        
-      const A_lat = parseFloat($("#pickup_lat").val());
-      const A_lng = parseFloat($("#pickup_lng").val());
-      const B_lat = parseFloat($("#drop_lat").val());
-      const B_lng = parseFloat($("#drop_lng").val());
-      const C_lat = parseFloat($("#return_pickup_lat").val());
-      const C_lng = parseFloat($("#return_pickup_lng").val());
-      const D_lat = parseFloat($("#return_drop_lat").val());
-      const D_lng = parseFloat($("#return_drop_lng").val());
-        
-      if (!A_lat || !B_lat || !C_lat || !D_lat) return;
-        
-      directionsService.route({
-        origin: { lat: A_lat, lng: A_lng },
-        destination: { lat: A_lat, lng: A_lng },
-        waypoints: [
-          { location: { lat: B_lat, lng: B_lng }, stopover: true },
-          { location: { lat: C_lat, lng: C_lng }, stopover: true },
-          { location: { lat: D_lat, lng: D_lng }, stopover: true }
-        ],
-        travelMode: google.maps.TravelMode.DRIVING
-      }, function (result, status) {
-    
-        if (status !== "OK") return;
-    
-        directionsRenderer.setDirections(result);
-    
-        const labels = [
-          "Pickup → Drop",
-          "Drop → Return Pickup",
-          "Return Pickup → Return Drop",
-          "Return Drop → Pickup"
-        ];
-    
-        let totalKm = 0;
-        let html = `<div class="font-semibold mb-1">Trip Distance Details</div>`;
-    
-        result.routes[0].legs.forEach((leg, i) => {
-        
-          const km = leg.distance.value / 1000;
-          if (km <= 0.1) return;
-        
-          totalKm += km;
-        
-          html += `
+
+        const A_lat = parseFloat($("#pickup_lat").val());
+        const A_lng = parseFloat($("#pickup_lng").val());
+        const B_lat = parseFloat($("#drop_lat").val());
+        const B_lng = parseFloat($("#drop_lng").val());
+        const C_lat = parseFloat($("#return_pickup_lat").val());
+        const C_lng = parseFloat($("#return_pickup_lng").val());
+        const D_lat = parseFloat($("#return_drop_lat").val());
+        const D_lng = parseFloat($("#return_drop_lng").val());
+
+        if (!A_lat || !B_lat || !C_lat || !D_lat) return;
+
+        directionsService.route({
+            origin: { lat: A_lat, lng: A_lng },
+            destination: { lat: A_lat, lng: A_lng },
+            waypoints: [
+                { location: { lat: B_lat, lng: B_lng }, stopover: true },
+                { location: { lat: C_lat, lng: C_lng }, stopover: true },
+                { location: { lat: D_lat, lng: D_lng }, stopover: true }
+            ],
+            travelMode: google.maps.TravelMode.DRIVING
+        }, function (result, status) {
+
+            if (status !== "OK") return;
+
+            directionsRenderer.setDirections(result);
+
+            const labels = [
+                "Pickup → Drop",
+                "Drop → Return Pickup",
+                "Return Pickup → Return Drop",
+                "Return Drop → Pickup"
+            ];
+
+            let totalKm = 0;
+            let html = `<div class="font-semibold mb-1">Trip Distance Details</div>`;
+
+            result.routes[0].legs.forEach((leg, i) => {
+
+                const km = leg.distance.value / 1000;
+                if (km <= 0.1) return;
+
+                totalKm += km;
+
+                html += `
             <div class="flex justify-between">
               <span>${labels[i]}</span>
               <strong>${km.toFixed(2)} km</strong>
             </div>
           `;
-        });
-    
-        html += `
+            });
+
+            html += `
           <hr class="my-2">
           <div class="flex justify-between font-semibold">
             <span>Total Distance</span>
             <span>${totalKm.toFixed(2)} km</span>
           </div>
         `;
-    
-        // 🔥 PRICING LOGIC
-        const pickupDropKm = result.routes[0].legs[0].distance.value / 1000;
-    
-        $("#distanceKm").text(totalKm.toFixed(2));
-        $("#distance_value").val(totalKm.toFixed(2));
-    
-        $("#range_km").val(pickupDropKm.toFixed(2)); // range check
-        $("#billable_km").val(totalKm.toFixed(2));   // full round km
-    
-        $("#tripDetails").removeClass("hidden").html(html);
-    
-        if (window.CAR_DATA) {
-          renderFareBreakdown(window.CAR_DATA);
-        }
-      });
+
+            // 🔥 PRICING LOGIC
+            const pickupDropKm = result.routes[0].legs[0].distance.value / 1000;
+
+            $("#distanceKm").text(totalKm.toFixed(2));
+            $("#distance_value").val(totalKm.toFixed(2));
+
+            // ✅ Update Travel Time (Duration)
+            if (result.routes[0].legs.length > 0) {
+                // For round trip, we sum the durations of all legs
+                let totalSeconds = 0;
+                result.routes[0].legs.forEach(leg => {
+                    totalSeconds += leg.duration.value;
+                });
+                
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                
+                let durationStr = "";
+                if (hours > 0) durationStr += `${hours} hr `;
+                durationStr += `${minutes} mins`;
+                
+                $("#travelTime").text("Approx. " + durationStr);
+            }
+
+            $("#range_km").val(pickupDropKm.toFixed(2)); // range check
+            $("#billable_km").val(totalKm.toFixed(2));   // full round km
+
+            $("#tripDetails").removeClass("hidden").html(html);
+
+            if (window.CAR_DATA) {
+                renderFareBreakdown(window.CAR_DATA);
+            }
+        });
     }
 
 
@@ -383,270 +458,357 @@ $(document).ready(function () {
     ===================================================== */
     function initAutocomplete() {
 
-      pickupAutocomplete = new google.maps.places.Autocomplete(
-        document.getElementById("pickup"),
-        { componentRestrictions: { country: "in" } }
-      );
-      pickupAutocomplete.addListener("place_changed", function () {
-        const p = pickupAutocomplete.getPlace();
-        if (!p.geometry) return;
-        $("#pickup_lat").val(p.geometry.location.lat());
-        $("#pickup_lng").val(p.geometry.location.lng());
-        map.setCenter(p.geometry.location);
-        drawRoute();
-      });
+        pickupAutocomplete = new google.maps.places.Autocomplete(
+            document.getElementById("pickup"),
+            { componentRestrictions: { country: "in" } }
+        );
+        pickupAutocomplete.addListener("place_changed", function () {
+            const p = pickupAutocomplete.getPlace();
+            if (!p.geometry) return;
+            $("#pickup_lat").val(p.geometry.location.lat());
+            $("#pickup_lng").val(p.geometry.location.lng());
+            map.setCenter(p.geometry.location);
+            drawRoute();
+        });
 
-      dropAutocomplete = new google.maps.places.Autocomplete(
-        document.getElementById("drop"),
-        { componentRestrictions: { country: "in" } }
-      );
-      dropAutocomplete.addListener("place_changed", function () {
-        const p = dropAutocomplete.getPlace();
-        if (!p.geometry) return;
-        $("#drop_lat").val(p.geometry.location.lat());
-        $("#drop_lng").val(p.geometry.location.lng());
-        drawRoute();
-      });
+        dropAutocomplete = new google.maps.places.Autocomplete(
+            document.getElementById("drop"),
+            { componentRestrictions: { country: "in" } }
+        );
+        dropAutocomplete.addListener("place_changed", function () {
+            const p = dropAutocomplete.getPlace();
+            if (!p.geometry) return;
+            $("#drop_lat").val(p.geometry.location.lat());
+            $("#drop_lng").val(p.geometry.location.lng());
+            drawRoute();
+        });
 
-      const returnPickupAuto = new google.maps.places.Autocomplete(
-        document.getElementById("return_pickup"),
-        { componentRestrictions: { country: "in" } }
-      );
-      returnPickupAuto.addListener("place_changed", function () {
-        const p = returnPickupAuto.getPlace();
-        if (!p.geometry) return;
+        const returnPickupAuto = new google.maps.places.Autocomplete(
+            document.getElementById("return_pickup"),
+            { componentRestrictions: { country: "in" } }
+        );
+        returnPickupAuto.addListener("place_changed", function () {
+            const p = returnPickupAuto.getPlace();
+            if (!p.geometry) return;
 
-        const dLat = parseFloat($("#drop_lat").val());
-        const dLng = parseFloat($("#drop_lng").val());
-        const rLat = p.geometry.location.lat();
-        const rLng = p.geometry.location.lng();
+            const dLat = parseFloat($("#drop_lat").val());
+            const dLng = parseFloat($("#drop_lng").val());
+            const rLat = p.geometry.location.lat();
+            const rLng = p.geometry.location.lng();
 
-        if (getDistanceKm(dLat, dLng, rLat, rLng) > 5) {
-          $.toastr.error("Return pickup must be within 5 km from drop");
-          $("#return_pickup").val("");
-          return;
-        }
+            if (getDistanceKm(dLat, dLng, rLat, rLng) > 5) {
+                $.toastr.error("Return pickup must be within 5 km from drop");
+                $("#return_pickup").val("");
+                return;
+            }
 
-        $("#return_pickup_lat").val(rLat);
-        $("#return_pickup_lng").val(rLng);
-      });
+            $("#return_pickup_lat").val(rLat);
+            $("#return_pickup_lng").val(rLng);
+        });
 
-      const returnDropAuto = new google.maps.places.Autocomplete(
-        document.getElementById("return_drop"),
-        { componentRestrictions: { country: "in" } }
-      );
-      returnDropAuto.addListener("place_changed", function () {
-        const p = returnDropAuto.getPlace();
-        if (!p.geometry) return;
+        const returnDropAuto = new google.maps.places.Autocomplete(
+            document.getElementById("return_drop"),
+            { componentRestrictions: { country: "in" } }
+        );
+        returnDropAuto.addListener("place_changed", function () {
+            const p = returnDropAuto.getPlace();
+            if (!p.geometry) return;
 
-        const A_lat = parseFloat($("#pickup_lat").val());
-        const A_lng = parseFloat($("#pickup_lng").val());
-        const rLat = p.geometry.location.lat();
-        const rLng = p.geometry.location.lng();
+            const A_lat = parseFloat($("#pickup_lat").val());
+            const A_lng = parseFloat($("#pickup_lng").val());
+            const rLat = p.geometry.location.lat();
+            const rLng = p.geometry.location.lng();
 
-        if (getDistanceKm(A_lat, A_lng, rLat, rLng) > 10) {
-          $.toastr.error("Return drop must be within 10 km from pickup");
-          $("#return_drop").val("");
-          return;
-        }
+            if (getDistanceKm(A_lat, A_lng, rLat, rLng) > 10) {
+                $.toastr.error("Return drop must be within 10 km from pickup");
+                $("#return_drop").val("");
+                return;
+            }
 
-        $("#return_drop_lat").val(rLat);
-        $("#return_drop_lng").val(rLng);
+            $("#return_drop_lat").val(rLat);
+            $("#return_drop_lng").val(rLng);
 
-        drawFullRoundTrip();
-      });
+            drawFullRoundTrip();
+        });
     }
 
     /* =====================================================
        INIT
     ===================================================== */
     setTimeout(() => {
-      initRouteMap();
-      initAutocomplete();
+        initRouteMap();
+        initAutocomplete();
     }, 800);
 
     /* =====================================================
        CURRENT LOCATION (PICKUP ONLY)
     ===================================================== */
     $("#useCurrentLocation").on("click", function () {
-      if (!navigator.geolocation) {
-        $.toastr.error("Geolocation not supported");
-        return;
-      }
+        if (!navigator.geolocation) {
+            $.toastr.error("Geolocation not supported");
+            return;
+        }
 
-      navigator.geolocation.getCurrentPosition(function (position) {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
 
-        $("#pickup_lat").val(lat);
-        $("#pickup_lng").val(lng);
+            $("#pickup_lat").val(lat);
+            $("#pickup_lng").val(lng);
 
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ location: { lat, lng } }, function (results, status) {
-          if (status === "OK" && results[0]) {
-            $("#pickup").val(results[0].formatted_address);
-            map.setCenter({ lat, lng });
-            drawRoute();
-          }
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: { lat, lng } }, function (results, status) {
+                if (status === "OK" && results[0]) {
+                    $("#pickup").val(results[0].formatted_address);
+                    map.setCenter({ lat, lng });
+                    drawRoute();
+                }
+            });
         });
-      });
     });
 
     /* =====================================================   
     // FARE BREAKDOWN RENDER
-    ===================================================== */         
- function renderFareBreakdown(carData) {
-  if (!carData) return;
+    ===================================================== */
+    function renderFareBreakdown(carData) {
+        if (!carData) return;
 
-  const tripType = $("#trip_type").val();
-  const apiTripType = tripType === "oneway" ? "one_way" : "round_trip";
-  const billableKm = parseFloat($("#billable_km").val() || 0);
+        const tripType = $("#trip_type").val();
+        const apiTripType = tripType === "oneway" ? "one_way" : "round_trip";
+        const billableKm = parseFloat($("#billable_km").val() || 0);
 
-  if (billableKm <= 0) {
-      $("#fareBreakdown").html("");
-      $("#totalFareBottom").text("0");
-      $("#totalFareSticky").text("0");
-      $("#totalFare").text("0");
-      return;
-  }
-
-  // Show a loading state
-  $("#fareBreakdown").html('<div class="text-gray-500 text-center py-2"><i class="fas fa-spinner fa-spin mr-2"></i> Calculating fare...</div>');
-
-  const payload = {
-    car_id: carData.id,
-    distance_km: billableKm,
-    trip_type: apiTripType,
-    stay_duration: "short", // Hardcoded per user prompt
-    waiting_minutes: 0,
-    is_ac: carData.is_ac == 1 || carData.is_ac === true
-  };
-
-  $.ajax({
-    url: "/calculate-charges",
-    type: "POST",
-    contentType: "application/json",
-    data: JSON.stringify(payload),
-    success: function (res) {
-      if (res && res.success && res.data) {
-        const data = res.data;
-        let html = "";
-        
-        if (data.charges_breakdown && data.charges_breakdown.length > 0) {
-          data.charges_breakdown.forEach(charge => {
-            let label = charge.type || charge.charge_type;
-            
-            // Format distance & rate if not already in label
-            if (charge.distance && charge.rate && !label.includes('km')) {
-                label += ` (${charge.distance} km × ${data.currency || '₹'}${charge.rate})`;
-            }
-            
-            html += `
-              <div class="flex justify-between">
-                <span>${label}</span>
-                <span>${data.currency || '₹'} ${Math.round(charge.amount)}</span>
-              </div>`;
-          });
-        } else {
-            html = '<div class="text-gray-500">No charges applied.</div>';
+        if (billableKm <= 0) {
+            $("#fareBreakdown").html("");
+            $("#totalFareBottom").text("0");
+            $("#totalFareSticky").text("0");
+            $("#totalFare").text("0");
+            return;
         }
 
-        $("#fareBreakdown").html(html);
-        
-        const total = Math.round(data.total_amount || 0);
-        $("#totalFareBottom").text(total);
-        $("#totalFareSticky").text(total);
-        $("#totalFare").text(total);
-      } else {
-        $("#fareBreakdown").html('<div class="text-red-500 text-sm">Failed to calculate fare properly.</div>');
-      }
-    },
-    error: function (xhr) {
-      console.error("Fare calculation error:", xhr.responseText);
-      const err = xhr.responseJSON || {};
-      const msg = err.error || err.debug || err.message || "Error calculating fare. Please check connection.";
-      $("#fareBreakdown").html(`<div class="text-red-500 text-sm">${msg}</div>`);
-      showToast("Calculation Error", msg, "error");
-    }
-  });
-}
+        // Show a loading state
+        $("#fareBreakdown").html('<div class="text-gray-500 text-center py-2"><i class="fas fa-spinner fa-spin mr-2"></i> Calculating fare...</div>');
 
+        let days = 1;
+        let hours = 0;
+        
+        const pDateVal = $("#pickupDate").val();
+        const pTimeVal = $("#pickupTime").val();
+        const rDateVal = $("#returnDate").val();
+        const rTimeVal = $("#returnTime").val();
+
+        if (apiTripType === "round_trip") {
+            const pPicker = document.querySelector("#pickupDate")._flatpickr;
+            const rPicker = document.querySelector("#returnDate")._flatpickr;
+            
+            const pDate = pPicker ? pPicker.selectedDates[0] : null;
+            const rDate = rPicker ? rPicker.selectedDates[0] : null;
+
+            if (pDate && rDate) {
+                if (rDate > pDate) {
+                    const diffTime = Math.abs(rDate - pDate);
+                    days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                } else if (rDate.toDateString() === pDate.toDateString()) {
+                    days = 1;
+                }
+            } else {
+                days = 1; 
+            }
+
+            // Calculate exact hours for "Per Hour" charges
+            if (pDateVal && pTimeVal && rDateVal && rTimeVal) {
+                // Extract "HH:mm" from "HH:mm AM to HH:mm PM"
+                const pTimeClean = pTimeVal.split(' ')[0]; 
+                const rTimeClean = rTimeVal.split(' ')[0];
+
+                const start = new Date(`${pDateVal}T${pTimeClean}`);
+                const end = new Date(`${rDateVal}T${rTimeClean}`);
+                if (end > start) {
+                    hours = (end - start) / (1000 * 60 * 60);
+                }
+            }
+        } else {
+            // One-way might still have waiting hours or specific hourly components
+            hours = 0; 
+        }
+
+        const isAcChecked = $("#acToggle").length > 0 ? $("#acToggle").is(":checked") : (carData.is_ac == 1);
+
+        const payload = {
+            car_id: carData.id,
+            distance_km: billableKm,
+            trip_type: apiTripType,
+            days: days,
+            hours: hours.toFixed(2), // Send precise hours
+            waiting_minutes: 0,
+            is_ac: isAcChecked
+        };
+
+        $.ajax({
+            url: "/calculate-charges",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(payload),
+            success: function (res) {
+                if (res && res.success && res.data) {
+                    const data = res.data;
+                    let html = "";
+
+                    if (data.charges_breakdown && data.charges_breakdown.length > 0) {
+                        data.charges_breakdown.forEach(charge => {
+                            let label = charge.charge_title;
+                            const isIncluded = Math.round(charge.amount) === 0;
+
+                            // Format details if not a flat/included charge
+                            if (charge.unit !== 'Flat' && !isIncluded) {
+                                label += ` (${charge.quantity} ${charge.unit} × ${data.currency || '₹'}${charge.rate})`;
+                            }
+                            if (charge.is_minimum_applied) {
+                                label += ` <span class="text-[10px] text-red-500 bg-red-50 px-1 rounded ml-1">Min. Applied</span>`;
+                            }
+
+                            html += `
+              <div class="flex justify-between items-center text-gray-700 py-0.5">
+                <span>${label}</span>
+                <span class="font-medium">${isIncluded ? 'Included' : (data.currency || '₹') + ' ' + Math.round(charge.amount)}</span>
+              </div>`;
+                        });
+                    } else {
+                        html = '<div class="text-gray-500">No charges applied.</div>';
+                    }
+
+                    $("#fareBreakdown").html(html);
+
+                    const total = Math.round(data.total_amount || 0);
+                    $("#totalFareBottom").text(total);
+                    $("#totalFareSticky").text(total);
+                    $("#totalFare").text(total);
+                } else {
+                    $("#fareBreakdown").html('<div class="text-red-500 text-sm">Failed to calculate fare properly.</div>');
+                }
+            },
+            error: function (xhr) {
+                console.error("Fare calculation error:", xhr.responseText);
+                const err = xhr.responseJSON || {};
+                const msg = err.error || err.debug || err.message || "Error calculating fare. Please check connection.";
+                $("#fareBreakdown").html(`<div class="text-red-500 text-sm">${msg}</div>`);
+                showToast("Calculation Error", msg, "error");
+            }
+        });
+    }
+
+
+    // =====================================================
+    // TIME SLOTS DYNAMIC FILTERING
+    // =====================================================
+    function updateAvailableTimeSlots() {
+        const pDateVal = $("#pickupDate").val();
+        if (!pDateVal) return;
+
+        const now = new Date();
+        const selectedDate = new Date(pDateVal);
+        const isToday = now.toDateString() === selectedDate.toDateString();
+
+        let enabledCount = 0;
+
+        $("#pickupTime option").each(function() {
+            const slotVal = $(this).val(); 
+            const parts = slotVal.split(' '); 
+            const timePart = parts[0]; 
+            const ampm = parts[1]; 
+            
+            let [hours, minutes] = timePart.split(':').map(Number);
+            if (ampm === "PM" && hours < 12) hours += 12;
+            if (ampm === "AM" && hours === 12) hours = 0;
+
+            const slotStartTime = new Date(selectedDate);
+            slotStartTime.setHours(hours, minutes, 0, 0);
+
+            if (isToday) {
+                // Minimum 30 minutes from now
+                const minTime = new Date(now.getTime() + (30 * 60 * 1000));
+                
+                if (slotStartTime < minTime) {
+                    $(this).prop('disabled', true).addClass('text-gray-400');
+                } else {
+                    $(this).prop('disabled', false).removeClass('text-gray-400');
+                    enabledCount++;
+                }
+            } else {
+                $(this).prop('disabled', false).removeClass('text-gray-400');
+                enabledCount++;
+            }
+            $(this).show(); 
+        });
+
+        // If today is exhausted, auto-switch to tomorrow
+        if (isToday && enabledCount === 0) {
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const fp = document.querySelector("#pickupDate")._flatpickr;
+            if (fp) {
+                fp.setDate(tomorrow);
+                return; // fp.setDate will trigger change event
+            }
+        }
+
+        // If current selected option is now disabled, select the first enabled one
+        if ($("#pickupTime option:selected").is(":disabled") || $("#pickupTime option:selected").is(":hidden")) {
+            $("#pickupTime option:not(:disabled):first").prop('selected', true);
+        }
+        
+        if (window.CAR_DATA) {
+            renderFareBreakdown(window.CAR_DATA);
+        }
+    }
 
     // =====================================================
     // DATE PICKER INIT
     // =====================================================
-    flatpickr("#pickupDate", {
-      altInput: true,
-      altFormat: "d M, Y",
-      dateFormat: "Y-m-d",
-
-      defaultDate: "today",
-      minDate: "today",
-      disableMobile: true
-    });
-    //====================================================
-    // TIME PICKER INIT
-    // =====================================================
-    flatpickr("#pickupTime", {
-      enableTime: true,
-      noCalendar: true,
-      dateFormat: "H:i",
-      time_24hr: true,
-      minuteIncrement: 10,
-      minTime: "00:00",
-      maxTime: "23:50",
-      disableMobile: true
-    });
-    // =====================================================
-    // RETURN DATE & TIME PICKER INIT
-    // ====================================================
-
-    flatpickr("#returnDate", {
-      altInput: true,
-      altFormat: "d M, Y",
-      dateFormat: "Y-m-d",
-      minDate: "today",
-      disableMobile: true
-    });
-    //====================================================
-    // RETURN TIME PICKER INIT
-    // =====================================================
-    flatpickr("#returnTime", {
-      enableTime: true,
-      noCalendar: true,
-      dateFormat: "H:i",
-      time_24hr: true,
-      minuteIncrement: 10,
-      minTime: "00:00",
-      maxTime: "23:50",
-      disableMobile: true
-    });
-    // =====================================================
-    // PICKUP & RETURN DATE LINKED LOGIC
-    // =====================================================
-
-    flatpickr("#pickupDate", {
-      altInput: true,
-      altFormat: "d M, Y",
-      dateFormat: "Y-m-d",
-      defaultDate: "today",
-      minDate: "today",
-      disableMobile: true,
-      onChange: function(selectedDates) {
-        if (selectedDates.length) {
-          returnDatePicker.set("minDate", selectedDates[0]);
-        }
-      }
-    });
-    //====================================================
-    // RETURN DATE PICKER INSTANCE
-    // =====================================================
+    // Initialize Date Pickers (Merged & Cleaned)
     const returnDatePicker = flatpickr("#returnDate", {
-      altInput: true,
-      altFormat: "d M, Y",
-      dateFormat: "Y-m-d",
-      minDate: "today",
-      disableMobile: true
+        altInput: true,
+        altFormat: "d M, Y",
+        dateFormat: "Y-m-d",
+        minDate: "today",
+        disableMobile: true,
+        onChange: function() { 
+            if (window.CAR_DATA) renderFareBreakdown(window.CAR_DATA); 
+        }
+    });
+
+    flatpickr("#pickupDate", {
+        altInput: true,
+        altFormat: "d M, Y",
+        dateFormat: "Y-m-d",
+        defaultDate: "today",
+        minDate: "today",
+        disableMobile: true,
+        onChange: function(selectedDates) { 
+            if (selectedDates.length) {
+                returnDatePicker.set("minDate", selectedDates[0]);
+            }
+            updateAvailableTimeSlots();
+        }
+    });
+
+    // Call once on init to filter today's slots
+    setTimeout(updateAvailableTimeSlots, 1000);
+    // Time Slots Listeners
+    $("#pickupTime, #returnTime").on("change", function() {
+        if (window.CAR_DATA) renderFareBreakdown(window.CAR_DATA);
+    });
+
+    // AC Toggle
+    $(document).on("change", "#acToggle", function() {
+        if (window.CAR_DATA) {
+            renderFareBreakdown(window.CAR_DATA);
+        }
+    });
+
+    $(document).on("change", "#acToggle", function() {
+        if (window.CAR_DATA) {
+            renderFareBreakdown(window.CAR_DATA);
+        }
     });
 
     // =====================================================
@@ -664,13 +826,13 @@ $(document).ready(function () {
     // var typed = new Typed("#typed", options);
 
     $('.faq-toggle').on('click', function () {
-      const $button = $(this);
-      const $content = $button.next('.faq-content');
-      const $icon = $button.find('svg');
-      $('.faq-content').not($content).slideUp();
-      $('.faq-toggle svg').not($icon).removeClass('rotate-180');
-      $content.slideToggle();
-      $icon.toggleClass('rotate-180');
+        const $button = $(this);
+        const $content = $button.next('.faq-content');
+        const $icon = $button.find('svg');
+        $('.faq-content').not($content).slideUp();
+        $('.faq-toggle svg').not($icon).removeClass('rotate-180');
+        $content.slideToggle();
+        $icon.toggleClass('rotate-180');
     });
     /**
      * =============================================================================
@@ -1383,7 +1545,7 @@ $(document).ready(function () {
         }
     }
 
-    
+
     // User dropdown toggle
     $("#user-menu-button").click(function () {
         if ($("#user-dropdown").hasClass("hidden")) {
@@ -1439,7 +1601,15 @@ $(document).ready(function () {
     // =====================================================
     $("#bookingForm").on("submit", function (e) {
         e.preventDefault();
-        
+
+        // 🔐 Check Login Status First
+        const token = localStorage.getItem("customer_token");
+        if (!token) {
+            showToast("Login Required", "Please login to confirm your booking.", "warning");
+            $("#loginModal").removeClass("hidden");
+            return;
+        }
+
         if (!window.CAR_DATA) {
             showToast("Error", "Car data is missing. Please refresh the page.", "error");
             return;
@@ -1447,7 +1617,7 @@ $(document).ready(function () {
 
         const btn = $(this).find('button[type="submit"]');
         const originalText = btn.text();
-        
+
         // Basic Validation
         const pickup = $("#pickup").val();
         const drop = $("#drop").val();
@@ -1467,23 +1637,24 @@ $(document).ready(function () {
 
         const tripType = $("#trip_type").val() === "oneway" ? "one_way" : "round_trip";
         const oneWayKm = parseFloat($("#range_km").val() || 0);
-        
+        const isAcChecked = $("#acToggle").length > 0 ? $("#acToggle").is(":checked") : (window.CAR_DATA.is_ac == 1);
+
         const payload = {
             car_id: window.CAR_DATA.id,
             trip_type: tripType,
             stay_duration: "short",
-            is_ac: window.CAR_DATA.is_ac == 1,
-            
+            is_ac: isAcChecked,
+
             // Pickup details
             pickup_address: pickup,
             pickup_lat: $("#pickup_lat").val(),
             pickup_lng: $("#pickup_lng").val(),
-            
+
             // Drop details
             drop_address: drop,
             drop_lat: $("#drop_lat").val(),
             drop_lng: $("#drop_lng").val(),
-            
+
             // Return details (only if round_trip)
             return_pickup_address: tripType === "round_trip" ? $("#return_pickup").val() : null,
             return_pickup_lat: tripType === "round_trip" ? $("#return_pickup_lat").val() : null,
@@ -1491,33 +1662,32 @@ $(document).ready(function () {
             return_drop_address: tripType === "round_trip" ? $("#return_drop").val() : null,
             return_drop_lat: tripType === "round_trip" ? $("#return_drop_lat").val() : null,
             return_drop_lng: tripType === "round_trip" ? $("#return_drop_lng").val() : null,
-            
+
             // Distance
             distance_km: oneWayKm,
             return_km: tripType === "round_trip" ? parseFloat($("#distance_value").val() || 0) - oneWayKm : 0,
-            
+
             // Schedule
             pickup_date: $("#pickupDate").val(),
             pickup_time: $("#pickupTime").val(),
             return_date: tripType === "round_trip" ? $("#returnDate").val() : null,
             return_time: tripType === "round_trip" ? $("#returnTime").val() : null,
-            
+
             // Passengers
             passengers: $("#pax").val(),
             bags: $("#bags").val(),
             notes_for_driver: $("#notes").val(),
-            
+
             // Customer
             customer_name: custName,
             customer_mobile: custPhone,
-            
+
             // Extras
             coupon_code: $("#coupon").val(),
             waiting_minutes: 0,
             estimated_toll: parseFloat($("#toll_value").val() || 0)
         };
 
-        const token = localStorage.getItem("customer_token");
         const headers = {};
         if (token) {
             headers["Authorization"] = "Bearer " + token;
@@ -1551,4 +1721,28 @@ $(document).ready(function () {
         });
     });
 
+    // ✅ Pre-fill search parameters from URL (at the end to ensure initializations)
+    (function prefillFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPickup = urlParams.get('pickup');
+        const urlDrop = urlParams.get('destination');
+        const urlDate = urlParams.get('date');
+        const urlTime = urlParams.get('pickup_time');
+
+        if (urlPickup && $("#pickup").length > 0) $("#pickup").val(urlPickup);
+        if (urlDrop && $("#drop").length > 0) $("#drop").val(urlDrop);
+        if (urlDate && $("#pickupDate").length > 0) {
+            setTimeout(() => {
+                const fp = document.querySelector("#pickupDate")._flatpickr;
+                if (fp) {
+                    fp.setDate(urlDate);
+                } else {
+                    $("#pickupDate").val(urlDate);
+                }
+            }, 1000); // Wait for flatpickr init
+        }
+        if (urlTime && $("#pickupTime").length > 0) {
+            $("#pickupTime").val(urlTime);
+        }
+    })();
 });

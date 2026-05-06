@@ -6,8 +6,15 @@
     <button id="closeLogin"
       class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg font-bold">×</button>
 
-    <h2 class="text-xl font-bold text-gray-800 mb-3">Login</h2>
-    <p class="text-gray-600 text-sm mb-4">Enter your mobile number and password</p>
+    <h2 class="text-xl font-bold text-gray-800 mb-3">Login / Register</h2>
+    <p id="loginSubtitle" class="text-gray-600 text-sm mb-4">Enter your mobile number and password</p>
+
+    <!-- Name input (Hidden by default, shown for new users) -->
+    <div id="nameInputWrapper" class="hidden animate-in slide-in-from-top duration-300">
+      <input id="nameInput" type="text"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-3 focus:ring-2 focus:ring-red-500 focus:outline-none"
+        placeholder="Enter your full name">
+    </div>
 
     <input id="mobileInput" type="text" maxlength="10"
       class="w-full border border-gray-300 rounded-lg px-4 py-2 mb-3 focus:ring-2 focus:ring-red-500 focus:outline-none"

@@ -97,6 +97,17 @@
                 <p class="text-sm mt-1">Click "Add New Slider" to create your first one.</p>
             </div>
         </div>
+
+        <!-- Pagination Controls -->
+        <div x-show="pagination.last_page > 1" class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+            <span class="text-sm text-gray-600">
+                Showing page <span x-text="pagination.current_page" class="font-semibold text-gray-900"></span> of <span x-text="pagination.last_page" class="font-semibold text-gray-900"></span>
+            </span>
+            <div class="flex items-center gap-2">
+                <button @click="changePage(pagination.current_page - 1)" :disabled="pagination.current_page === 1" class="px-3 py-1 text-sm bg-white border border-gray-200 rounded-md shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Previous</button>
+                <button @click="changePage(pagination.current_page + 1)" :disabled="pagination.current_page === pagination.last_page" class="px-3 py-1 text-sm bg-white border border-gray-200 rounded-md shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+            </div>
+        </div>
     </div>
 
     <!-- Add / Edit Modal -->
@@ -228,38 +239,48 @@
                 imageFile: null
             },
             
-            sliders: [
-                {
-                    id: 1,
-                    slider_id: 'SLD-2026-001',
-                    title: 'Summer Car Rental Sale',
-                    alt: 'Summer car rental discount banner',
-                    meta_title: 'Save 20% on Summer Rentals',
-                    order: 1,
-                    status: 'Active',
-                    image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=1920&h=800'
-                },
-                {
-                    id: 2,
-                    slider_id: 'SLD-2026-002',
-                    title: 'Premium Airport Transfers',
-                    alt: 'Luxury car at airport',
-                    meta_title: 'Reliable Airport Taxi Service',
-                    order: 2,
-                    status: 'Active',
-                    image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=1920&h=800'
-                },
-                {
-                    id: 3,
-                    slider_id: 'SLD-2026-003',
-                    title: 'Outstation Travel Packages',
-                    alt: 'Family traveling in SUV',
-                    meta_title: 'Book Outstation Cabs Online',
-                    order: 3,
-                    status: 'Inactive',
-                    image: 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&q=80&w=1920&h=800'
+            sliders: [],
+            pagination: {
+                current_page: 1,
+                last_page: 1,
+                total: 0
+            },
+
+            init() {
+                this.loadSliders(1);
+            },
+
+            loadSliders(page = 1) {
+                fetch(`{{ route("sliders.data") }}?page=${page}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.data) {
+                        this.sliders = data.data.map(item => ({
+                            id: item.id,
+                            slider_id: item.slider_id,
+                            title: item.title,
+                            alt: item.alt,
+                            meta_title: item.meta_title,
+                            order: item.order,
+                            status: item.status == 1 ? 'Active' : 'Inactive',
+                            image: '/images/sliders/' + item.image_path
+                        }));
+                        this.pagination = {
+                            current_page: data.current_page,
+                            last_page: data.last_page,
+                            total: data.total
+                        };
+                    }
+                });
+            },
+
+            changePage(page) {
+                if(page >= 1 && page <= this.pagination.last_page) {
+                    this.loadSliders(page);
                 }
-            ],
+            },
 
             generateId() {
                 const random = Math.floor(100 + Math.random() * 900);
@@ -307,7 +328,6 @@
                     imagePreview: null,
                     imageFile: null
                 };
-                // Reset file input
                 const fileInput = document.querySelector('input[type="file"]');
                 if(fileInput) fileInput.value = '';
             },
@@ -325,20 +345,50 @@
             },
 
             toggleStatus(id) {
-                // Basic AJAX mockup
                 const slider = this.sliders.find(s => s.id === id);
                 if (slider) {
                     const newStatus = slider.status === 'Active' ? 'Inactive' : 'Active';
-                    slider.status = newStatus;
-                    toastr.success(`Status updated to ${newStatus}`);
+                    const dbStatus = newStatus === 'Active' ? 1 : 0;
+                    
+                    let formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('status', dbStatus);
+
+                    fetch(`/panel/sliders/${id}/changeStatus`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.success) {
+                            slider.status = newStatus;
+                            toastr.success(`Status updated to ${newStatus}`);
+                        } else {
+                            toastr.error('Failed to update status');
+                        }
+                    });
                 }
             },
 
             deleteSlider(id) {
                 if (confirm('Are you sure you want to delete this slider?')) {
-                    // Basic AJAX mockup
-                    this.sliders = this.sliders.filter(s => s.id !== id);
-                    toastr.success('Slider deleted successfully');
+                    let formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('_method', 'DELETE');
+
+                    fetch(`/panel/sliders/${id}`, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.success) {
+                            this.sliders = this.sliders.filter(s => s.id !== id);
+                            toastr.success('Slider deleted successfully');
+                        } else {
+                            toastr.error('Failed to delete slider');
+                        }
+                    });
                 }
             },
 
@@ -354,39 +404,45 @@
                     return;
                 }
 
-                // Basic AJAX save mockup
-                if (this.isEditing) {
-                    const index = this.sliders.findIndex(s => s.id === this.form.id);
-                    if (index !== -1) {
-                        this.sliders[index] = {
-                            ...this.sliders[index],
-                            title: this.form.title,
-                            alt: this.form.alt,
-                            meta_title: this.form.meta_title,
-                            order: parseInt(this.form.order),
-                            status: this.form.status,
-                            image: this.form.imagePreview // In real app, this would be new uploaded URL
-                        };
-                        toastr.success('Slider updated successfully');
-                    }
-                } else {
-                    const newSlider = {
-                        id: Date.now(),
-                        slider_id: this.form.slider_id,
-                        title: this.form.title,
-                        alt: this.form.alt,
-                        meta_title: this.form.meta_title,
-                        order: parseInt(this.form.order),
-                        status: this.form.status,
-                        image: this.form.imagePreview
-                    };
-                    this.sliders.push(newSlider);
-                    toastr.success('Slider created successfully');
-                }
+                let formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('slider_id', this.form.slider_id);
+                formData.append('title', this.form.title);
+                formData.append('alt', this.form.alt);
+                formData.append('meta_title', this.form.meta_title || '');
+                formData.append('order', this.form.order);
+                formData.append('status', this.form.status);
                 
-                // Sort by order
-                this.sliders.sort((a, b) => a.order - b.order);
-                this.closeModal();
+                if (this.form.imageFile) {
+                    formData.append('image', this.form.imageFile);
+                }
+
+                let url = '{{ route("sliders.store") }}';
+                if (this.isEditing) {
+                    url = `/panel/sliders/${this.form.id}/update`;
+                }
+
+                fetch(url, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if(res.success) {
+                        toastr.success(res.message);
+                        this.loadSliders();
+                        this.closeModal();
+                    } else {
+                        if(res.errors) {
+                            Object.values(res.errors).forEach(err => toastr.error(err[0]));
+                        } else {
+                            toastr.error(res.message || 'Something went wrong');
+                        }
+                    }
+                })
+                .catch(err => {
+                    toastr.error('Network error');
+                });
             }
         }));
     });

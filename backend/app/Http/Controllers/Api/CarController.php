@@ -10,21 +10,65 @@ use App\Models\Car;
 
 class CarController extends Controller
 {
-    // List all cars
-    public function index()
+    // Search and Filter Cars
+    public function carFilter(Request $request)
     {
-        $cars = Car::where('status', 1)->get();
+        $query = Car::with(['carType', 'charges.chargeType'])->where('status', 1);
+
+        // Filter by Car Type (supports single ID or array)
+        if ($request->filled('car_type_id')) {
+            $typeIds = is_array($request->car_type_id) ? $request->car_type_id : [$request->car_type_id];
+            $query->whereIn('car_type_id', $typeIds);
+        }
+
+        // Filter by Seating Capacity
+        if ($request->filled('seats')) {
+            $query->where('car_seats', $request->seats);
+        }
+
+        // Sort Logic
+        if ($request->sort_by === 'price') {
+            $query->orderBy('min_trip_amount', 'asc');
+        } elseif ($request->sort_by === 'rating') {
+            $query->orderBy('rating_value', 'desc');
+        } else {
+            $query->orderBy('id', 'desc'); // Popularity / Default
+        }
+
+        $cars = $query->get();
+
         $cars->transform(function ($car) {
             $car->car_photos = $car->car_photos
                 ? asset('images/car/' . $car->car_photos)
                 : null;
+            
+            // Find Per KM Charge
+            $perKmCharge = $car->charges->first(function($charge) {
+                return $charge->chargeType && $charge->chargeType->charges_type === 'Per KM Charges';
+            });
+            
+            // Find Driver Allowance
+            $driverAllowance = $car->charges->first(function($charge) {
+                return $charge->chargeType && $charge->chargeType->charges_type === 'Driver Allowance';
+            });
+            
+            $car->per_km_fare = $perKmCharge ? $perKmCharge->amount : ($car->min_trip_amount ?: '12');
+            $car->driver_allowance = $driverAllowance ? $driverAllowance->amount : '0';
+            
             return $car;
         });
+
         return response()->json([
             'status' => 1,
-            'message' => $cars->isEmpty() ? 'No record found' : 'Cars fetched successfully',
+            'message' => 'Cars filtered successfully',
+            'count' => $cars->count(),
             'data' => $cars
         ]);
+    }
+
+    public function index(Request $request)
+    {
+        return $this->carFilter($request);
     }
 
 
@@ -66,8 +110,6 @@ class CarController extends Controller
                     'title',
                     'amount',
                     'charge_unit',
-                    'free_wait_minutes',
-                    'wait_charge_unit',
                     'min_km',
                     'max_km'
                 )
@@ -90,5 +132,13 @@ class CarController extends Controller
         }
     }
 
-
+    public function carTypes()
+    {
+        $types = \App\Models\CarType::where('status', 1)->get();
+        return response()->json([
+            'status' => 1,
+            'message' => 'Car types fetched successfully',
+            'data' => $types
+        ]);
+    }
 }

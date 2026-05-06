@@ -10,15 +10,26 @@ from config import API_BASE_URL
 # ======================
 @app.route('/')
 def index():
+    cars = []
+    sliders = []
     try:
-        response = requests.get(f"{API_BASE_URL}/cars", timeout=10)
-        data = response.json()
-        cars = data.get("data", []) if data.get("status") == 1 else []
+        # Fetch Cars
+        response_cars = requests.get(f"{API_BASE_URL}/cars", timeout=10)
+        data_cars = response_cars.json()
+        cars = data_cars.get("data", []) if data_cars.get("status") == 1 else []
+        
+        # Fetch Sliders
+        response_sliders = requests.get(f"{API_BASE_URL}/sliders", timeout=10)
+        data_sliders = response_sliders.json()
+        # Slider API returns status, message, and data (which is a paginated object)
+        if data_sliders.get("status") == 1:
+            sliders_payload = data_sliders.get("data", {})
+            sliders = sliders_payload.get("data", [])
+            
     except Exception as e:
         print("HOME API ERROR:", e)
-        cars = []
 
-    return render_template('index.html', cars=cars)
+    return render_template('index.html', cars=cars, sliders=sliders)
 
 
 
@@ -46,12 +57,16 @@ def login():
             }), 422
 
         # 🔥 Laravel API call
+        api_payload = {
+            "mobile": mobile,
+            "password": password
+        }
+        if payload.get("name"):
+            api_payload["name"] = payload.get("name")
+
         response = requests.post(
             f"{API_BASE_URL}/loginOrRegister",
-            json={
-                "mobile": mobile,
-                "password": password
-            },
+            json=api_payload,
             timeout=10
         )
 
@@ -200,6 +215,56 @@ def place_order():
     except Exception as e:
         print("PLACE ORDER API ERROR:", e)
         return jsonify({"status": 0, "message": "Failed to place order"}), 500
+
+
+
+# ======================
+# CAR LISTING / SEARCH RESULTS
+# ======================
+@app.route('/search-results')
+def search_results():
+    cars = []
+    car_types = []
+    try:
+        # Fetch search parameters
+        pickup = request.args.get('pickup', '')
+        destination = request.args.get('destination', '')
+        date = request.args.get('date', '')
+        pickup_time = request.args.get('pickup_time', '')
+        selected_type = request.args.get('car_type_id', '')
+
+        # Fetch Cars from Laravel API (with optional filter)
+        car_api_url = f"{API_BASE_URL}/cars"
+        if selected_type:
+            car_api_url += f"?car_type_id={selected_type}"
+            
+        response = requests.get(car_api_url, timeout=10)
+        data = response.json()
+        
+        if data.get("status") == 1:
+            cars = data.get("data", [])
+
+        # Fetch Car Types for sidebar filters
+        type_response = requests.get(f"{API_BASE_URL}/car-types", timeout=10)
+        type_data = type_response.json()
+        if type_data.get("status") == 1:
+            car_types = type_data.get("data", [])
+            
+    except Exception as e:
+        print("SEARCH RESULTS API ERROR:", e)
+
+    return render_template('car_listing/index.html', cars=cars, car_types=car_types)
+
+
+@app.route('/api/filter-cars')
+def filter_cars():
+    try:
+        params = request.args.to_dict()
+        response = requests.get(f"{API_BASE_URL}/car-filter", params=params, timeout=10)
+        return jsonify(response.json())
+    except Exception as e:
+        print("FILTER API ERROR:", e)
+        return jsonify({"status": 0, "message": str(e)}), 500
 
 
 # ======================

@@ -17,8 +17,6 @@ class CarCharge extends Model
         'title',
         'amount',
         'charge_unit',
-        'free_wait_minutes',
-        'wait_charge_unit',
         'min_km',
         'max_km',
         'status',

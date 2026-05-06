@@ -6,7 +6,8 @@ use App\Http\Controllers\Api\CarController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\CabOrderController;
-use App\Http\Controllers\ChargeCalculationController;
+use App\Http\Controllers\Api\ChargeCalculationController;
+use App\Http\Controllers\Api\SliderController;
 
 
 /*
@@ -29,7 +30,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/loginOrRegister', [CustomerController::class, 'loginOrRegister']);
     Route::get('/settings', [SettingsController::class, 'index']);
     Route::get('/cars', [CarController::class, 'index']);
+    Route::get('/car-filter', [CarController::class, 'carFilter']);
+    Route::get('/car-types', [CarController::class, 'carTypes']);
     Route::post('/carDetails', [CarController::class, 'carDetails']);
+    Route::get('/sliders', [SliderController::class, 'getActiveSliders']);
 
     // Charge Calculation endpoints
     Route::post('/calculate-charges', [ChargeCalculationController::class, 'calculateCharges']);

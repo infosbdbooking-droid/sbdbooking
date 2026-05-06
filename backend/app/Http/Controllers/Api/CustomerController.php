@@ -73,8 +73,17 @@ class CustomerController extends Controller
             // ======================
             // REGISTRATION FLOW
             // ======================
+            // If name is missing, ask for it first
+            if (!$request->name) {
+                return response()->json([
+                    'status'  => 2, // Special status: Need Name
+                    'message' => 'New user detected. Please enter your name to register.',
+                    'data'    => null
+                ], 200);
+            }
+
             $newCustomer = Customer::create([
-                'name'     => 'User_' . substr($request->mobile, -4),
+                'name'     => $request->name,
                 'mobile'   => $request->mobile,
                 'password' => Hash::make($request->password),
                 'status'   => 1,

@@ -1,47 +1,196 @@
-<section class="relative  bg-gradient-to-r from-[#d6e4ff] via-[#e0e8ff] to-[#f0eaff] pb-44"
-         style="background-image: url('https://s3.rdbuz.com/Images/responsiveweb/HomeSaleBanner.webp'); background-size: cover; background-position: center; height: 300px;">
-  <!-- Form stays unchanged -->
-  <div class="absolute inset-x-0 bottom-0 translate-y-1/2 z-10 flex justify-center px-4">
-    <form class="w-full max-w-6xl">
-      <div class="bg-white rounded-[2rem] p-4 sm:p-6 shadow-xl flex flex-col lg:flex-row gap-4 items-stretch">
-
-        <!-- From -->
-        <div class="flex items-center border rounded-xl px-4 py-3 w-full flex-1">
-          <i class="fa-solid fa-bus text-black mr-2"></i>
-          <input type="text" placeholder="From" class="outline-none w-full text-sm text-black placeholder:text-gray-500 font-semibold" />
+<section class="relative z-10 mb-6 md:mb-16">
+  <!-- Responsive Swiper Slider Container -->
+  <div class="swiper heroSwiper w-full relative h-[250px] sm:h-[320px] md:h-[380px]">
+    <div class="swiper-wrapper">
+      {% if sliders %}
+      {% for slider in sliders %}
+      <div class="swiper-slide relative">
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-[4000ms]"
+          style="background-image: url('{{ slider.image_url if slider.image_url else '/static/images/sliders/' + slider.image_path }}');">
         </div>
-
-        <!-- To -->
-        <div class="flex items-center border rounded-xl px-4 py-3 w-full flex-1">
-          <i class="fa-solid fa-bus text-black mr-2 rotate-180"></i>
-          <input type="text" placeholder="To" class="outline-none w-full text-sm text-black placeholder:text-gray-500 font-semibold" />
-        </div>
-
-        <!-- Date Picker -->
-        <div class="flex items-center border rounded-xl px-4 py-3 w-full lg:w-64">
-          <i class="fa-solid fa-calendar-days text-black mr-2"></i>
-          <div class="text-left w-full">
-            <label for="datePicker" class="block text-xs text-gray-500 font-semibold leading-tight">Date of Journey</label>
-            <input type="text" id="datePicker" name="journey_date" value="2025-07-05"
-                   class="outline-none w-full text-sm font-bold text-black bg-transparent" />
+        <!-- Overlay with same container alignment -->
+        <div class="absolute inset-0 bg-black/10 flex items-center">
+          <div class="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <div class="max-w-xl animate-fade-in-up">
+              <h1
+                class="text-white text-2xl sm:text-4xl md:text-5xl font-black leading-tight drop-shadow-2xl tracking-tighter">
+                {{ slider.title if slider.title else "India's No. 1 online <br> bus ticket booking site" | safe }}
+              </h1>
+            </div>
           </div>
         </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <!-- Fallback Static Banner -->
+      <div class="swiper-slide relative">
+        <div class="absolute inset-0 bg-cover bg-center"
+          style="background-image: url('https://s3.rdbuz.com/Images/responsiveweb/HomeSaleBanner.webp');">
+        </div>
+        <div class="absolute inset-0 bg-black/5 flex items-center">
+          <div class="max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+            <div class="max-w-xl">
+              <h1
+                class="text-white text-2xl sm:text-4xl md:text-5xl font-black leading-tight drop-shadow-2xl tracking-tighter">
+                India's No. 1 online <br> bus ticket booking site
+              </h1>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <!-- Adjusted Swiper Pagination -->
+    <div class="swiper-pagination !bottom-20 sm:!bottom-32 !left-4 sm:!left-32 !w-auto"></div>
+  </div>
 
-        <!-- Search Button -->
-        <div class="flex items-center border rounded-xl px-4 py-3 w-full lg:w-72 gap-2">
-          <div class="flex flex-col text-left flex-grow">
+  <!-- Search Form: relative on mobile (below slider), absolute on md+ (overlapping) -->
+  <div class="relative md:absolute inset-x-0 md:bottom-0 md:translate-y-1/2 z-20 -mt-6 md:mt-0">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        class="bg-white rounded-xl sm:rounded-[1.25rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-gray-50 p-2 sm:p-3 md:p-4 relative">
+        <form action="/search-results" method="GET" class="flex flex-col lg:flex-row items-stretch gap-2 sm:gap-3">
+
+          <!-- Box 1: From & To -->
+          <div
+            class="flex-[3] flex flex-col sm:flex-row items-stretch border border-gray-200 rounded-lg sm:rounded-xl overflow-hidden bg-white">
+            <div
+              class="flex-1 flex items-center p-3 sm:p-4 md:p-5 border-b sm:border-b-0 sm:border-r border-gray-200 hover:bg-gray-50/50 transition-all group/input">
+              <i
+                class="fa-solid fa-bus text-gray-400 text-lg sm:text-xl mr-3 sm:mr-5 group-focus-within/input:text-[#d84e55]"></i>
+              <div class="flex flex-col text-left">
+                <label
+                  class="text-[9px] sm:text-[10px] text-gray-400 font-black uppercase tracking-widest mb-0.5">From</label>
+                <input type="text" id="home_from" name="pickup" placeholder="Departure City"
+                  class="w-full outline-none text-gray-800 font-bold placeholder:text-gray-300 bg-transparent text-base sm:text-lg">
+              </div>
+            </div>
+            <div class="flex-1 flex items-center p-3 sm:p-4 md:p-5 hover:bg-gray-50/50 transition-all group/input">
+              <i
+                class="fa-solid fa-bus text-gray-400 text-lg sm:text-xl mr-3 sm:mr-5 rotate-180 group-focus-within/input:text-[#d84e55]"></i>
+              <div class="flex flex-col text-left">
+                <label
+                  class="text-[9px] sm:text-[10px] text-gray-400 font-black uppercase tracking-widest mb-0.5">To</label>
+                <input type="text" id="home_to" name="destination" placeholder="Destination City"
+                  class="w-full outline-none text-gray-800 font-bold placeholder:text-gray-300 bg-transparent text-base sm:text-lg">
+              </div>
+            </div>
+          </div>
+
+          <!-- Box 2: Date of Journey -->
+          <div
+            class="flex-1 flex items-center p-3 sm:p-4 md:p-5 border border-gray-200 rounded-lg sm:rounded-xl bg-white hover:bg-gray-50/50 transition-all group/box2 lg:min-w-[180px] cursor-pointer">
+            <i
+              class="fa-solid fa-calendar-day text-gray-400 text-lg sm:text-xl mr-3 sm:mr-5 group-focus-within/box2:text-[#d84e55]"></i>
+            <div class="flex flex-col text-left">
+              <label
+                class="text-[9px] sm:text-[10px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Date</label>
+              <input type="text" id="datePicker" name="date" value="06 May, 2026"
+                class="outline-none text-gray-800 font-bold bg-transparent text-base sm:text-lg cursor-pointer w-full">
+            </div>
+          </div>
+
+          <!-- Box 3: Pickup Time -->
+          <div
+            class="flex-1 flex items-center p-3 sm:p-4 md:p-5 border border-gray-200 rounded-lg sm:rounded-xl bg-white hover:bg-gray-50/50 transition-all group/box3 lg:min-w-[180px] cursor-pointer">
+            <i
+              class="fa-solid fa-clock text-gray-400 text-lg sm:text-xl mr-3 sm:mr-5 group-focus-within/box3:text-[#d84e55]"></i>
+            <div class="flex flex-col text-left w-full">
+              <label
+                class="text-[9px] sm:text-[10px] text-gray-400 font-black uppercase tracking-widest mb-0.5">Time</label>
+              <select name="pickup_time" class="outline-none text-gray-800 font-bold bg-transparent text-base sm:text-lg cursor-pointer w-full appearance-none">
+                  <option value="06:00 AM to 08:00 AM">06:00 AM to 08:00 AM</option>
+                  <option value="08:00 AM to 10:00 AM">08:00 AM to 10:00 AM</option>
+                  <option value="10:00 AM to 12:00 PM">10:00 AM to 12:00 PM</option>
+                  <option value="12:00 PM to 02:00 PM">12:00 PM to 02:00 PM</option>
+                  <option value="02:00 PM to 04:00 PM">02:00 PM to 04:00 PM</option>
+                  <option value="04:00 PM to 06:00 PM">04:00 PM to 06:00 PM</option>
+                  <option value="06:00 PM to 08:00 PM">06:00 PM to 08:00 PM</option>
+                  <option value="08:00 PM to 10:00 PM">08:00 PM to 10:00 PM</option>
+                  <option value="10:00 PM to 12:00 AM">10:00 PM to 12:00 AM</option>
+                  <option value="12:00 AM to 06:00 AM">12:00 AM to 06:00 AM</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Responsive Search Button -->
+          <div class="flex-none flex items-stretch">
             <button type="submit"
-                    class="bg-[#eb2e2e] hover:bg-[#d82626] text-white font-bold px-10 py-3 rounded-full shadow-lg transition duration-200 text-base">
-              <i class="fa-solid fa-magnifying-glass mr-2"></i> Search 
+              class="w-full lg:w-auto bg-gradient-to-r from-[#d84e55] to-[#c13d44] hover:from-[#c13d44] hover:to-[#ac343a] text-white font-black py-3 sm:py-0 px-8 sm:px-12 rounded-lg sm:rounded-xl shadow-[0_8px_20px_rgba(216,78,85,0.3)] hover:shadow-[0_12px_25px_rgba(216,78,85,0.4)] transition-all transform active:scale-[0.98] flex items-center justify-center gap-3 lg:min-w-[200px] text-base sm:text-xl uppercase tracking-widest border-b-4 border-black/15">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              Search
             </button>
           </div>
-        </div>
 
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </section>
+<!-- Initialization Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Swiper Init
+    new Swiper(".heroSwiper", {
+      loop: true,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+      },
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+      effect: 'fade',
+      fadeEffect: {
+        crossFade: true
+      },
+    });
 
+    // Flatpickr Init
+    if (typeof flatpickr !== 'undefined') {
+      flatpickr("#datePicker", {
+        dateFormat: "d M, Y",
+        minDate: "today",
+        defaultDate: "today",
+        disableMobile: "true"
+      });
+    }
 
+    // Google Places Autocomplete for Homepage
+    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+      const homeFrom = document.getElementById('home_from');
+      const homeTo = document.getElementById('home_to');
+      
+      const options = {
+        types: ['(cities)'],
+        componentRestrictions: { country: "in" }
+      };
 
+      new google.maps.places.Autocomplete(homeFrom, options);
+      new google.maps.places.Autocomplete(homeTo, options);
 
+      // Fix: Close autocomplete on scroll to prevent it from floating away
+      window.addEventListener('scroll', () => {
+        if (document.activeElement === homeFrom || document.activeElement === homeTo) {
+          document.activeElement.blur();
+        }
+      });
+
+      // Width sync: Make dropdown match input width
+      const syncWidth = () => {
+        const pac = document.querySelector('.pac-container');
+        if (pac && document.activeElement && (document.activeElement === homeFrom || document.activeElement === homeTo)) {
+          // Find the container box for width
+          const container = document.activeElement.closest('.group\\/input') || document.activeElement.closest('.group');
+          if (container) {
+            pac.style.width = container.offsetWidth + 'px';
+          }
+        }
+      };
+      homeFrom.addEventListener('focus', () => setTimeout(syncWidth, 10));
+      homeTo.addEventListener('focus', () => setTimeout(syncWidth, 10));
+      window.addEventListener('resize', syncWidth);
+    }
+  });
+</script>

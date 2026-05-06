@@ -55,9 +55,9 @@ return new class extends Migration
 
             // ─── Schedule ─────────────────────────────────────────────────
             $table->date('pickup_date');
-            $table->time('pickup_time');
+            $table->string('pickup_time');
             $table->date('return_date')->nullable();
-            $table->time('return_time')->nullable();
+            $table->string('return_time')->nullable();
 
             // ─── Passengers & Bags ────────────────────────────────────────
             $table->unsignedTinyInteger('passengers')->default(1);

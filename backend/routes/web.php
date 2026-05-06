@@ -10,6 +10,7 @@ use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\CarTypeController;
 use App\Http\Controllers\CabOrderWebController;
+use App\Http\Controllers\SliderController;
 
 
 Route::prefix('panel')->group(function () {
@@ -108,6 +109,12 @@ Route::prefix('panel')->group(function () {
         # Sliders Management
         Route::prefix('sliders')->group(function () {
             Route::get('/', function () { return view('sliders.index'); })->name('sliders.index');
+            Route::get('/data', [SliderController::class, 'index'])->name('sliders.data');
+            Route::post('/store', [SliderController::class, 'store'])->name('sliders.store');
+            Route::get('/{id}/edit', [SliderController::class, 'edit'])->name('sliders.edit');
+            Route::post('/{id}/update', [SliderController::class, 'update'])->name('sliders.update'); // using POST for file uploads
+            Route::delete('/{id}', [SliderController::class, 'destroy'])->name('sliders.destroy');
+            Route::post('/{id}/changeStatus', [SliderController::class, 'changeStatus'])->name('sliders.changeStatus');
         });
 
         # Settings

@@ -71,9 +71,9 @@ class CabOrderController extends Controller
 
             // Schedule
             'pickup_date' => 'required|date',
-            'pickup_time' => 'required|date_format:H:i',
+            'pickup_time' => 'required|string',
             'return_date' => 'nullable|date',
-            'return_time' => 'nullable|date_format:H:i',
+            'return_time' => 'nullable|string',
 
             // Passengers
             'passengers' => 'nullable|integer|min:1',
@@ -111,8 +111,9 @@ class CabOrderController extends Controller
 
             // ─── Resolve customer details ──────────────────────────
             $customerId = $customer?->id ?? null;
-            $customerName = $customer?->name ?? $request->customer_name;
-            $customerMobile = $customer?->mobile ?? $request->customer_mobile;
+            // Prioritize name/mobile from the form (for booking on behalf of others)
+            $customerName = $request->customer_name ?: ($customer?->name ?? 'Guest');
+            $customerMobile = $request->customer_mobile ?: ($customer?->mobile ?? 'N/A');
 
             // ─── Fetch car snapshot ────────────────────────────────
             $car = Car::findOrFail($request->car_id);
