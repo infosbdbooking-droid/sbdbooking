@@ -10,7 +10,7 @@
             <!-- Logo -->
             <div class="h-16 flex items-center justify-center border-b">
                 <a href="{{ route('dashboard') }}">
-                    <img src="{{ asset('/public/images/logo/' . session('logo')) }}" alt="Logo" class="h-10">
+                    <img src="{{ asset('images/logo/' . session('logo')) }}" alt="Logo" class="h-10">
                 </a>
             </div>
 
@@ -19,7 +19,7 @@
 
                 @can('dashboard')
                             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                                               {{ request()->is('dashboard')
+                                                           {{ request()->is('dashboard')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                 <i class="fas fa-home text-base"></i>
@@ -30,7 +30,7 @@
                 @can('manage_orders')
                             <div x-data="{ open: {{ Request::is('orders*') || Request::is('cab-orders*') ? 'true' : 'false' }} }">
                                 <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2 rounded-lg transition
-                                                    {{ Request::is('orders*') || Request::is('cab-orders*')
+                                                                {{ Request::is('orders*') || Request::is('cab-orders*')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                     <div class="flex items-center gap-3">
@@ -43,7 +43,7 @@
 
                                 <div x-show="open" x-transition class="mt-1 pl-8 space-y-1">
                                     <a href="{{ route('cabOrders') }}" class="flex items-center gap-2 px-3 py-2 rounded-md text-sm
-                                                       {{ Request::is('cab-orders*')
+                                                                   {{ Request::is('cab-orders*')
                     ? 'bg-blue-100 text-blue-600'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                         <i class="fas fa-taxi"></i>
@@ -55,7 +55,7 @@
 
                 @can('charges_type')
                             <a href="{{ route('chargesType') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                                               {{ request()->is('chargesType')
+                                                           {{ request()->is('chargesType')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                 <i class="fas fa-layer-group"></i>
@@ -65,7 +65,7 @@
 
                 @can('car')
                             <a href="{{ route('car') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                                               {{ request()->is('car')
+                                                           {{ request()->is('car')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                 <i class="fas fa-car"></i>
@@ -75,7 +75,7 @@
 
                 @can('car_type')
                             <a href="{{ route('carType') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                                                {{ request()->is('carType')
+                                                            {{ request()->is('carType')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                 <i class="fas fa-car-side"></i>
@@ -85,7 +85,7 @@
 
                 @can('sliders')
                             <a href="{{ route('sliders.index') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                                                {{ request()->is('sliders*')
+                                                            {{ request()->is('sliders*')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                 <i class="fas fa-images"></i>
@@ -96,7 +96,7 @@
                 @can('access')
                             <div x-data="{ open: {{ Request::is('access*') ? 'true' : 'false' }} }">
                                 <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2 rounded-lg transition
-                                                    {{ Request::is('access*')
+                                                                {{ Request::is('access*')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                     <div class="flex items-center gap-3">
@@ -125,7 +125,7 @@
 
                 @can('settings')
                             <a href="{{ route('settings') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg transition
-                                               {{ request()->is('settings*')
+                                                           {{ request()->is('settings*')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-gray-600 hover:bg-blue-50' }}">
                                 <i class="fas fa-cog"></i>

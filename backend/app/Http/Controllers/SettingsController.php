@@ -77,12 +77,12 @@ class SettingsController extends Controller
 
 
             if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
-                if ($settings->logo && Storage::exists('public/images/logo' . $settings->logo)) {
-                    Storage::delete('public/images/logo' . $settings->logo);
+                if ($settings->logo && file_exists(public_path('images/logo/' . $settings->logo))) {
+                    unlink(public_path('images/logo/' . $settings->logo));
                 }
                 $logo = $request->file('logo');
                 $logoName = 'logo-' . uniqid() . '.' . $logo->getClientOriginalExtension();
-                $logo->move(public_path('public/images/logo'), $logoName);
+                $logo->move(public_path('images/logo'), $logoName);
                 $settings->logo = $logoName;
             }
 

@@ -432,7 +432,7 @@
                         name: 'car_photos',
                         render: function (data) {
                             return data
-                                ? `<img src="{{ asset('public/images/car') }}/${data}" width="50" height="50" class="mx-auto" />`
+                                ? `<img src="{{ asset('images/car') }}/${data}" width="50" height="50" class="mx-auto" />`
                                 : 'No Icon';
                         }
                     },
@@ -443,11 +443,11 @@
                             const label = row.status === 1 ? 'Active' : 'Inactive';
                             const toggleClass = row.status === 1 ? 'bg-green-500' : 'bg-red-400';
                             return `
-                               <button class="toggle-status px-3 py-1 text-white rounded ${toggleClass}" 
-                                   data-id="${row.id}" data-status="${row.status}">
-                                   ${label}
-                               </button>
-                           `;
+                                   <button class="toggle-status px-3 py-1 text-white rounded ${toggleClass}" 
+                                       data-id="${row.id}" data-status="${row.status}">
+                                       ${label}
+                                   </button>
+                               `;
                         }
                     },
                     {
@@ -457,15 +457,15 @@
                         searchable: false,
                         render: function (data, type, row) {
                             return `
-                                   <div class="flex space-x-2 justify-center">
-                                       <button type="button" class="edit-btn px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm" data-id="${row.id}">
-                                           Edit
-                                       </button>
-                                       <button type="button" class="delete-btn px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm" data-id="${row.id}">
-                                           Delete
-                                       </button>
-                                   </div>
-                               `;
+                                       <div class="flex space-x-2 justify-center">
+                                           <button type="button" class="edit-btn px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm" data-id="${row.id}">
+                                               Edit
+                                           </button>
+                                           <button type="button" class="delete-btn px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm" data-id="${row.id}">
+                                               Delete
+                                           </button>
+                                       </div>
+                                   `;
                         }
                     }
                 ]
@@ -473,13 +473,13 @@
 
             $('#addBookingInclude').on('click', function () {
                 $('#bookingIncludesWrap').append(`
-                   <div class="flex gap-2 mt-2">
-                       <input type="text" name="booking_includes[]"
-                           class="w-full border border-gray-300 rounded px-3 py-2"
-                           placeholder="Include item">
-                       <button type="button" class="removeInclude text-red-500">✕</button>
-                   </div>
-               `);
+                       <div class="flex gap-2 mt-2">
+                           <input type="text" name="booking_includes[]"
+                               class="w-full border border-gray-300 rounded px-3 py-2"
+                               placeholder="Include item">
+                           <button type="button" class="removeInclude text-red-500">✕</button>
+                       </div>
+                   `);
             });
 
             $(document).on('click', '.removeInclude', function () {
@@ -488,13 +488,13 @@
 
             $('#addWhyBook').on('click', function () {
                 $('#whyBookWrap').append(`
-                   <div class="flex gap-2 mt-2">
-                       <input type="text" name="why_book_us[]"
-                           class="w-full border border-gray-300 rounded px-3 py-2"
-                           placeholder="Reason">
-                       <button type="button" class="removeWhyBook text-red-500">✕</button>
-                   </div>
-               `);
+                       <div class="flex gap-2 mt-2">
+                           <input type="text" name="why_book_us[]"
+                               class="w-full border border-gray-300 rounded px-3 py-2"
+                               placeholder="Reason">
+                           <button type="button" class="removeWhyBook text-red-500">✕</button>
+                       </div>
+                   `);
             });
 
             $(document).on('click', '.removeWhyBook', function () {
@@ -506,22 +506,22 @@
 
             $('#addTripPolicy').on('click', function () {
                 $('#tripPoliciesWrap').append(`
-                <div class="policy-item border rounded p-3 mb-3 bg-gray-50">
-                    <input type="text"
-                        name="trip_policies[${tripPolicyIndex}][question]"
-                        class="w-full border border-gray-300 rounded px-3 py-2 mb-2"
-                        placeholder="Question">
+                    <div class="policy-item border rounded p-3 mb-3 bg-gray-50">
+                        <input type="text"
+                            name="trip_policies[${tripPolicyIndex}][question]"
+                            class="w-full border border-gray-300 rounded px-3 py-2 mb-2"
+                            placeholder="Question">
 
-                    <textarea name="trip_policies[${tripPolicyIndex}][answer]"
-                        class="w-full border border-gray-300 rounded px-3 py-2"
-                        rows="2"
-                        placeholder="Answer"></textarea>
+                        <textarea name="trip_policies[${tripPolicyIndex}][answer]"
+                            class="w-full border border-gray-300 rounded px-3 py-2"
+                            rows="2"
+                            placeholder="Answer"></textarea>
 
-                    <button type="button" class="removeRow text-sm text-red-600 mt-2">
-                        Remove
-                    </button>
-                </div>
-            `);
+                        <button type="button" class="removeRow text-sm text-red-600 mt-2">
+                            Remove
+                        </button>
+                    </div>
+                `);
                 tripPolicyIndex++;
             });
 
@@ -530,29 +530,29 @@
 
             $('#addReview').on('click', function () {
                 $('#recentReviewsWrap').append(`
-                <div class="review-item border rounded p-3 mb-3 bg-gray-50">
-                    <div class="flex space-x-2 mb-2">
-                        <input type="text"
-                            name="recent_reviews[${reviewIndex}][name]"
-                            class="w-1/2 border rounded px-2 py-2"
-                            placeholder="User name">
+                    <div class="review-item border rounded p-3 mb-3 bg-gray-50">
+                        <div class="flex space-x-2 mb-2">
+                            <input type="text"
+                                name="recent_reviews[${reviewIndex}][name]"
+                                class="w-1/2 border rounded px-2 py-2"
+                                placeholder="User name">
 
-                        <input type="number"
-                            name="recent_reviews[${reviewIndex}][rating]"
-                            class="w-1/4 border rounded px-2 py-2"
-                            placeholder="Stars (1–5)">
+                            <input type="number"
+                                name="recent_reviews[${reviewIndex}][rating]"
+                                class="w-1/4 border rounded px-2 py-2"
+                                placeholder="Stars (1–5)">
+                        </div>
+
+                        <textarea name="recent_reviews[${reviewIndex}][comment]"
+                            class="w-full border rounded px-3 py-2"
+                            rows="2"
+                            placeholder="Review comment"></textarea>
+
+                        <button type="button" class="removeRow text-sm text-red-600 mt-2">
+                            Remove
+                        </button>
                     </div>
-
-                    <textarea name="recent_reviews[${reviewIndex}][comment]"
-                        class="w-full border rounded px-3 py-2"
-                        rows="2"
-                        placeholder="Review comment"></textarea>
-
-                    <button type="button" class="removeRow text-sm text-red-600 mt-2">
-                        Remove
-                    </button>
-                </div>
-            `);
+                `);
                 reviewIndex++;
             });
 
@@ -568,66 +568,66 @@
 
             $('#addCarCharge').on('click', function () {
                 const html = `
-               <div class="border rounded p-4 mb-3 bg-gray-50 car-charge-row">
-                   <div class="grid grid-cols-2 gap-4">
-                       <div>
-                           <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Type</label>
-                           <select name="car_charges[charges_type_id][]"
-                               class="charges_type_select w-full border rounded px-3 py-2"></select>
+                   <div class="border rounded p-4 mb-3 bg-gray-50 car-charge-row">
+                       <div class="grid grid-cols-2 gap-4">
+                           <div>
+                               <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Type</label>
+                               <select name="car_charges[charges_type_id][]"
+                                   class="charges_type_select w-full border rounded px-3 py-2"></select>
+                           </div>
+                           <div>
+                               <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Title</label>
+                               <input type="text" name="car_charges[title][]"
+                                   class="w-full border rounded px-3 py-2"
+                                   placeholder="e.g. Night Charge / Extra KM">
+                           </div>
+                           <div>
+                               <label class="text-xs font-medium text-gray-600 mb-1 block">Amount (₹)</label>
+                               <input type="number" step="0.01" name="car_charges[amount][]"
+                                   class="w-full border rounded px-3 py-2"
+                                   placeholder="e.g. 150">
+                           </div>
+                           <div>
+                               <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Unit</label>
+                               <select name="car_charges[charge_unit][]"
+                                   class="charge_unit w-full border rounded px-3 py-2">
+                                   <option value="0">Flat</option>
+                                   <option value="1">Per KM</option>
+                                   <option value="2">Per Hour</option>
+                               </select>
+                           </div>
+                           <div>
+                               <label class="text-xs font-medium text-gray-600 mb-1 block">Free Wait (min)</label>
+                               <input type="number" name="car_charges[free_wait_minutes][]"
+                                   class="w-full border rounded px-3 py-2"
+                                   placeholder="e.g. 5">
+                           </div>
+                           <div>
+                               <label class="text-xs font-medium text-gray-600 mb-1 block">Wait Charge Unit</label>
+                               <select name="car_charges[wait_charge_unit][]"
+                                   class="w-full border rounded px-3 py-2">
+                                   <option value="0">Per Minute</option>
+                                   <option value="1">Per Hour</option>
+                               </select>
+                           </div>
+                           <div>
+                               <label class="text-xs font-medium text-gray-600 mb-1 block">Min KM</label>
+                               <input type="number" name="car_charges[min_km][]"
+                                   class="w-full border rounded px-3 py-2"
+                                   placeholder="0">
+                           </div>
+                           <div>
+                               <label class="text-xs font-medium text-gray-600 mb-1 block">Max KM</label>
+                               <input type="number" name="car_charges[max_km][]"
+                                   class="w-full border rounded px-3 py-2"
+                                   placeholder="10">
+                           </div>
                        </div>
-                       <div>
-                           <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Title</label>
-                           <input type="text" name="car_charges[title][]"
-                               class="w-full border rounded px-3 py-2"
-                               placeholder="e.g. Night Charge / Extra KM">
-                       </div>
-                       <div>
-                           <label class="text-xs font-medium text-gray-600 mb-1 block">Amount (₹)</label>
-                           <input type="number" step="0.01" name="car_charges[amount][]"
-                               class="w-full border rounded px-3 py-2"
-                               placeholder="e.g. 150">
-                       </div>
-                       <div>
-                           <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Unit</label>
-                           <select name="car_charges[charge_unit][]"
-                               class="charge_unit w-full border rounded px-3 py-2">
-                               <option value="0">Flat</option>
-                               <option value="1">Per KM</option>
-                               <option value="2">Per Hour</option>
-                           </select>
-                       </div>
-                       <div>
-                           <label class="text-xs font-medium text-gray-600 mb-1 block">Free Wait (min)</label>
-                           <input type="number" name="car_charges[free_wait_minutes][]"
-                               class="w-full border rounded px-3 py-2"
-                               placeholder="e.g. 5">
-                       </div>
-                       <div>
-                           <label class="text-xs font-medium text-gray-600 mb-1 block">Wait Charge Unit</label>
-                           <select name="car_charges[wait_charge_unit][]"
-                               class="w-full border rounded px-3 py-2">
-                               <option value="0">Per Minute</option>
-                               <option value="1">Per Hour</option>
-                           </select>
-                       </div>
-                       <div>
-                           <label class="text-xs font-medium text-gray-600 mb-1 block">Min KM</label>
-                           <input type="number" name="car_charges[min_km][]"
-                               class="w-full border rounded px-3 py-2"
-                               placeholder="0">
-                       </div>
-                       <div>
-                           <label class="text-xs font-medium text-gray-600 mb-1 block">Max KM</label>
-                           <input type="number" name="car_charges[max_km][]"
-                               class="w-full border rounded px-3 py-2"
-                               placeholder="10">
-                       </div>
-                   </div>
-                   <button type="button"
-                       class="removeCarCharge text-red-500 text-sm mt-3">
-                       Remove Charge
-                   </button>
-               </div>`;
+                       <button type="button"
+                           class="removeCarCharge text-red-500 text-sm mt-3">
+                           Remove Charge
+                       </button>
+                   </div>`;
                 $('#carChargesWrap').append(html);
                 const row = $('#carChargesWrap .car-charge-row').last();
                 // load charge types and then set defaults for this row
@@ -815,11 +815,11 @@
                         if (data.booking_includes && data.booking_includes.length) {
                             data.booking_includes.forEach(function (item) {
                                 $('#bookingIncludesWrap').append(`
-                                   <div class="flex gap-2 mt-2">
-                                       <input type="text" name="booking_includes[]" class="w-full border border-gray-300 rounded px-3 py-2" value="${escapeHtml(item)}">
-                                       <button type="button" class="removeInclude text-red-500">✕</button>
-                                   </div>
-                               `);
+                                       <div class="flex gap-2 mt-2">
+                                           <input type="text" name="booking_includes[]" class="w-full border border-gray-300 rounded px-3 py-2" value="${escapeHtml(item)}">
+                                           <button type="button" class="removeInclude text-red-500">✕</button>
+                                       </div>
+                                   `);
                             });
                         } else {
                             $('#bookingIncludesWrap').append(`<input type="text" name="booking_includes[]" class="w-full mt-2 border border-gray-300 rounded px-3 py-2" placeholder="e.g. Professional driver">`);
@@ -828,11 +828,11 @@
                         if (data.why_book_us && data.why_book_us.length) {
                             data.why_book_us.forEach(function (item) {
                                 $('#whyBookWrap').append(`
-                                   <div class="flex gap-2 mt-2">
-                                       <input type="text" name="why_book_us[]" class="w-full border border-gray-300 rounded px-3 py-2" value="${escapeHtml(item)}">
-                                       <button type="button" class="removeWhyBook text-red-500">✕</button>
-                                   </div>
-                               `);
+                                       <div class="flex gap-2 mt-2">
+                                           <input type="text" name="why_book_us[]" class="w-full border border-gray-300 rounded px-3 py-2" value="${escapeHtml(item)}">
+                                           <button type="button" class="removeWhyBook text-red-500">✕</button>
+                                       </div>
+                                   `);
                             });
                         } else {
                             $('#whyBookWrap').append(`<input type="text" name="why_book_us[]" class="w-full mt-2 border border-gray-300 rounded px-3 py-2" placeholder="e.g. Assured on-time pickup">`);
@@ -842,22 +842,22 @@
                         if (data.trip_policies && data.trip_policies.length) {
                             data.trip_policies.forEach(function (policy, idx) {
                                 $('#tripPoliciesWrap').append(`
-                                   <div class="policy-item border rounded p-3 mb-3 bg-gray-50">
-                                       <input type="text" name="trip_policies[${idx}][question]" class="w-full border border-gray-300 rounded px-3 py-2 mb-2" placeholder="Question" value="${escapeHtml(policy.question)}">
-                                       <textarea name="trip_policies[${idx}][answer]" class="w-full border border-gray-300 rounded px-3 py-2" rows="2" placeholder="Answer">${escapeHtml(policy.answer)}</textarea>
-                                       <button type="button" class="removeRow text-sm text-red-600 mt-2">Remove</button>
-                                   </div>
-                               `);
+                                       <div class="policy-item border rounded p-3 mb-3 bg-gray-50">
+                                           <input type="text" name="trip_policies[${idx}][question]" class="w-full border border-gray-300 rounded px-3 py-2 mb-2" placeholder="Question" value="${escapeHtml(policy.question)}">
+                                           <textarea name="trip_policies[${idx}][answer]" class="w-full border border-gray-300 rounded px-3 py-2" rows="2" placeholder="Answer">${escapeHtml(policy.answer)}</textarea>
+                                           <button type="button" class="removeRow text-sm text-red-600 mt-2">Remove</button>
+                                       </div>
+                                   `);
                                 localTripIndex = idx + 1;
                             });
                         } else {
                             $('#tripPoliciesWrap').append(`
-                               <div class="policy-item border rounded p-3 mb-3 bg-gray-50">
-                                   <input type="text" name="trip_policies[0][question]" class="w-full border border-gray-300 rounded px-3 py-2 mb-2" placeholder="Question">
-                                   <textarea name="trip_policies[0][answer]" class="w-full border border-gray-300 rounded px-3 py-2" rows="2" placeholder="Answer"></textarea>
-                                   <button type="button" class="removeRow text-sm text-red-600 mt-2">Remove</button>
-                               </div>
-                           `);
+                                   <div class="policy-item border rounded p-3 mb-3 bg-gray-50">
+                                       <input type="text" name="trip_policies[0][question]" class="w-full border border-gray-300 rounded px-3 py-2 mb-2" placeholder="Question">
+                                       <textarea name="trip_policies[0][answer]" class="w-full border border-gray-300 rounded px-3 py-2" rows="2" placeholder="Answer"></textarea>
+                                       <button type="button" class="removeRow text-sm text-red-600 mt-2">Remove</button>
+                                   </div>
+                               `);
                             localTripIndex = 1;
                         }
                         tripPolicyIndex = localTripIndex;
@@ -866,28 +866,28 @@
                         if (data.recent_reviews && data.recent_reviews.length) {
                             data.recent_reviews.forEach(function (rev, idx) {
                                 $('#recentReviewsWrap').append(`
-                                   <div class="review-item border rounded p-3 mb-3 bg-gray-50">
-                                       <div class="flex space-x-2 mb-2">
-                                           <input type="text" name="recent_reviews[${idx}][name]" class="w-1/2 border rounded px-2 py-2" placeholder="User name" value="${escapeHtml(rev.name)}">
-                                           <input type="number" name="recent_reviews[${idx}][rating]" class="w-1/4 border rounded px-2 py-2" placeholder="Stars (1–5)" value="${escapeHtml(rev.rating)}">
+                                       <div class="review-item border rounded p-3 mb-3 bg-gray-50">
+                                           <div class="flex space-x-2 mb-2">
+                                               <input type="text" name="recent_reviews[${idx}][name]" class="w-1/2 border rounded px-2 py-2" placeholder="User name" value="${escapeHtml(rev.name)}">
+                                               <input type="number" name="recent_reviews[${idx}][rating]" class="w-1/4 border rounded px-2 py-2" placeholder="Stars (1–5)" value="${escapeHtml(rev.rating)}">
+                                           </div>
+                                           <textarea name="recent_reviews[${idx}][comment]" class="w-full border rounded px-3 py-2" rows="2" placeholder="Review comment">${escapeHtml(rev.comment)}</textarea>
+                                           <button type="button" class="removeRow text-sm text-red-600 mt-2">Remove</button>
                                        </div>
-                                       <textarea name="recent_reviews[${idx}][comment]" class="w-full border rounded px-3 py-2" rows="2" placeholder="Review comment">${escapeHtml(rev.comment)}</textarea>
-                                       <button type="button" class="removeRow text-sm text-red-600 mt-2">Remove</button>
-                                   </div>
-                               `);
+                                   `);
                                 localReviewIndex = idx + 1;
                             });
                         } else {
                             $('#recentReviewsWrap').append(`
-                               <div class="review-item border rounded p-3 mb-3 bg-gray-50">
-                                   <div class="flex space-x-2 mb-2">
-                                       <input type="text" name="recent_reviews[0][name]" class="w-1/2 border rounded px-2 py-2" placeholder="User name">
-                                       <input type="number" name="recent_reviews[0][rating]" class="w-1/4 border rounded px-2 py-2" placeholder="Stars (1–5)">
+                                   <div class="review-item border rounded p-3 mb-3 bg-gray-50">
+                                       <div class="flex space-x-2 mb-2">
+                                           <input type="text" name="recent_reviews[0][name]" class="w-1/2 border rounded px-2 py-2" placeholder="User name">
+                                           <input type="number" name="recent_reviews[0][rating]" class="w-1/4 border rounded px-2 py-2" placeholder="Stars (1–5)">
+                                       </div>
+                                       <textarea name="recent_reviews[0][comment]" class="w-full border rounded px-3 py-2" rows="2" placeholder="Review comment"></textarea>
+                                       <button type="button" class="removeRow text-sm text-red-600 mt-2">Remove</button>
                                    </div>
-                                   <textarea name="recent_reviews[0][comment]" class="w-full border rounded px-3 py-2" rows="2" placeholder="Review comment"></textarea>
-                                   <button type="button" class="removeRow text-sm text-red-600 mt-2">Remove</button>
-                               </div>
-                           `);
+                               `);
                             localReviewIndex = 1;
                         }
                         reviewIndex = localReviewIndex;
@@ -895,50 +895,50 @@
                         if (data.charges && data.charges.length) {
                             data.charges.forEach(function (charge) {
                                 const html = `
-                                   <div class="border rounded p-4 mb-3 bg-gray-50 car-charge-row">
-                                       <div class="grid grid-cols-2 gap-4">
-                                           <div>
-                                               <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Type</label>
-                                               <select name="car_charges[charges_type_id][]" class="charges_type_select w-full border border-gray-300 rounded px-3 py-2"></select>
+                                       <div class="border rounded p-4 mb-3 bg-gray-50 car-charge-row">
+                                           <div class="grid grid-cols-2 gap-4">
+                                               <div>
+                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Type</label>
+                                                   <select name="car_charges[charges_type_id][]" class="charges_type_select w-full border border-gray-300 rounded px-3 py-2"></select>
+                                               </div>
+                                               <div>
+                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Title</label>
+                                                   <input type="text" name="car_charges[title][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. Night Charge / Toll Charge" value="${escapeHtml(charge.title)}">
+                                               </div>
+                                               <div>
+                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Amount (₹)</label>
+                                                   <input type="number" step="0.01" name="car_charges[amount][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 150" value="${escapeHtml(charge.amount)}">
+                                               </div>
+                                               <div>
+                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Unit</label>
+                                                   <select name="car_charges[charge_unit][]" class="w-full border border-gray-300 rounded px-3 py-2">
+                                                       <option value="0">Flat</option>
+                                                       <option value="1">Per KM</option>
+                                                       <option value="2">Per Hour</option>
+                                                   </select>
+                                               </div>
+                                               <div>
+                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Free Waiting Minutes</label>
+                                                   <input type="number" name="car_charges[free_wait_minutes][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 5" value="${escapeHtml(charge.free_wait_minutes)}">
+                                               </div>
+                                               <div>
+                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Waiting Charge Unit</label>
+                                                   <select name="car_charges[wait_charge_unit][]" class="w-full border border-gray-300 rounded px-3 py-2">
+                                                       <option value="0">Per Minute</option>
+                                                       <option value="1">Per Hour</option>
+                                                   </select>
+                                               </div>
+                                               <div>
+                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Minimum KM</label>
+                                                   <input type="number" name="car_charges[min_km][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 0" value="${escapeHtml(charge.min_km)}">
+                                               </div>
+                                               <div>
+                                                   <label class="text-xs font-medium text-gray-600 mb-1 block">Maximum KM</label>
+                                                   <input type="number" name="car_charges[max_km][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 10" value="${escapeHtml(charge.max_km)}">
+                                               </div>
                                            </div>
-                                           <div>
-                                               <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Title</label>
-                                               <input type="text" name="car_charges[title][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. Night Charge / Toll Charge" value="${escapeHtml(charge.title)}">
-                                           </div>
-                                           <div>
-                                               <label class="text-xs font-medium text-gray-600 mb-1 block">Amount (₹)</label>
-                                               <input type="number" step="0.01" name="car_charges[amount][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 150" value="${escapeHtml(charge.amount)}">
-                                           </div>
-                                           <div>
-                                               <label class="text-xs font-medium text-gray-600 mb-1 block">Charge Unit</label>
-                                               <select name="car_charges[charge_unit][]" class="w-full border border-gray-300 rounded px-3 py-2">
-                                                   <option value="0">Flat</option>
-                                                   <option value="1">Per KM</option>
-                                                   <option value="2">Per Hour</option>
-                                               </select>
-                                           </div>
-                                           <div>
-                                               <label class="text-xs font-medium text-gray-600 mb-1 block">Free Waiting Minutes</label>
-                                               <input type="number" name="car_charges[free_wait_minutes][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 5" value="${escapeHtml(charge.free_wait_minutes)}">
-                                           </div>
-                                           <div>
-                                               <label class="text-xs font-medium text-gray-600 mb-1 block">Waiting Charge Unit</label>
-                                               <select name="car_charges[wait_charge_unit][]" class="w-full border border-gray-300 rounded px-3 py-2">
-                                                   <option value="0">Per Minute</option>
-                                                   <option value="1">Per Hour</option>
-                                               </select>
-                                           </div>
-                                           <div>
-                                               <label class="text-xs font-medium text-gray-600 mb-1 block">Minimum KM</label>
-                                               <input type="number" name="car_charges[min_km][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 0" value="${escapeHtml(charge.min_km)}">
-                                           </div>
-                                           <div>
-                                               <label class="text-xs font-medium text-gray-600 mb-1 block">Maximum KM</label>
-                                               <input type="number" name="car_charges[max_km][]" class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 10" value="${escapeHtml(charge.max_km)}">
-                                           </div>
-                                       </div>
-                                       <button type="button" class="removeCarCharge text-red-500 text-sm mt-3">Remove Charge</button>
-                                   </div>`;
+                                           <button type="button" class="removeCarCharge text-red-500 text-sm mt-3">Remove Charge</button>
+                                       </div>`;
                                 $('#carChargesWrap').append(html);
                             });
                             fetchChargesTypes().done(function () {

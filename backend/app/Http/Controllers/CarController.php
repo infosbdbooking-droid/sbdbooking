@@ -148,10 +148,9 @@ class CarController extends Controller
             if ($request->hasFile('car_photos')) {
                 $photo = $request->file('car_photos');
                 $photoName = 'car-' . uniqid() . '.' . $photo->getClientOriginalExtension();
-                $photo->storeAs('public/images/car', $photoName);
+                $photo->move(public_path('images/car'), $photoName);
                 $car->car_photos = $photoName;
             }
-
             $car->save();
 
             /* =======================
@@ -291,12 +290,12 @@ class CarController extends Controller
             $car->recent_reviews = json_encode($request->recent_reviews);
             /* ================= IMAGE UPDATE ================= */
             if ($request->hasFile('car_photos')) {
-                if ($car->car_photos && file_exists(public_path('public/images/car/' . $car->car_photos))) {
-                    unlink(public_path('public/images/car/' . $car->car_photos));
+                if ($car->car_photos && file_exists(public_path('images/car/' . $car->car_photos))) {
+                    unlink(public_path('images/car/' . $car->car_photos));
                 }
                 $photo = $request->file('car_photos');
                 $photoName = 'car-' . uniqid() . '.' . $photo->getClientOriginalExtension();
-                $photo->move(public_path('public/images/car'), $photoName);
+                $photo->move(public_path('images/car'), $photoName);
                 $car->car_photos = $photoName;
             }
             $car->save();
