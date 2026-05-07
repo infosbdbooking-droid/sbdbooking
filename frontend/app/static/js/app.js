@@ -12,10 +12,125 @@ $(document).ready(function () {
         }
     }
 
+    // =====================================================
+    // LOAD DYNAMIC SETTINGS (LOGO, CONTACT, SOCIAL)
+    // =====================================================
+    (function loadDynamicSettings() {
+        // Use API_BASE_URL from Flask template (injected in footer)
+        const apiBaseUrl = window.API_BASE_URL;
+        
+        if (!apiBaseUrl) {
+            console.warn("⚠️ API_BASE_URL not found in window. Settings won't load.");
+            return;
+        }
+        
+        $.ajax({
+            url: apiBaseUrl + "/settings",
+            type: "GET",
+            contentType: "application/json",
+            xhrFields: {
+                withCredentials: false
+            },
+            success: function (response) {
+                if (response.success && response.data) {
+                    const settings = response.data;
+
+                    // Update Logo
+                    if (settings.logo) {
+                        $("#dynamicLogo").attr("src", settings.logo);
+                    }
+
+                    // Update Copyright
+                    const year = new Date().getFullYear();
+                    $("#copyrightYear").text(year);
+                    if (settings.copyright) {
+                        $("#copyrightText").text(settings.copyright);
+                    }
+
+                    // Update Contact Info
+                    if ($("#contactInfo").length > 0) {
+                        let contactHTML = '';
+                        
+                        if (settings.address) {
+                            contactHTML += `
+                                <li>
+                                    <span class="mr-1">📍</span>
+                                    <address class="not-italic">${settings.address}</address>
+                                </li>
+                            `;
+                        }
+                        
+                        if (settings.contact) {
+                            contactHTML += `
+                                <li>
+                                    <span class="mr-1">📞</span> 
+                                    <a href="tel:${settings.contact}" class="hover:text-blue-600 transition">
+                                        ${settings.contact}
+                                    </a>
+                                </li>
+                            `;
+                        }
+                        
+                        if (settings.email) {
+                            contactHTML += `
+                                <li>
+                                    <span class="mr-1">✉️</span> 
+                                    <a href="mailto:${settings.email}" class="hover:text-blue-600 transition">
+                                        ${settings.email}
+                                    </a>
+                                </li>
+                            `;
+                        }
+
+                        $("#contactInfo").html(contactHTML);
+                    }
+
+                    // Update Social Links
+                    if ($("#socialLinks").length > 0) {
+                        let socialHTML = '';
+                        const socialLinks = [
+                            { name: 'facebook', icon: 'fa-facebook-f', color: 'blue' },
+                            { name: 'twitter', icon: 'fa-twitter', color: 'blue' },
+                            { name: 'instagram', icon: 'fa-instagram', color: 'pink' },
+                            { name: 'youtube', icon: 'fa-youtube', color: 'red' }
+                        ];
+
+                        socialLinks.forEach(social => {
+                            if (settings[social.name]) {
+                                const hoverClass = social.color === 'pink' 
+                                    ? 'hover:border-pink-600 hover:text-pink-600' 
+                                    : 'hover:border-blue-600 hover:text-blue-600';
+                                
+                                socialHTML += `
+                                    <li>
+                                        <a href="${settings[social.name]}" target="_blank" aria-label="${social.name}"
+                                            class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 ${hoverClass} transition">
+                                            <i class="fab ${social.icon} text-sm"></i>
+                                        </a>
+                                    </li>
+                                `;
+                            }
+                        });
+
+                        if (socialHTML) {
+                            $("#socialLinks").html(socialHTML);
+                        }
+                    }
+
+                    console.log("✅ Settings loaded from:", apiBaseUrl);
+                } else {
+                    console.warn("⚠️ No settings data received:", response);
+                }
+            },
+            error: function (err) {
+                console.warn("⚠️ Could not load settings from " + apiBaseUrl + ":", err);
+            }
+        });
+    })();
 
     // =====================================================
     // LOGIN MODAL (MOBILE + PASSWORD) + AUTH CHECK
-    // =====================================================
+    // ===================================================== 
     // =============================
     // CHECK LOGIN STATUS ON LOAD
     // ==============================

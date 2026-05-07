@@ -72,6 +72,7 @@ class ActionController extends Controller
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,
+                    'error' => $e->getMessage(),
                     'message' => 'Something went wrong. Please try again later.'
                 ], 500);
             }
@@ -81,7 +82,7 @@ class ActionController extends Controller
     }
 
     # STORE USER SESSION DATA
-    protected function storeSession(Request $request, user $user)
+    protected function storeSession(Request $request, User $user)
     {
         try {
             # Store session data

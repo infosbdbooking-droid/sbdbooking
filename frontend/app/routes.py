@@ -29,7 +29,7 @@ def index():
     except Exception as e:
         print("HOME API ERROR:", e)
 
-    return render_template('index.html', cars=cars, sliders=sliders)
+    return render_template('index.html', cars=cars, sliders=sliders, api_base_url=API_BASE_URL)
 
 
 
@@ -105,7 +105,8 @@ def car_detail(car_id):
             return render_template(
                 'car_rental/car_detail.html',
                 car=None,
-                error="Car not found."
+                error="Car not found.",
+                api_base_url=API_BASE_URL
             ), 404
 
         car = data["data"]
@@ -115,7 +116,8 @@ def car_detail(car_id):
         return render_template(
             'car_rental/car_detail.html',
             car=None,
-            error="Failed to load car details."
+            error="Failed to load car details.",
+            api_base_url=API_BASE_URL
         ), 502
 
     # ======================
@@ -148,7 +150,8 @@ def car_detail(car_id):
 
     return render_template(
         'car_rental/car_detail.html',
-        car=car
+        car=car,
+        api_base_url=API_BASE_URL
     )
 
 
@@ -253,7 +256,7 @@ def search_results():
     except Exception as e:
         print("SEARCH RESULTS API ERROR:", e)
 
-    return render_template('car_listing/index.html', cars=cars, car_types=car_types)
+    return render_template('car_listing/index.html', cars=cars, car_types=car_types, api_base_url=API_BASE_URL)
 
 
 @app.route('/api/filter-cars')
@@ -272,4 +275,4 @@ def filter_cars():
 # ======================
 @app.errorhandler(404)
 def not_found(e):
-    return render_template('404.html'), 404
+    return render_template('404.html', api_base_url=API_BASE_URL), 404
