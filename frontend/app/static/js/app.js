@@ -19,8 +19,10 @@ $(document).ready(function () {
         // Use API_BASE_URL from Flask template (injected in footer)
         const apiBaseUrl = window.API_BASE_URL;
         
+        console.log("🔍 Starting logo load. API_BASE_URL:", apiBaseUrl);
+        
         if (!apiBaseUrl) {
-            console.warn("⚠️ API_BASE_URL not found in window. Settings won't load.");
+            console.error("❌ API_BASE_URL not found in window. Settings won't load.");
             return;
         }
         
@@ -32,12 +34,18 @@ $(document).ready(function () {
                 withCredentials: false
             },
             success: function (response) {
+                console.log("✅ API Response received:", response);
+                
                 if (response.success && response.data) {
                     const settings = response.data;
+                    console.log("✅ Logo URL from API:", settings.logo);
 
                     // Update Logo
                     if (settings.logo) {
                         $("#dynamicLogo").attr("src", settings.logo);
+                        console.log("✅ Logo updated to:", settings.logo);
+                    } else {
+                        console.warn("⚠️ No logo in settings response");
                     }
 
                     // Update Copyright
@@ -119,11 +127,16 @@ $(document).ready(function () {
 
                     console.log("✅ Settings loaded from:", apiBaseUrl);
                 } else {
-                    console.warn("⚠️ No settings data received:", response);
+                    console.error("❌ No settings data received. Response:", response);
                 }
             },
-            error: function (err) {
-                console.warn("⚠️ Could not load settings from " + apiBaseUrl + ":", err);
+            error: function (xhr, status, error) {
+                console.error("❌ FAILED to load settings from " + apiBaseUrl);
+                console.error("   Status:", status);
+                console.error("   Error:", error);
+                console.error("   Response Status Code:", xhr.status);
+                console.error("   Response Text:", xhr.responseText);
+                console.error("   URL attempted:", apiBaseUrl + "/settings");
             }
         });
     })();
