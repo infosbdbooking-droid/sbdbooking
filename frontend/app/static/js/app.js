@@ -429,7 +429,7 @@ $(document).ready(function () {
 
             const tripType = $("#trip_type").val();
             const oneWayKm = result.routes[0].legs[0].distance.value / 1000;
-            const totalKm = (tripType === "oneway") ? oneWayKm : (oneWayKm * 2);
+            const totalKm = oneWayKm * 2;
 
             // UI
             $("#distanceKm").text(totalKm.toFixed(2));
@@ -459,16 +459,14 @@ $(document).ready(function () {
             <span>Pickup → Drop</span>
             <strong>${oneWayKm.toFixed(2)} km</strong>
           </div>
-          ${tripType === "oneway" ? "" : `
           <div class="flex justify-between">
-            <span>Return (empty cab)</span>
+            <span>Return → Pickup</span>
             <strong>${oneWayKm.toFixed(2)} km</strong>
           </div>
-          `}
           <hr class="my-2">
           <div class="flex justify-between font-semibold">
             <span>Total Distance</span>
-            <span>${totalKm.toFixed(2)} km</span>
+            <span>${oneWayKm.toFixed(2)} * 2 = ${totalKm.toFixed(2)} km</span>
           </div>
         `);
 
