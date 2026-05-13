@@ -32,10 +32,11 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div>{{ $order->pickup_date ? \Carbon\Carbon::parse($order->pickup_date)->format('d M, Y') : '-' }}</div>
-                                <div class="text-xs text-gray-500">{{ $order->pickup_time ? \Carbon\Carbon::parse($order->pickup_time)->format('h:i A') : '-' }}</div>
+                                <div class="text-xs text-gray-500">{{ $order->pickup_time ? (strpos($order->pickup_time, ' to ') !== false ? $order->pickup_time : \Carbon\Carbon::parse($order->pickup_time)->format('h:i A')) : '-' }}</div>
                             </td>
-                            <td class="px-6 py-4 capitalize">
-                                {{ str_replace('_', ' ', $order->trip_type) }}
+                            <td class="px-6 py-4">
+                                <div class="capitalize">{{ str_replace('_', ' ', $order->trip_type) }}</div>
+                                <div class="text-xs text-gray-500">{{ $order->total_km }} km</div>
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900">
                                 ₹{{ number_format($order->total_amount, 2) }}

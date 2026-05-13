@@ -109,13 +109,15 @@
                 $chargeName = $charge->title ?: ($charge->chargeType ? $charge->chargeType->charges_type : 'Unknown Charge');
                 $typeId = (int)$charge->charges_type_id;
                 
-                // Special Case: AC Charges (ID 15)
-                if ($typeId === 15 && !$isAc) {
+                // Special Case: AC Charges (Match by Name or ID 10)
+                $isAcCharge = ($typeId === 10 || ($charge->chargeType && $charge->chargeType->charges_type === 'AC Charges'));
+                if ($isAcCharge && !$isAc) {
                     continue;
                 }
 
-                // Special Case: Stay Charges (ID 8) only for Round Trip
-                if ($typeId === 8 && $tripType === 'one_way') {
+                // Special Case: Stay Charges (Match by Name or ID 8)
+                $isStayCharge = ($typeId === 8 || ($charge->chargeType && $charge->chargeType->charges_type === 'Stay Charges'));
+                if ($isStayCharge && $tripType === 'one_way') {
                     continue;
                 }
 

@@ -135,7 +135,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Pickup Time</span>
-                            <span class="font-medium text-gray-800">{{ $order->pickup_time ? \Carbon\Carbon::parse($order->pickup_time)->format('h:i A') : '-' }}</span>
+                            <span class="font-medium text-gray-800">{{ $order->pickup_time ? (strpos($order->pickup_time, ' to ') !== false ? $order->pickup_time : \Carbon\Carbon::parse($order->pickup_time)->format('h:i A')) : '-' }}</span>
                         </div>
                         @if($order->trip_type === 'round_trip')
                         <div class="flex justify-between">
@@ -144,12 +144,20 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Return Time</span>
-                            <span class="font-medium text-gray-800">{{ $order->return_time ? \Carbon\Carbon::parse($order->return_time)->format('h:i A') : '-' }}</span>
+                            <span class="font-medium text-gray-800">{{ $order->return_time ? (strpos($order->return_time, ' to ') !== false ? $order->return_time : \Carbon\Carbon::parse($order->return_time)->format('h:i A')) : '-' }}</span>
                         </div>
                         @endif
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Total Distance</span>
-                            <span class="font-medium text-gray-800">{{ $order->total_km }} km</span>
+                            <span class="text-gray-500">Pickup to Drop-off</span>
+                            <span class="font-medium text-gray-800">{{ $order->one_way_km }} km</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Return to Pickup</span>
+                            <span class="font-medium text-gray-800">{{ $order->return_km }} km</span>
+                        </div>
+                        <div class="flex justify-between pt-2 border-t border-dashed">
+                            <span class="text-gray-500 font-bold">Total Billed Distance</span>
+                            <span class="font-bold text-blue-600">{{ $order->total_km }} km</span>
                         </div>
                     </div>
                 </div>

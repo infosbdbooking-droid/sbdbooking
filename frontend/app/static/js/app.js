@@ -188,7 +188,7 @@ $(document).ready(function () {
     // ==============================
     // CLOSE LOGIN MODAL
     // ==============================
-    $("#closeLogin, #loginModal .absolute.inset-0").on("click", function () {
+    $("#closeLogin").on("click", function () {
         $("#loginModal").addClass("hidden");
     });
     // Prevent modal close when clicking inside
@@ -428,8 +428,9 @@ $(document).ready(function () {
             directionsRenderer.setDirections(result);
 
             const tripType = $("#trip_type").val();
+            const isRound = (tripType === "round");
             const oneWayKm = result.routes[0].legs[0].distance.value / 1000;
-            const totalKm = oneWayKm * 2;
+            const totalKm = oneWayKm * 2; // Always double for the car return leg
 
             // UI
             $("#distanceKm").text(totalKm.toFixed(2));
@@ -438,7 +439,7 @@ $(document).ready(function () {
             // ✅ Update Travel Time (Duration)
             if (result.routes[0].legs.length > 0) {
                 const oneWaySeconds = result.routes[0].legs[0].duration.value;
-                const totalSeconds = (tripType === "oneway") ? oneWaySeconds : (oneWaySeconds * 2);
+                const totalSeconds = oneWaySeconds * 2;
                 
                 const hours = Math.floor(totalSeconds / 3600);
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -454,21 +455,21 @@ $(document).ready(function () {
             $("#billable_km").val(totalKm.toFixed(2));   // A → B → A
 
             $("#tripDetails").removeClass("hidden").html(`
-          <div class="font-semibold mb-1">Trip Distance Details</div>
-          <div class="flex justify-between">
-            <span>Pickup → Drop</span>
-            <strong>${oneWayKm.toFixed(2)} km</strong>
-          </div>
-          <div class="flex justify-between">
-            <span>Return → Pickup</span>
-            <strong>${oneWayKm.toFixed(2)} km</strong>
-          </div>
-          <hr class="my-2">
-          <div class="flex justify-between font-semibold">
-            <span>Total Distance</span>
-            <span>${oneWayKm.toFixed(2)} * 2 = ${totalKm.toFixed(2)} km</span>
-          </div>
-        `);
+                <div class="font-semibold mb-1">Trip Distance Details</div>
+                <div class="flex justify-between">
+                    <span>Pickup → Drop</span>
+                    <strong>${oneWayKm.toFixed(2)} km</strong>
+                </div>
+                <div class="flex justify-between">
+                    <span>Return → Pickup ${!isRound ? '(Car Return)' : ''}</span>
+                    <strong>${oneWayKm.toFixed(2)} km</strong>
+                </div>
+                <hr class="my-2">
+                <div class="flex justify-between font-semibold">
+                    <span>Total Distance</span>
+                    <span>${oneWayKm.toFixed(2)} * 2 = ${totalKm.toFixed(2)} km</span>
+                </div>
+            `);
 
             if (window.CAR_DATA) {
                 renderFareBreakdown(window.CAR_DATA);
@@ -757,7 +758,7 @@ $(document).ready(function () {
             hours = 0; 
         }
 
-        const isAcChecked = $("#acToggle").length > 0 ? $("#acToggle").is(":checked") : (carData.is_ac == 1);
+        const isAcChecked = $("#acToggle").length > 0 ? ($("#acToggle").is(":checked") ? 1 : 0) : (carData.is_ac ? 1 : 0);
 
         const payload = {
             car_id: carData.id,
@@ -925,12 +926,6 @@ $(document).ready(function () {
     });
 
     // AC Toggle
-    $(document).on("change", "#acToggle", function() {
-        if (window.CAR_DATA) {
-            renderFareBreakdown(window.CAR_DATA);
-        }
-    });
-
     $(document).on("change", "#acToggle", function() {
         if (window.CAR_DATA) {
             renderFareBreakdown(window.CAR_DATA);
@@ -1763,7 +1758,7 @@ $(document).ready(function () {
 
         const tripType = $("#trip_type").val() === "oneway" ? "one_way" : "round_trip";
         const oneWayKm = parseFloat($("#range_km").val() || 0);
-        const isAcChecked = $("#acToggle").length > 0 ? $("#acToggle").is(":checked") : (window.CAR_DATA.is_ac == 1);
+        const isAcChecked = $("#acToggle").length > 0 ? ($("#acToggle").is(":checked") ? 1 : 0) : (window.CAR_DATA.is_ac ? 1 : 0);
 
         const payload = {
             car_id: window.CAR_DATA.id,
@@ -1869,6 +1864,34 @@ $(document).ready(function () {
         }
         if (urlTime && $("#pickupTime").length > 0) {
             $("#pickupTime").val(urlTime);
+        }
+
+        // 🚀 Auto-trigger routing if both locations are present
+        if (urlPickup && urlDrop) {
+            setTimeout(() => {
+                if (typeof google === 'undefined' || !google.maps || !google.maps.Geocoder) return;
+                
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ address: urlPickup }, (results, status) => {
+                    if (status === "OK") {
+                        const pLoc = results[0].geometry.location;
+                        $("#pickup_lat").val(pLoc.lat());
+                        $("#pickup_lng").val(pLoc.lng());
+                        
+                        geocoder.geocode({ address: urlDrop }, (results2, status2) => {
+                            if (status2 === "OK") {
+                                const dLoc = results2[0].geometry.location;
+                                $("#drop_lat").val(dLoc.lat());
+                                $("#drop_lng").val(dLoc.lng());
+                                
+                                // Center map and draw
+                                if (map) map.setCenter(pLoc);
+                                drawRoute();
+                            }
+                        });
+                    }
+                });
+            }, 1500);
         }
     })();
 });

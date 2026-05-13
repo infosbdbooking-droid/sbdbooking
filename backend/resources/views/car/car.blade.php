@@ -106,13 +106,18 @@
                         </div>
                         <div class="w-1/2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Rating Value</label>
-                            <input type="number" name="rating_value" id="rating_value"
+                            <input type="number" step="0.01" name="rating_value" id="rating_value"
                                 class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Rating value">
                         </div>
                         <div class="w-1/2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Rating Count</label>
                             <input type="number" name="rating_count" id="rating_count"
                                 class="w-full border border-gray-300 rounded px-3 py-2" placeholder="Rating count">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Min Trip Amount (₹)</label>
+                            <input type="number" step="0.01" name="min_trip_amount" id="min_trip_amount"
+                                class="w-full border border-gray-300 rounded px-3 py-2" placeholder="e.g. 2000">
                         </div>
                     </div>
                     <hr class="my-4">
@@ -376,11 +381,13 @@
                 $('#Modal').removeClass('flex').addClass('hidden');
             });
 
+            /* 
             $('#Modal').on('click', function (e) {
                 if ($(e.target).is('#Modal')) {
                     $(this).removeClass('flex').addClass('hidden');
                 }
             });
+            */
             const table = $('#table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -578,7 +585,6 @@
                                    <option value="2">Per Hour</option>
                                    <option value="3">Per Day</option>
                                </select>
-                           </div>
                            </div>
                            <div>
                                <label class="text-xs font-medium text-gray-600 mb-1 block">Min KM</label>
@@ -786,6 +792,7 @@
                         $('#rating_summary').val(data.rating_summary || '');
                         $('#rating_value').val(data.rating_value || '');
                         $('#rating_count').val(data.rating_count || '');
+                        $('#min_trip_amount').val(data.min_trip_amount || '');
 
                         if (data.car_photos) {
                             $('#iconPreview')
@@ -900,7 +907,6 @@
                                                        <option value="2">Per Hour</option>
                                                        <option value="3">Per Day</option>
                                                    </select>
-                                               </div>
                                                </div>
                                                <div>
                                                    <label class="text-xs font-medium text-gray-600 mb-1 block">Minimum KM</label>

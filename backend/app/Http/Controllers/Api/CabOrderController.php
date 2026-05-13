@@ -118,10 +118,15 @@ class CabOrderController extends Controller
             // ─── Fetch car snapshot ────────────────────────────────
             $car = Car::findOrFail($request->car_id);
 
+            $oneWayKm = (float)$request->distance_km;
+            // If return_km is not provided or is 0, default to oneWayKm (car return)
+            $returnKm = ($request->return_km && (float)$request->return_km > 0) ? (float)$request->return_km : $oneWayKm;
+            $totalKmForCalc = $oneWayKm + $returnKm;
+
             // ─── Calculate Charges ─────────────────────────────────
             $chargesResult = $this->computeCharges(
                 carId: $request->car_id,
-                distanceKm: $request->distance_km,
+                distanceKm: $totalKmForCalc,
                 tripType: $request->trip_type,
                 stayDuration: $request->stay_duration ?? 'short',
                 isAc: (bool) ($request->is_ac ?? false),
@@ -159,8 +164,7 @@ class CabOrderController extends Controller
             $totalAmount = max(0, $subtotal - $discountAmount);
 
             // ─── Distance totals ───────────────────────────────────
-            $oneWayKm = $request->distance_km;
-            $returnKm = $request->return_km ?? ($request->trip_type === 'round_trip' ? $oneWayKm : 0);
+            // $oneWayKm and $returnKm already calculated above
             $totalKm = $oneWayKm + $returnKm;
 
             // ─── Create order ──────────────────────────────────────
@@ -398,17 +402,25 @@ class CabOrderController extends Controller
         };
         $allowanceCharge = $carCharges->firstWhere('chargeType.charges_type', $allowanceKey);
         if ($allowanceCharge) {
-            $charges[] = [
-                'type' => 'Driver Allowance',
-                'charge_type' => $allowanceCharge->chargeType->charges_type,
-                'amount' => $allowanceCharge->amount,
-            ];
-            $totalAmount += $allowanceCharge->amount;
+            // Stay Charges only for Round Trip
+            if (($allowanceCharge->charges_type_id == 8 || strpos($allowanceCharge->chargeType->charges_type, 'Stay') !== false) && $tripType === 'one_way') {
+                // skip
+            } else {
+                $charges[] = [
+                    'type' => 'Driver Allowance',
+                    'charge_type' => $allowanceCharge->chargeType->charges_type,
+                    'amount' => $allowanceCharge->amount,
+                ];
+                $totalAmount += $allowanceCharge->amount;
+            }
         }
 
-        // AC Charges
+        // AC Charges (Match by name or type)
         if ($isAc) {
-            $acCharge = $carCharges->firstWhere('chargeType.charges_type', 'AC Charges');
+            $acCharge = $carCharges->first(function($ch) {
+                return (int)$ch->charges_type_id === 10 || 
+                       ($ch->chargeType && $ch->chargeType->charges_type === 'AC Charges');
+            });
             if ($acCharge) {
                 $acAmount = $distanceKm * $acCharge->amount;
                 $charges[] = [

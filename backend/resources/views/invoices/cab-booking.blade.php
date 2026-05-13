@@ -255,11 +255,15 @@
             <tr>
                 <th>Trip Date & Time</th>
                 <td>
-                    {{ \Carbon\Carbon::parse($order->pickup_date)->format('d-m-Y') }} {{ \Carbon\Carbon::parse($order->pickup_time)->format('h:i A') }}
+                    {{ \Carbon\Carbon::parse($order->pickup_date)->format('d-m-Y') }} {{ strpos($order->pickup_time, ' to ') !== false ? $order->pickup_time : \Carbon\Carbon::parse($order->pickup_time)->format('h:i A') }}
                     @if($order->trip_type === 'round_trip')
-                        RETURN {{ \Carbon\Carbon::parse($order->return_date)->format('d-m-Y') }} {{ \Carbon\Carbon::parse($order->return_time)->format('h:i A') }}
+                        RETURN {{ \Carbon\Carbon::parse($order->return_date)->format('d-m-Y') }} {{ strpos($order->return_time, ' to ') !== false ? $order->return_time : \Carbon\Carbon::parse($order->return_time)->format('h:i A') }}
                     @endif
                 </td>
+            </tr>
+            <tr>
+                <th>Billed Distance</th>
+                <td>{{ $order->one_way_km }} km (Trip) + {{ $order->return_km }} km (Return to Pickup) = {{ $order->total_km }} km</td>
             </tr>
         </table>
 
@@ -295,7 +299,7 @@
             <ul class="terms-list">
                 <li>Terms & Conditions - SBD GROUP</li>
                 <li>Journey Date: {{ \Carbon\Carbon::parse($order->pickup_date)->format('d/m/Y') }}</li>
-                <li>Departure Time: {{ \Carbon\Carbon::parse($order->pickup_time)->format('h:i A') }}</li>
+                <li>Departure Time: {{ strpos($order->pickup_time, ' to ') !== false ? $order->pickup_time : \Carbon\Carbon::parse($order->pickup_time)->format('h:i A') }}</li>
                 <li>Vehicle: {{ $order->car_name }} ({{ $order->is_ac ? 'AC' : 'Non-AC' }})</li>
                 <li>Fare Type: Package Based / KM Based</li>
                 <li>Local Use: Vehicle will remain available for the fixed trip schedule only.</li>

@@ -131,10 +131,13 @@ def car_detail(car_id):
         except Exception:
             return default
 
-    car["booking_includes"] = safe_json(car.get("booking_includes"), [])
-    car["why_book_us"] = safe_json(car.get("why_book_us"), [])
-    car["trip_policies"] = safe_json(car.get("trip_policies"), [])
-    car["recent_reviews"] = safe_json(car.get("recent_reviews"), [])
+    # Normalize JSON fields (If they are dicts, convert to values list)
+    for field in ["recent_reviews", "trip_policies", "why_book_us", "booking_includes"]:
+        val = safe_json(car.get(field), [])
+        if isinstance(val, dict):
+            car[field] = list(val.values())
+        else:
+            car[field] = val
 
     # ======================
     # NORMALIZE SIMPLE FIELDS

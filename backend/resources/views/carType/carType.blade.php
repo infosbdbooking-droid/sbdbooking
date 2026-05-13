@@ -82,11 +82,13 @@
                 $('#Modal').removeClass('flex').addClass('hidden');
             });
 
+            /* 
             $('#Modal').on('click', function (e) {
                 if ($(e.target).is('#Modal')) {
                     $(this).removeClass('flex').addClass('hidden');
                 }
             });
+            */
 
             // Initialize DataTable
             // Toggle Status

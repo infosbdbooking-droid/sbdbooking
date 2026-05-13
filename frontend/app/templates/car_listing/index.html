@@ -8,9 +8,9 @@
 <!-- Navbar -->
 {% include 'layouts/navbar.html' %}
 
-<main class="bg-gray-50 min-h-screen pb-0">
+<main class="bg-gray-50 min-h-screen pb-0 ">
     <!-- Breadcrumb -->
-    <div class="bg-white border-b border-gray-100 py-3">
+    <div class=" bg-white border-b border-gray-100 py-3">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex text-xs sm:text-sm font-medium text-gray-500 items-center gap-2">
                 <a href="/" class="hover:text-[#d84e55] transition-colors">Home</a>
@@ -25,47 +25,85 @@
     <!-- Hero Search Bar Section (Matching Homepage Hero Style) -->
     <section class="bg-white shadow-sm sticky top-[72px] z-40 py-4 border-b border-gray-200">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <form action="/search-results" method="GET" class="bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-gray-100 p-2 sm:p-3 flex flex-wrap lg:flex-nowrap items-center gap-3">
-                <div class="flex-1 min-w-[200px] relative group border border-gray-200 rounded-xl bg-white hover:bg-gray-50/50 transition-all">
-                    <i class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d84e55] transition-colors"></i>
+            <form action="/search-results" method="GET"
+                class="bg-white rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-gray-100 p-2 sm:p-3 flex flex-wrap lg:flex-nowrap items-center gap-3">
+                <div
+                    class="flex-1 min-w-[200px] relative group border border-gray-200 rounded-xl bg-white hover:bg-gray-50/50 transition-all">
+                    <i
+                        class="fa-solid fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d84e55] transition-colors"></i>
                     <div class="flex flex-col pl-11 pr-4 py-2">
                         <label class="text-[9px] font-black uppercase text-gray-400 tracking-wider">Pickup</label>
-                        <input type="text" id="pickup_location" name="pickup" placeholder="Enter Pickup City" class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-900 placeholder:text-gray-300" value="{{ request.args.get('pickup', 'Jabalpur, MP') }}">
+                        <input type="text" id="pickup_location" name="pickup" placeholder="Enter Pickup City"
+                            class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-900 placeholder:text-gray-300"
+                            value="{{ request.args.get('pickup', 'Jabalpur, MP') }}">
                     </div>
                 </div>
-                <div class="flex-1 min-w-[200px] relative group border border-gray-200 rounded-xl bg-white hover:bg-gray-50/50 transition-all">
-                    <i class="fa-solid fa-map-pin absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d84e55] transition-colors"></i>
+                <div
+                    class="flex-1 min-w-[200px] relative group border border-gray-200 rounded-xl bg-white hover:bg-gray-50/50 transition-all">
+                    <i
+                        class="fa-solid fa-map-pin absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d84e55] transition-colors"></i>
                     <div class="flex flex-col pl-11 pr-4 py-2">
                         <label class="text-[9px] font-black uppercase text-gray-400 tracking-wider">Destination</label>
-                        <input type="text" id="destination_location" name="destination" placeholder="Enter Destination City" class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-900 placeholder:text-gray-300" value="{{ request.args.get('destination', 'Amarkantak, MP') }}">
+                        <input type="text" id="destination_location" name="destination"
+                            placeholder="Enter Destination City"
+                            class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-900 placeholder:text-gray-300"
+                            value="{{ request.args.get('destination', 'Amarkantak, MP') }}">
                     </div>
                 </div>
-                <div class="flex-1 min-w-[150px] relative group border border-gray-200 rounded-xl bg-white hover:bg-gray-50/50 transition-all">
-                    <i class="fa-solid fa-calendar-day absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d84e55] transition-colors"></i>
+                <div
+                    class="flex-1 min-w-[150px] relative group border border-gray-200 rounded-xl bg-white hover:bg-gray-50/50 transition-all">
+                    <i
+                        class="fa-solid fa-calendar-day absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d84e55] transition-colors"></i>
                     <div class="flex flex-col pl-11 pr-4 py-2">
                         <label class="text-[9px] font-black uppercase text-gray-400 tracking-wider">Date</label>
-                        <input type="text" id="listingDatePicker" name="date" class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-900 cursor-pointer" value="{{ request.args.get('date', '12 May, 2026') }}">
+                        <input type="text" id="listingDatePicker" name="date"
+                            class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-900 cursor-pointer"
+                            value="{{ request.args.get('date', '12 May, 2026') }}">
                     </div>
                 </div>
-                <div class="flex-1 min-w-[150px] relative group border border-gray-200 rounded-xl bg-white hover:bg-gray-50/50 transition-all">
-                    <i class="fa-solid fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d84e55] transition-colors"></i>
+                <div
+                    class="flex-1 min-w-[150px] relative group border border-gray-200 rounded-xl bg-white hover:bg-gray-50/50 transition-all">
+                    <i
+                        class="fa-solid fa-clock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#d84e55] transition-colors"></i>
                     <div class="flex flex-col pl-11 pr-4 py-2">
                         <label class="text-[9px] font-black uppercase text-gray-400 tracking-wider">Time</label>
-                        <select name="pickup_time" class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-900 cursor-pointer appearance-none">
-                            <option value="06:00 AM to 08:00 AM" {% if request.args.get('pickup_time') == "06:00 AM to 08:00 AM" %}selected{% endif %}>06:00 AM to 08:00 AM</option>
-                            <option value="08:00 AM to 10:00 AM" {% if request.args.get('pickup_time') == "08:00 AM to 10:00 AM" %}selected{% endif %}>08:00 AM to 10:00 AM</option>
-                            <option value="10:00 AM to 12:00 PM" {% if request.args.get('pickup_time') == "10:00 AM to 12:00 PM" %}selected{% endif %}>10:00 AM to 12:00 PM</option>
-                            <option value="12:00 PM to 02:00 PM" {% if request.args.get('pickup_time') == "12:00 PM to 02:00 PM" %}selected{% endif %}>12:00 PM to 02:00 PM</option>
-                            <option value="02:00 PM to 04:00 PM" {% if request.args.get('pickup_time') == "02:00 PM to 04:00 PM" %}selected{% endif %}>02:00 PM to 04:00 PM</option>
-                            <option value="04:00 PM to 06:00 PM" {% if request.args.get('pickup_time') == "04:00 PM to 06:00 PM" %}selected{% endif %}>04:00 PM to 06:00 PM</option>
-                            <option value="06:00 PM to 08:00 PM" {% if request.args.get('pickup_time') == "06:00 PM to 08:00 PM" %}selected{% endif %}>06:00 PM to 08:00 PM</option>
-                            <option value="08:00 PM to 10:00 PM" {% if request.args.get('pickup_time') == "08:00 PM to 10:00 PM" %}selected{% endif %}>08:00 PM to 10:00 PM</option>
-                            <option value="10:00 PM to 12:00 AM" {% if request.args.get('pickup_time') == "10:00 PM to 12:00 AM" %}selected{% endif %}>10:00 PM to 12:00 AM</option>
-                            <option value="12:00 AM to 06:00 AM" {% if request.args.get('pickup_time') == "12:00 AM to 06:00 AM" %}selected{% endif %}>12:00 AM to 06:00 AM</option>
+                        <select name="pickup_time"
+                            class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm font-bold text-gray-900 cursor-pointer appearance-none">
+                            <option value="06:00 AM to 08:00 AM" {% if
+                                request.args.get('pickup_time')=="06:00 AM to 08:00 AM" %}selected{% endif %}>06:00 AM
+                                to 08:00 AM</option>
+                            <option value="08:00 AM to 10:00 AM" {% if
+                                request.args.get('pickup_time')=="08:00 AM to 10:00 AM" %}selected{% endif %}>08:00 AM
+                                to 10:00 AM</option>
+                            <option value="10:00 AM to 12:00 PM" {% if
+                                request.args.get('pickup_time')=="10:00 AM to 12:00 PM" %}selected{% endif %}>10:00 AM
+                                to 12:00 PM</option>
+                            <option value="12:00 PM to 02:00 PM" {% if
+                                request.args.get('pickup_time')=="12:00 PM to 02:00 PM" %}selected{% endif %}>12:00 PM
+                                to 02:00 PM</option>
+                            <option value="02:00 PM to 04:00 PM" {% if
+                                request.args.get('pickup_time')=="02:00 PM to 04:00 PM" %}selected{% endif %}>02:00 PM
+                                to 04:00 PM</option>
+                            <option value="04:00 PM to 06:00 PM" {% if
+                                request.args.get('pickup_time')=="04:00 PM to 06:00 PM" %}selected{% endif %}>04:00 PM
+                                to 06:00 PM</option>
+                            <option value="06:00 PM to 08:00 PM" {% if
+                                request.args.get('pickup_time')=="06:00 PM to 08:00 PM" %}selected{% endif %}>06:00 PM
+                                to 08:00 PM</option>
+                            <option value="08:00 PM to 10:00 PM" {% if
+                                request.args.get('pickup_time')=="08:00 PM to 10:00 PM" %}selected{% endif %}>08:00 PM
+                                to 10:00 PM</option>
+                            <option value="10:00 PM to 12:00 AM" {% if
+                                request.args.get('pickup_time')=="10:00 PM to 12:00 AM" %}selected{% endif %}>10:00 PM
+                                to 12:00 AM</option>
+                            <option value="12:00 AM to 06:00 AM" {% if
+                                request.args.get('pickup_time')=="12:00 AM to 06:00 AM" %}selected{% endif %}>12:00 AM
+                                to 06:00 AM</option>
                         </select>
                     </div>
                 </div>
-                <button type="submit" class="w-full lg:w-auto bg-gradient-to-r from-[#d84e55] to-[#c13d44] text-white px-10 py-4 rounded-xl font-black uppercase tracking-widest shadow-[0_8px_20px_rgba(216,78,85,0.3)] hover:shadow-[0_12px_25px_rgba(216,78,85,0.4)] transition-all active:scale-95 border-b-4 border-black/15">
+                <button type="submit"
+                    class="w-full lg:w-auto bg-gradient-to-r from-[#d84e55] to-[#c13d44] text-white px-10 py-4 rounded-xl font-black uppercase tracking-widest shadow-[0_8px_20px_rgba(216,78,85,0.3)] hover:shadow-[0_12px_25px_rgba(216,78,85,0.4)] transition-all active:scale-95 border-b-4 border-black/15">
                     Modify Search
                 </button>
             </form>
@@ -73,25 +111,31 @@
     </section>
 
     <!-- Main Listing Section -->
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        <div class="grid grid-cols-12 gap-8">
-            
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 ">
+        <div class="grid grid-cols-12 gap-8 ">
+
             <!-- Filter Sidebar -->
-            <aside class="hidden lg:block lg:col-span-3">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-52 overflow-y-auto max-h-[calc(100vh-220px)]">
+            <aside class="hidden lg:block lg:col-span-3 mb-10">
+                <div
+                    class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-52 overflow-y-auto max-h-[calc(100vh-220px)]">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-lg font-bold text-gray-900">Filters</h2>
-                        <button class="text-xs font-bold text-[#d84e55] hover:underline clear-filters">Clear All</button>
+                        <button class="text-xs font-bold text-[#d84e55] hover:underline clear-filters">Clear
+                            All</button>
                     </div>
 
                     <div class="space-y-8">
                         <!-- Sort By -->
                         <div>
-                            <label class="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 block">Sort By</label>
+                            <label class="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 block">Sort
+                                By</label>
                             <div class="flex flex-wrap gap-2" id="sortBy">
-                                <button data-sort="default" class="px-4 py-2 bg-[#d84e55] text-white rounded-lg text-xs font-bold shadow-md shadow-[#d84e55]/20 sort-btn active">Popularity</button>
-                                <button data-sort="price" class="px-4 py-2 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold border border-gray-100 hover:border-red-200 transition-all sort-btn">Price</button>
-                                <button data-sort="rating" class="px-4 py-2 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold border border-gray-100 hover:border-red-200 transition-all sort-btn">Rating</button>
+                                <button data-sort="default"
+                                    class="px-4 py-2 bg-[#d84e55] text-white rounded-lg text-xs font-bold shadow-md shadow-[#d84e55]/20 sort-btn active">Popularity</button>
+                                <button data-sort="price"
+                                    class="px-4 py-2 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold border border-gray-100 hover:border-red-200 transition-all sort-btn">Price</button>
+                                <button data-sort="rating"
+                                    class="px-4 py-2 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold border border-gray-100 hover:border-red-200 transition-all sort-btn">Rating</button>
                             </div>
                         </div>
 
@@ -100,55 +144,67 @@
                             <div id="filterForm">
                                 <!-- Hidden Search Params to preserve state -->
                                 <input type="hidden" name="pickup" value="{{ request.args.get('pickup', '') }}">
-                                <input type="hidden" name="destination" value="{{ request.args.get('destination', '') }}">
+                                <input type="hidden" name="destination"
+                                    value="{{ request.args.get('destination', '') }}">
                                 <input type="hidden" name="date" value="{{ request.args.get('date', '') }}">
 
-                                <label class="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 block">Vehicle Type</label>
+                                <label
+                                    class="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 block">Vehicle
+                                    Type</label>
                                 <div class="space-y-3">
                                     {% if car_types %}
-                                        {% for type in car_types %}
-                                        <label class="flex items-center group cursor-pointer">
-                                            <input type="radio" name="car_type_id" value="{{ type.id }}" 
-                                                   class="filter-checkbox w-5 h-5 rounded-full border-gray-200 text-[#d84e55] focus:ring-[#d84e55]/20 transition-all cursor-pointer" 
-                                                   {% if request.args.get('car_type_id')|int == type.id %}checked{% endif %}>
-                                            <span class="ml-3 text-sm font-medium text-gray-600 group-hover:text-[#d84e55] transition-colors">{{ type.car_type }}</span>
-                                        </label>
-                                        {% endfor %}
+                                    {% for type in car_types %}
+                                    <label class="flex items-center group cursor-pointer">
+                                        <input type="radio" name="car_type_id" value="{{ type.id }}"
+                                            class="filter-checkbox w-5 h-5 rounded-full border-gray-200 text-[#d84e55] focus:ring-[#d84e55]/20 transition-all cursor-pointer"
+                                            {% if request.args.get('car_type_id')|int==type.id %}checked{% endif %}>
+                                        <span
+                                            class="ml-3 text-sm font-medium text-gray-600 group-hover:text-[#d84e55] transition-colors">{{
+                                            type.car_type }}</span>
+                                    </label>
+                                    {% endfor %}
                                     {% else %}
-                                        <p class="text-[10px] text-gray-400">No categories available</p>
+                                    <p class="text-[10px] text-gray-400">No categories available</p>
                                     {% endif %}
                                 </div>
-                            </form>
-                        </div>
+                                </form>
+                            </div>
 
-                        <!-- Seating Capacity -->
-                        <div class="border-t border-gray-50 pt-6">
-                            <label class="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 block">Seating Capacity</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                {% for seat in ['4', '6', '7', '12'] %}
-                                <button data-seats="{{ seat }}" class="seat-btn py-2.5 px-3 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all hover:border-[#d84e55] hover:text-[#d84e55] text-gray-500">
-                                    {{ seat if seat != '12' else '12+' }} Seats
-                                </button>
-                                {% endfor %}
+                            <!-- Seating Capacity -->
+                            <div class="border-t border-gray-50 pt-6">
+                                <label
+                                    class="text-xs font-black uppercase tracking-wider text-gray-400 mb-4 block">Seating
+                                    Capacity</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    {% for seat in ['4', '6', '7', '12'] %}
+                                    <button data-seats="{{ seat }}"
+                                        class="seat-btn py-2.5 px-3 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all hover:border-[#d84e55] hover:text-[#d84e55] text-gray-500">
+                                        {{ seat if seat != '12' else '12+' }} Seats
+                                    </button>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
             </aside>
 
             <!-- Results Listing -->
-            <div class="col-span-12 lg:col-span-9">
+            <div class="col-span-12 lg:col-span-9 mb-10">
                 <!-- Top Result Info Bar -->
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between mb-6 gap-4" data-aos="fade-down">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row items-center justify-between mb-6 gap-4"
+                    data-aos="fade-down">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-[#d84e55] text-xl font-black car-count-display">{{ cars|length }}</div>
+                        <div
+                            class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-[#d84e55] text-xl font-black car-count-display">
+                            {{ cars|length }}</div>
                         <div>
-                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-tight">Available Cars Found</h3>
+                            <h3 class="text-sm font-black text-gray-900 uppercase tracking-tight">Available Cars Found
+                            </h3>
                             <p class="text-xs text-gray-500">
-                                {{ request.args.get('pickup', 'Selected Location') }} 
-                                <i class="fa-solid fa-arrow-right mx-1 text-[10px]"></i> 
-                                {{ request.args.get('destination', 'Destination') }} • 
-                                {{ request.args.get('date', 'Today') }} • 
+                                {{ request.args.get('pickup', 'Selected Location') }}
+                                <i class="fa-solid fa-arrow-right mx-1 text-[10px]"></i>
+                                {{ request.args.get('destination', 'Destination') }} •
+                                {{ request.args.get('date', 'Today') }} •
                                 {{ request.args.get('pickup_time', 'Any Time') }}
                             </p>
                         </div>
@@ -158,103 +214,117 @@
                 <!-- Car Listing Container -->
                 <div class="space-y-4" id="carList">
                     {% if cars %}
-                        {% for car in cars %}
-                        <!-- Dynamic Car Card: {{ car.car_name }} -->
-                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all duration-300 group overflow-hidden" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
-                            <div class="flex flex-col md:flex-row h-full">
-                                <!-- Left: Optimized Image Section -->
-                                <div class="md:w-64 lg:w-72 relative flex items-center justify-center bg-white">
-                                    <img src="{{ car.car_photos if car.car_photos else 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800' }}" 
-                                         class="max-w-full max-h-40 object-contain group-hover:scale-105 transition-transform duration-700" 
-                                         alt="{{ car.car_name }}">
-                                    <div class="absolute top-0 left-0 flex flex-col gap-1">
-                                        <span class="bg-emerald-500 text-white text-[8px] font-black px-3 py-1 rounded-br-lg shadow-sm uppercase tracking-widest">
-                                            {{ car.car_type.car_type if car.car_type else "Standard" }}
-                                        </span>
-                                    </div>
-                                    {% if car.is_ac %}
-                                    <div class="absolute bottom-0 left-0 bg-white/90 backdrop-blur-sm text-[9px] font-bold px-3 py-1 rounded-tr-lg border-t border-r border-gray-100 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-snowflake text-blue-400"></i> AC
-                                    </div>
-                                    {% endif %}
+                    {% for car in cars %}
+                    <!-- Dynamic Car Card: {{ car.car_name }} -->
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-red-100 transition-all duration-300 group overflow-hidden"
+                        data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                        <div class="flex flex-col md:flex-row h-full">
+                            <!-- Left: Optimized Image Section -->
+                            <div class="md:w-64 lg:w-72 relative flex items-center justify-center bg-white">
+                                <img src="{{ car.car_photos if car.car_photos else 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800' }}"
+                                    class="max-w-full max-h-40 object-contain group-hover:scale-105 transition-transform duration-700"
+                                    alt="{{ car.car_name }}">
+                                <div class="absolute top-0 left-0 flex flex-col gap-1">
+                                    <span
+                                        class="bg-emerald-500 text-white text-[8px] font-black px-3 py-1 rounded-br-lg shadow-sm uppercase tracking-widest">
+                                        {{ car.car_type.car_type if car.car_type else "Standard" }}
+                                    </span>
                                 </div>
+                                {% if car.is_ac %}
+                                <div
+                                    class="absolute bottom-0 left-0 bg-white/90 backdrop-blur-sm text-[9px] font-bold px-3 py-1 rounded-tr-lg border-t border-r border-gray-100 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-snowflake text-blue-400"></i> AC
+                                </div>
+                                {% endif %}
+                            </div>
 
-                                <!-- Center: Refined Details -->
-                                <div class="flex-1 p-4 md:p-5 flex flex-col justify-between border-r border-gray-50">
-                                    <div>
-                                        <div class="flex items-center justify-between mb-1">
-                                            <h3 class="text-lg font-black text-gray-900 tracking-tight group-hover:text-[#d84e55] transition-colors">{{ car.car_name }}</h3>
-                                            <div class="flex items-center gap-1 text-[#d84e55]">
-                                                <i class="fa-solid fa-star text-[10px]"></i>
-                                                <span class="text-xs font-black">{{ car.rating_value if car.rating_value else "4.9" }}</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-4">
-                                            {{ car.car_type.car_type if car.car_type else "Luxury" }} • {{ car.car_seats if car.car_seats else "4" }} Seater
-                                        </p>
-                                        
-                                        <div class="flex flex-wrap gap-3">
-                                            <div class="flex items-center gap-2 text-gray-500 bg-gray-50 px-2 py-1 rounded">
-                                                <i class="fa-solid fa-users text-[10px]"></i>
-                                                <span class="text-[10px] font-bold">{{ car.car_seats }} Seats</span>
-                                            </div>
-                                            <div class="flex items-center gap-2 text-gray-500 bg-gray-50 px-2 py-1 rounded">
-                                                <i class="fa-solid fa-suitcase text-[10px]"></i>
-                                                <span class="text-[10px] font-bold">{{ car.max_bags if car.max_bags else "2" }} Bags</span>
-                                            </div>
-                                            <div class="flex items-center gap-2 text-gray-500 bg-gray-50 px-2 py-1 rounded">
-                                                <i class="fa-solid fa-snowflake text-[10px]"></i>
-                                                <span class="text-[10px] font-bold">{{ "AC" if car.is_ac else "Non-AC" }}</span>
-                                            </div>
+                            <!-- Center: Refined Details -->
+                            <div class="flex-1 p-4 md:p-5 flex flex-col justify-between border-r border-gray-50">
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h3
+                                            class="text-lg font-black text-gray-900 tracking-tight group-hover:text-[#d84e55] transition-colors">
+                                            {{ car.car_name }}</h3>
+                                        <div class="flex items-center gap-1 text-[#d84e55]">
+                                            <i class="fa-solid fa-star text-[10px]"></i>
+                                            <span class="text-xs font-black">{{ car.rating_value if car.rating_value
+                                                else "4.9" }}</span>
                                         </div>
                                     </div>
-                                    <div class="mt-4 pt-4 border-t border-gray-50 flex items-center gap-4">
-                                        <div class="flex items-center gap-1.5 text-emerald-600">
-                                            <i class="fa-solid fa-check-circle text-[10px]"></i>
-                                            <span class="text-[10px] font-bold">Free Cancellation</span>
+                                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mb-4">
+                                        {{ car.car_type.car_type if car.car_type else "Luxury" }} • {{ car.car_seats if
+                                        car.car_seats else "4" }} Seater
+                                    </p>
+
+                                    <div class="flex flex-wrap gap-3">
+                                        <div class="flex items-center gap-2 text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                                            <i class="fa-solid fa-users text-[10px]"></i>
+                                            <span class="text-[10px] font-bold">{{ car.car_seats }} Seats</span>
                                         </div>
-                                        <div class="flex items-center gap-1.5 text-blue-600">
-                                            <i class="fa-solid fa-id-card text-[10px]"></i>
-                                            <span class="text-[10px] font-bold">Expert Driver</span>
+                                        <div class="flex items-center gap-2 text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                                            <i class="fa-solid fa-suitcase text-[10px]"></i>
+                                            <span class="text-[10px] font-bold">{{ car.max_bags if car.max_bags else "2"
+                                                }} Bags</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-gray-500 bg-gray-50 px-2 py-1 rounded">
+                                            <i class="fa-solid fa-snowflake text-[10px]"></i>
+                                            <span class="text-[10px] font-bold">{{ "AC" if car.is_ac else "Non-AC"
+                                                }}</span>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Right: Professional Pricing -->
-                                <div class="md:w-56 p-4 md:p-5 bg-gray-50/40 flex flex-col justify-between">
-                                    <div class="text-right">
-                                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Fare starts from</p>
-                                        <div class="flex items-baseline justify-end gap-1">
-                                            <span class="text-2xl font-black text-gray-900">₹{{ car.per_km_fare }}</span>
-                                            <span class="text-[11px] text-gray-500 font-bold">/km</span>
-                                        </div>
+                                <div class="mt-4 pt-4 border-t border-gray-50 flex items-center gap-4">
+                                    <div class="flex items-center gap-1.5 text-emerald-600">
+                                        <i class="fa-solid fa-check-circle text-[10px]"></i>
+                                        <span class="text-[10px] font-bold">Free Cancellation</span>
                                     </div>
-                                    <div class="flex flex-col gap-2 mt-4">
-                                        <a href="{{ url_for('car_detail', car_id=car.id, pickup=request.args.get('pickup'), destination=request.args.get('destination'), date=request.args.get('date'), pickup_time=request.args.get('pickup_time')) }}" class="w-full py-2.5 rounded-lg bg-[#d84e55] text-white text-[10px] font-black uppercase tracking-widest shadow-md shadow-red-500/20 active:scale-95 transition-all border-b-2 border-black/10 text-center flex items-center justify-center">
-                                            Book Now
-                                        </a>
+                                    <div class="flex items-center gap-1.5 text-blue-600">
+                                        <i class="fa-solid fa-id-card text-[10px]"></i>
+                                        <span class="text-[10px] font-bold">Expert Driver</span>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Right: Professional Pricing -->
+                            <div class="md:w-56 p-4 md:p-5 bg-gray-50/40 flex flex-col justify-between">
+                                <div class="text-right">
+                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Fare
+                                        starts from</p>
+                                    <div class="flex items-baseline justify-end gap-1">
+                                        <span class="text-2xl font-black text-gray-900">₹{{ car.per_km_fare }}</span>
+                                        <span class="text-[11px] text-gray-500 font-bold">/km</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-2 mt-4">
+                                    <a href="{{ url_for('car_detail', car_id=car.id, pickup=request.args.get('pickup'), destination=request.args.get('destination'), date=request.args.get('date'), pickup_time=request.args.get('pickup_time')) }}"
+                                        class="w-full py-2.5 rounded-lg bg-[#d84e55] text-white text-[10px] font-black uppercase tracking-widest shadow-md shadow-red-500/20 active:scale-95 transition-all border-b-2 border-black/10 text-center flex items-center justify-center">
+                                        Book Now
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        {% endfor %}
+                    </div>
+                    {% endfor %}
                     {% else %}
-                        <!-- No Cars Found -->
-                        <div class="bg-white rounded-2xl p-12 text-center border border-gray-100" data-aos="fade-up">
-                            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <i class="fa-solid fa-car-side text-[#d84e55] text-2xl"></i>
-                            </div>
-                            <h3 class="text-lg font-black text-gray-900">No Vehicles Found</h3>
-                            <p class="text-gray-500 text-sm">Modify your search to find more results.</p>
+                    <!-- No Cars Found -->
+                    <div class="bg-white rounded-2xl p-12 text-center border border-gray-100" data-aos="fade-up">
+                        <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-car-side text-[#d84e55] text-2xl"></i>
                         </div>
+                        <h3 class="text-lg font-black text-gray-900">No Vehicles Found</h3>
+                        <p class="text-gray-500 text-sm">Modify your search to find more results.</p>
+                    </div>
                     {% endif %}
                 </div>
 
                 <!-- Pagination -->
                 <div class="mt-16 flex items-center justify-center gap-2" data-aos="fade-up">
-                    <button class="w-12 h-12 rounded-2xl bg-[#d84e55] text-white font-black shadow-lg shadow-[#d84e55]/20">1</button>
-                    <button class="w-12 h-12 rounded-2xl bg-white border border-gray-100 text-gray-500 font-black hover:border-[#d84e55] hover:text-[#d84e55] transition-all">2</button>
-                    <button class="w-12 h-12 rounded-2xl bg-white border border-gray-100 text-gray-500 font-black hover:border-[#d84e55] hover:text-[#d84e55] transition-all">3</button>
+                    <button
+                        class="w-12 h-12 rounded-2xl bg-[#d84e55] text-white font-black shadow-lg shadow-[#d84e55]/20">1</button>
+                    <button
+                        class="w-12 h-12 rounded-2xl bg-white border border-gray-100 text-gray-500 font-black hover:border-[#d84e55] hover:text-[#d84e55] transition-all">2</button>
+                    <button
+                        class="w-12 h-12 rounded-2xl bg-white border border-gray-100 text-gray-500 font-black hover:border-[#d84e55] hover:text-[#d84e55] transition-all">3</button>
                 </div>
             </div>
         </div>
@@ -265,7 +335,7 @@
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         console.log("Search Results Page Loaded Successfully");
         AOS.init({ duration: 1000, once: true });
 
@@ -282,7 +352,7 @@
         if (typeof google !== 'undefined' && google.maps && google.maps.places) {
             const pickupInput = document.getElementById('pickup_location');
             const destinationInput = document.getElementById('destination_location');
-            
+
             const options = {
                 types: ['(cities)'],
                 componentRestrictions: { country: "in" }
@@ -309,7 +379,7 @@
             destinationInput.addEventListener('focus', () => setTimeout(syncWidth, 10));
             window.addEventListener('resize', syncWidth);
         }
-        
+
         // FAQ Toggle
         document.querySelectorAll('.faq-item button').forEach(button => {
             button.addEventListener('click', () => {
@@ -331,7 +401,7 @@
         function filterCars() {
             const carList = $('#carList');
             carList.addClass('opacity-50 pointer-events-none');
-            
+
             const params = {
                 pickup: $('input[name="pickup"]').val(),
                 destination: $('input[name="destination"]').val(),
@@ -346,14 +416,14 @@
                 url: '/api/filter-cars',
                 method: 'GET',
                 data: params,
-                success: function(res) {
+                success: function (res) {
                     carList.removeClass('opacity-50 pointer-events-none');
-                    if(res.status === 1) {
+                    if (res.status === 1) {
                         renderCars(res.data);
                         $('.car-count-display').text(res.count || res.data.length);
                     }
                 },
-                error: function(err) {
+                error: function (err) {
                     carList.removeClass('opacity-50 pointer-events-none');
                     console.error("Filter Error:", err);
                 }
@@ -364,7 +434,7 @@
             const container = $('#carList');
             container.empty();
 
-            if(!cars || cars.length === 0) {
+            if (!cars || cars.length === 0) {
                 container.append(`
                     <div class="bg-white rounded-2xl p-12 text-center border border-gray-100">
                         <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -446,25 +516,25 @@
         }
 
         // Event Listeners
-        $(document).on('change', '.filter-checkbox', function() {
+        $(document).on('change', '.filter-checkbox', function () {
             filterCars();
         });
 
-        $(document).on('click', '.sort-btn', function() {
+        $(document).on('click', '.sort-btn', function () {
             $('.sort-btn').removeClass('bg-[#d84e55] text-white').addClass('bg-gray-50 text-gray-600 border border-gray-100');
             $(this).removeClass('bg-gray-50 text-gray-600 border-gray-100').addClass('bg-[#d84e55] text-white shadow-md shadow-[#d84e55]/20');
             currentSort = $(this).data('sort');
             filterCars();
         });
 
-        $(document).on('click', '.seat-btn', function() {
+        $(document).on('click', '.seat-btn', function () {
             $('.seat-btn').removeClass('bg-red-50 border-red-200 text-[#d84e55]').addClass('text-gray-500 border-gray-100');
             $(this).removeClass('text-gray-500 border-gray-100').addClass('bg-red-50 border-red-200 text-[#d84e55]');
             currentSeats = $(this).data('seats');
             filterCars();
         });
 
-        $(document).on('click', '.clear-filters', function() {
+        $(document).on('click', '.clear-filters', function () {
             $('input[name="car_type_id"]').prop('checked', false);
             $('.seat-btn').removeClass('bg-red-50 border-red-200 text-[#d84e55]').addClass('text-gray-500 border-gray-100');
             currentSeats = '';

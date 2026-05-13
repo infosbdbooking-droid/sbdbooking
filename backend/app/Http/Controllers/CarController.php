@@ -83,6 +83,7 @@ class CarController extends Controller
                 'rating_summary' => 'required|numeric|min:0|max:5',
                 'rating_value' => 'required|numeric|min:0|max:5',
                 'rating_count' => 'required|integer|min:1',
+                'min_trip_amount' => 'nullable|numeric|min:0',
                 'booking_includes' => 'required|array|min:1',
                 'booking_includes.*' => 'required|string|min:2',
                 'why_book_us' => 'required|array|min:1',
@@ -126,6 +127,7 @@ class CarController extends Controller
             $car->rating_summary = $request->rating_summary;
             $car->rating_value = $request->rating_value;
             $car->rating_count = $request->rating_count;
+            $car->min_trip_amount = $request->min_trip_amount;
 
             // JSON save
             $car->booking_includes = $request->booking_includes
@@ -210,6 +212,7 @@ class CarController extends Controller
                     'rating_summary' => $car->rating_summary,
                     'rating_value' => $car->rating_value,
                     'rating_count' => $car->rating_count,
+                    'min_trip_amount' => $car->min_trip_amount,
                     'car_photos' => $car->car_photos,
                     'booking_includes' => $car->booking_includes ? json_decode($car->booking_includes, true) : [],
                     'why_book_us' => $car->why_book_us ? json_decode($car->why_book_us, true) : [],
@@ -245,6 +248,7 @@ class CarController extends Controller
                 'rating_summary' => 'required|numeric|min:0|max:5',
                 'rating_value' => 'required|numeric|min:0|max:5',
                 'rating_count' => 'required|integer|min:1',
+                'min_trip_amount' => 'nullable|numeric|min:0',
                 'booking_includes' => 'required|array|min:1',
                 'booking_includes.*' => 'required|string|min:2',
                 'why_book_us' => 'required|array|min:1',
@@ -283,6 +287,7 @@ class CarController extends Controller
             $car->rating_summary = $request->rating_summary;
             $car->rating_value = $request->rating_value;
             $car->rating_count = $request->rating_count;
+            $car->min_trip_amount = $request->min_trip_amount;
             /* ================= JSON UPDATE ================= */
             $car->booking_includes = json_encode($request->booking_includes);
             $car->why_book_us = json_encode($request->why_book_us);

@@ -99,11 +99,13 @@
             $('.closeModal, .closeUserModal').on('click', function () {
                 $('#Modal').removeClass('flex').addClass('hidden');
             });
+            /* 
             $('#Modal').on('click', function (e) {
                 if ($(e.target).is('#Modal')) {
                     $(this).removeClass('flex').addClass('hidden');
                 }
             });
+            */
             // Initialize select2
             $('#permissions').select2({
                 width: '100%',
