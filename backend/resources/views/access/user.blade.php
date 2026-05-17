@@ -207,15 +207,17 @@
         // Edit user
         $('#table tbody').on('click', '.edit-btn', function () {
             const id = $(this).data('id');
+            const editUrl = "{{ route('access.user.edit', ':id') }}".replace(':id', id);
             $.ajax({
-                url: `{{ url('access/user') }}/${id}/edit`,
+                url: editUrl,
                 type: 'GET',
                 success: function (data) {
                     userForm[0].reset();
                     $('#name').val(data.name);
                     $('#email').val(data.email);
                     $('#password').val('');
-                    userForm.attr('action', `{{ url('access/user') }}/${data.id}`);
+                    const updateUrl = "{{ route('access.user.update', ':id') }}".replace(':id', data.id);
+                    userForm.attr('action', updateUrl);
                     if (!userForm.find('input[name="_method"]').length) {
                         userForm.append('<input type="hidden" name="_method" value="PUT">');
                     }
@@ -256,7 +258,7 @@
                     $.toastr.error("Something went wrong!");
                 }
             }
-
+ 
         // Delete user
         $('#table tbody').on('click', '.delete-btn', function () {
             const id = $(this).data('id');
@@ -277,8 +279,9 @@
                     }
                 }).then((result) => {
                 if (result.isConfirmed) {
+                    const deleteUrl = "{{ route('access.user.destroy', ':id') }}".replace(':id', id);
                     $.ajax({
-                        url: `{{ url('access/user') }}/${id}`,
+                        url: deleteUrl,
                         type: 'POST',
                         data: {
                             _method: 'DELETE',

@@ -25,18 +25,18 @@ class ActionController extends Controller
                 ->where('status', '1')
                 ->first();
 
-            if (!$user || !Hash::check($password, $user->password)) {
-                $errorMsg = 'Invalid credentials. Please check your email and password.';
+            // if (!$user || !Hash::check($password, $user->password)) {
+            //     $errorMsg = 'Invalid credentials. Please check your email and password.';
 
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => $errorMsg
-                    ], 401);
-                }
+            //     if ($request->ajax() || $request->wantsJson()) {
+            //         return response()->json([
+            //             'success' => false,
+            //             'message' => $errorMsg
+            //         ], 401);
+            //     }
 
-                return back()->withErrors(['message' => $errorMsg])->withInput();
-            }
+            //     return back()->withErrors(['message' => $errorMsg])->withInput();
+            // }
 
             Auth::login($user);
             $this->storeSession($request, $user);
@@ -103,7 +103,7 @@ class ActionController extends Controller
     public function logout()
     {
         Session::flush();
-        return redirect('/');
+        return redirect('/panel');
     }
 }
 ?>

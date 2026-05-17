@@ -16,13 +16,13 @@ class CheckAuthentication
         $loggedId = Session::get('logged_id');
 
         if (!$loggedIn || !$loggedId) {
-            return redirect('/');
+            return redirect('/panel');
         }
 
         $user = User::find($loggedId);
         if (!$user) {
             Session::flush();
-            return redirect('/signin');
+            return redirect('/panel');
         }
 
 

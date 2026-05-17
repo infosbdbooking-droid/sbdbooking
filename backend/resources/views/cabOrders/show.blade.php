@@ -42,6 +42,67 @@
         </div>
     </div>
 
+    @if(session('success'))
+        <div class="p-4 bg-green-100 border border-green-200 text-green-800 rounded-xl flex items-center gap-2 shadow-sm">
+            <i class="fas fa-check-circle text-lg text-green-600 animate-pulse"></i>
+            <div class="font-semibold">{{ session('success') }}</div>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="p-4 bg-red-100 border border-red-200 text-red-800 rounded-xl flex items-center gap-2 shadow-sm">
+            <i class="fas fa-times-circle text-lg text-red-600"></i>
+            <div class="font-semibold">{{ session('error') }}</div>
+        </div>
+    @endif
+
+    <!-- Booking Actions Panel -->
+    <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white rounded-xl shadow-lg border border-slate-700 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center text-blue-400 text-xl shadow-inner">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-base leading-tight">Order & Payment Action Control</h4>
+                <p class="text-xs text-gray-400 mt-0.5">Approve bookings and register received payments instantly.</p>
+            </div>
+        </div>
+        
+        <div class="flex flex-wrap gap-3 items-center w-full md:w-auto justify-end">
+            <!-- Accept Button -->
+            @if($order->booking_status === 'pending')
+                <form action="{{ route('cabOrders.accept', $order->id) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="w-full md:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 text-sm uppercase tracking-wide">
+                        <i class="fas fa-check-circle text-base"></i>
+                        Accept & Approve Order
+                    </button>
+                </form>
+            @endif
+
+            <!-- Approve Payment Button -->
+            @if($order->payment_status !== 'paid')
+                <form action="{{ route('cabOrders.approvePayment', $order->id) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="w-full md:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg shadow hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 text-sm uppercase tracking-wide">
+                        <i class="fas fa-receipt text-base"></i>
+                        Approve Payment
+                    </button>
+                </form>
+            @endif
+
+            <!-- Cancel Button -->
+            @if($order->booking_status === 'pending' || $order->booking_status === 'confirmed')
+                <form action="{{ route('cabOrders.cancel', $order->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to cancel this booking?')">
+                    @csrf
+                    <button type="submit" class="w-full md:w-auto px-4 py-2.5 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 rounded-lg transition-all duration-150 flex items-center justify-center gap-2 text-sm">
+                        <i class="fas fa-times-circle"></i>
+                        Cancel Booking
+                    </button>
+                </form>
+            @endif
+        </div>
+    </div>
+
     <!-- Main Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         

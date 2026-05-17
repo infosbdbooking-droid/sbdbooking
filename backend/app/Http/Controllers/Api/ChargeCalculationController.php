@@ -159,6 +159,7 @@
 
                 $breakdown[] = [
                     'charge_title' => $chargeName,
+                    'master_type'  => $charge->chargeType ? $charge->chargeType->charges_type : '',
                     'rate' => $rate,
                     'unit' => $unitLabel,
                     'quantity' => $quantity,

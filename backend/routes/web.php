@@ -26,11 +26,16 @@ Route::prefix('panel')->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
         # Logout
-        Route::get('/signout', [ActionController::class, 'logout']);
+        Route::get('/signout', [ActionController::class, 'logout'])->name('logout');
 
         # Cab Orders (Bookings)
         Route::prefix('cab-orders')->group(function () {
             Route::get('/', [CabOrderWebController::class, 'index'])->name('cabOrders');
+            Route::get('/create', [CabOrderWebController::class, 'create'])->name('cabOrders.create');
+            Route::post('/store', [CabOrderWebController::class, 'store'])->name('cabOrders.store');
+            Route::post('/{id}/accept', [CabOrderWebController::class, 'acceptBooking'])->name('cabOrders.accept');
+            Route::post('/{id}/approve-payment', [CabOrderWebController::class, 'approvePayment'])->name('cabOrders.approvePayment');
+            Route::post('/{id}/cancel', [CabOrderWebController::class, 'cancelBooking'])->name('cabOrders.cancel');
             Route::get('/{id}', [CabOrderWebController::class, 'show'])->name('cabOrders.show');
             Route::get('/{id}/invoice', [CabOrderWebController::class, 'downloadInvoice'])->name('cabOrders.invoice');
         });

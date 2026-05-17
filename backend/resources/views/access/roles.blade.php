@@ -192,15 +192,15 @@
                         searchable: false,
                         render: function (data, type, row) {
                             return `
-                                    <div class="flex space-x-2 justify-center">
-                                        <button type="button" class="edit-btn px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm" data-id="${row.id}">
-                                            Edit
-                                        </button>
-                                        <button type="button" class="delete-btn px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm" data-id="${row.id}">
-                                            Delete
-                                        </button>
-                                    </div>
-                                `;
+                                        <div class="flex space-x-2 justify-center">
+                                            <button type="button" class="edit-btn px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm" data-id="${row.id}">
+                                                Edit
+                                            </button>
+                                            <button type="button" class="delete-btn px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm" data-id="${row.id}">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    `;
                         }
                     }
                 ]
@@ -212,7 +212,7 @@
                 e.preventDefault();
                 const form = this;
                 const formData = new FormData(form);
-                const url = isEditing ? `{{ url('access/roles') }}/${editingId}` : $(form).attr('action');
+                const url = isEditing ? "{{ route('access.roles.update', ':id') }}".replace(':id', editingId) : $(form).attr('action');
                 if (isEditing) formData.append('_method', 'PUT');
                 $.ajax({
                     url: url,
@@ -265,8 +265,9 @@
             $('#table tbody').on('click', '.edit-btn', function () {
                 editingId = $(this).data('id');
                 isEditing = true;
+                const editUrl = "{{ route('access.roles.edit', ':id') }}".replace(':id', editingId);
 
-                $.get(`{{ url('access/roles') }}/${editingId}/edit`, function (data) {
+                $.get(editUrl, function (data) {
                     $('#title').val(data.title);
                     $('#Modal h2').text('Edit Role');
                     $('.addBtn').text('Update Role');
@@ -297,8 +298,9 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        const deleteUrl = "{{ route('access.roles.destroy', ':id') }}".replace(':id', id);
                         $.ajax({
-                            url: `{{ url('access/roles') }}/${id}`,
+                            url: deleteUrl,
                             type: 'POST',
                             data: {
                                 _method: 'DELETE',

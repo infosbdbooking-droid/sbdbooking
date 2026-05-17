@@ -2,8 +2,25 @@
 
 @section('content')
 <div class="container mx-auto py-6">
+    @if(session('success'))
+        <div class="mb-4 p-4 bg-green-100 border border-green-200 text-green-800 rounded-lg flex items-center gap-2 shadow-sm">
+            <i class="fas fa-check-circle text-lg"></i>
+            <div class="font-medium">{{ session('success') }}</div>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-200 text-red-800 rounded-lg flex items-center gap-2 shadow-sm">
+            <i class="fas fa-times-circle text-lg"></i>
+            <div class="font-medium">{{ session('error') }}</div>
+        </div>
+    @endif
+
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Cab Bookings</h1>
+        <a href="{{ route('cabOrders.create') }}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg shadow-sm hover:shadow font-semibold transition-all duration-150">
+            <i class="fas fa-plus"></i>
+            Manual Booking
+        </a>
     </div>
 
     <div class="bg-white shadow rounded-lg overflow-hidden border border-gray-200">

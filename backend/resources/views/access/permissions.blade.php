@@ -145,7 +145,7 @@
                 $('.error-text').remove();
                 $('input, select, textarea').removeClass('border-red-500');
 
-                const url = isEditing ? `{{ url('access/permissions') }}/${editingId}` : $(form).attr('action');
+                const url = isEditing ? "{{ route('access.permissions.update', ':id') }}".replace(':id', editingId) : $(form).attr('action');
                 if (isEditing) formData.append('_method', 'PUT');
 
                 $.ajax({
@@ -201,8 +201,9 @@
             $('#table tbody').on('click', '.edit-btn', function () {
                 editingId = $(this).data('id');
                 isEditing = true;
+                const editUrl = "{{ route('access.permissions.edit', ':id') }}".replace(':id', editingId);
 
-                $.get(`{{ url('access/permissions') }}/${editingId}/edit`, function (data) {
+                $.get(editUrl, function (data) {
                     $('#title').val(data.title);
                     $('#permissionModal h2').text('Edit Permission');
                     $('.addBtn').text('Update Permission');
@@ -230,8 +231,9 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        const deleteUrl = "{{ route('access.permissions.destroy', ':id') }}".replace(':id', id);
                         $.ajax({
-                            url: `{{ url('access/permissions') }}/${id}`,
+                            url: deleteUrl,
                             type: 'POST',
                             data: {
                                 _method: 'DELETE',
