@@ -270,9 +270,21 @@ class CabOrderController extends Controller
                 return response()->json(['status' => 0, 'message' => 'Unauthenticated'], 401);
             }
 
-            $orders = CabOrder::where('customer_id', $customer->id)
-                ->orderByDesc('created_at')
-                ->paginate(10);
+            $perPage = $request->input('per_page', 10);
+            $search = $request->input('search');
+
+            $query = CabOrder::where('customer_id', $customer->id);
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('order_number', 'like', "%{$search}%")
+                      ->orWhere('pickup_address', 'like', "%{$search}%")
+                      ->orWhere('drop_address', 'like', "%{$search}%")
+                      ->orWhere('car_name', 'like', "%{$search}%");
+                });
+            }
+
+            $orders = $query->orderByDesc('created_at')->paginate($perPage);
 
             return response()->json([
                 'status' => 1,

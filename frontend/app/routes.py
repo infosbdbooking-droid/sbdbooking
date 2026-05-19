@@ -274,6 +274,107 @@ def filter_cars():
 
 
 # ======================
+# BOOKINGS PAGE
+# ======================
+@app.route('/bookings')
+def bookings():
+    return render_template('bookings/index.html', api_base_url=API_BASE_URL)
+
+
+# ======================
+# MY ORDERS PROXY (Authenticated)
+# ======================
+@app.route('/api/my-orders')
+def my_orders():
+    try:
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            headers['Authorization'] = auth_header
+
+        params = request.args.to_dict()
+        api_url = f"{API_BASE_URL}/cab-orders"
+
+        response = requests.get(api_url, headers=headers, params=params, cookies=request.cookies, timeout=15)
+
+        try:
+            data = response.json()
+        except ValueError:
+            return jsonify({
+                "status": 0,
+                "message": "Invalid response from API",
+                "debug": response.text[:500]
+            }), 502
+
+        return jsonify(data), response.status_code
+
+    except Exception as e:
+        print("MY ORDERS PROXY ERROR:", e)
+        return jsonify({"status": 0, "message": "Failed to fetch orders"}), 500
+
+
+# ======================
+# CANCEL ORDER PROXY (Authenticated)
+# ======================
+@app.route('/api/cancel-order/<order_number>', methods=['POST'])
+def cancel_order(order_number):
+    try:
+        headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            headers['Authorization'] = auth_header
+
+        api_url = f"{API_BASE_URL}/cab-orders/{order_number}/cancel"
+        response = requests.post(api_url, headers=headers, cookies=request.cookies, timeout=15)
+
+        try:
+            data = response.json()
+        except ValueError:
+            return jsonify({
+                "status": 0,
+                "message": "Invalid response from API"
+            }), 502
+
+        return jsonify(data), response.status_code
+
+    except Exception as e:
+        print("CANCEL ORDER PROXY ERROR:", e)
+        return jsonify({"status": 0, "message": "Failed to cancel order"}), 500
+
+
+# ======================
+# ORDER DETAIL PROXY (Public)
+# ======================
+@app.route('/api/order-detail/<order_number>')
+def order_detail_proxy(order_number):
+    try:
+        headers = {'Content-Type': 'application/json'}
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            headers['Authorization'] = auth_header
+
+        api_url = f"{API_BASE_URL}/cab-orders/{order_number}"
+        response = requests.get(api_url, headers=headers, timeout=10)
+
+        try:
+            data = response.json()
+        except ValueError:
+            return jsonify({"status": 0, "message": "Invalid response"}), 502
+
+        return jsonify(data), response.status_code
+
+    except Exception as e:
+        print("ORDER DETAIL PROXY ERROR:", e)
+        return jsonify({"status": 0, "message": "Failed to fetch order"}), 500
+
+
+# ======================
 # 404 PAGE
 # ======================
 @app.errorhandler(404)

@@ -1,0 +1,664 @@
+{% include 'layouts/header.html' %}
+{% include 'layouts/navbar.html' %}
+{% include 'login/login.html' %}
+
+<style>
+  .booking-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  }
+  .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+  .status-pending   { background: #fef9c3; color: #854d0e; }
+  .status-confirmed { background: #dcfce7; color: #14532d; }
+  .status-completed { background: #dbeafe; color: #1e3a5f; }
+  .status-cancelled { background: #fee2e2; color: #7f1d1d; }
+  .order-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 20px; overflow: hidden; transition: box-shadow .25s, transform .25s; }
+  .order-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,.1); transform: translateY(-2px); }
+  .route-line { display: flex; align-items: center; gap: 8px; }
+  .route-line .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .route-line .dot-pickup { background: #22c55e; }
+  .route-line .dot-drop   { background: #ef4444; }
+  .route-line .connector  { width: 2px; height: 18px; background: #d1d5db; margin-left: 4px; }
+  .detail-pill { display: inline-flex; align-items: center; gap: 5px; background: #f3f4f6; border-radius: 8px; padding: 4px 10px; font-size: 12px; color: #374151; }
+  .shimmer { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 10px; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .modal-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+  .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+</style>
+
+<!-- Hero -->
+<div class="bg-white border-b border-gray-100 py-6">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900">My Bookings</h1>
+    <p class="text-gray-500 text-sm mt-1">Track and manage all your ride bookings</p>
+  </div>
+</div>
+
+<!-- Main -->
+<main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-24">
+
+  <!-- Search Bar (Visible only when logged in) -->
+  <div id="searchContainer" class="hidden mb-6">
+    <div class="relative max-w-md">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class="fa-solid fa-search text-gray-400"></i>
+      </div>
+      <input type="text" id="searchInput" placeholder="Search by Booking ID, Location, Car..." 
+        class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all shadow-sm">
+    </div>
+  </div>
+
+  <!-- Not Logged In State -->
+  <div id="notLoggedIn" class="hidden text-center py-20">
+    <div class="w-20 h-20 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-4">
+      <i class="fa-solid fa-lock text-3xl text-red-400"></i>
+    </div>
+    <h2 class="text-xl font-bold text-gray-800">Login to view your bookings</h2>
+    <p class="text-gray-500 mt-2 text-sm">Your booking history will appear here after you log in.</p>
+    <button id="loginPromptBtn" class="mt-6 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors">
+      <i class="fa-solid fa-circle-user"></i> Login / Register
+    </button>
+  </div>
+
+  <!-- Loading Skeleton -->
+  <div id="loadingState">
+    <div class="space-y-4">
+      {% for _ in range(3) %}
+      <div class="order-card p-5 space-y-4">
+        <div class="flex justify-between items-center">
+          <div class="shimmer h-5 w-32"></div>
+          <div class="shimmer h-6 w-20"></div>
+        </div>
+        <div class="shimmer h-4 w-64"></div>
+        <div class="shimmer h-4 w-48"></div>
+        <div class="flex gap-2">
+          <div class="shimmer h-8 w-24"></div>
+          <div class="shimmer h-8 w-24"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="emptyState" class="hidden text-center py-20">
+    <div class="w-24 h-24 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4">
+      <i class="fa-solid fa-car-side text-4xl text-gray-300"></i>
+    </div>
+    <h2 class="text-xl font-bold text-gray-700">No bookings yet</h2>
+    <p class="text-gray-400 mt-2 text-sm">Book your first ride and it will appear here.</p>
+    <a href="/" class="mt-6 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors">
+      <i class="fa-solid fa-search"></i> Explore Rides
+    </a>
+  </div>
+
+  <!-- Error State -->
+  <div id="errorState" class="hidden text-center py-20">
+    <div class="w-20 h-20 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-4">
+      <i class="fa-solid fa-triangle-exclamation text-3xl text-red-400"></i>
+    </div>
+    <h2 class="text-xl font-bold text-gray-700">Something went wrong</h2>
+    <p id="errorMsg" class="text-gray-400 mt-2 text-sm">Failed to load your bookings. Please try again.</p>
+    <button onclick="loadOrders()" class="mt-6 inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors">
+      <i class="fa-solid fa-rotate-right"></i> Retry
+    </button>
+  </div>
+
+  <!-- Orders List -->
+  <div id="ordersList" class="hidden space-y-4"></div>
+
+  <!-- Pagination -->
+  <div id="pagination" class="hidden flex justify-center gap-2 mt-8"></div>
+
+</main>
+
+<!-- Order Detail Modal -->
+<div id="detailModal" class="fixed inset-0 z-[9999] flex items-center justify-center hidden">
+  <div class="modal-backdrop" onclick="closeDetailModal()"></div>
+  <div class="relative bg-white w-full max-w-2xl mx-4 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+    <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 flex items-center justify-between">
+      <div>
+        <p class="text-slate-400 text-xs uppercase tracking-widest">Order Details</p>
+        <h3 id="modalOrderNum" class="text-white font-bold text-lg mt-0.5"></h3>
+      </div>
+      <button onclick="closeDetailModal()" class="text-white/60 hover:text-white text-2xl leading-none">&times;</button>
+    </div>
+    <div id="modalBody" class="overflow-y-auto p-6 space-y-5 text-sm text-gray-700"></div>
+  </div>
+</div>
+
+<!-- Cancel Confirm Modal -->
+<div id="cancelModal" class="fixed inset-0 z-[9999] flex items-center justify-center hidden">
+  <div class="modal-backdrop"></div>
+  <div class="relative bg-white w-full max-w-sm mx-4 rounded-2xl shadow-2xl p-6 text-center">
+    <div class="w-16 h-16 mx-auto bg-red-50 rounded-full flex items-center justify-center mb-4">
+      <i class="fa-solid fa-ban text-2xl text-red-500"></i>
+    </div>
+    <h3 class="text-lg font-bold text-gray-800">Cancel this booking?</h3>
+    <p class="text-gray-500 text-sm mt-2">This action cannot be undone. Your booking will be marked as cancelled.</p>
+    <div class="flex gap-3 mt-6">
+      <button onclick="closeCancelModal()" class="flex-1 border border-gray-200 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50 transition-colors">
+        Keep Booking
+      </button>
+      <button id="confirmCancelBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition-colors">
+        Yes, Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const TOKEN_KEY = 'customer_token';
+  const USER_KEY  = 'customer_data';
+  let currentPage = 1;
+  let cancelTargetOrder = null;
+
+  // ─── Status helpers ────────────────────────────────────────────
+  function statusBadge(status) {
+    const map = {
+      pending:   ['status-pending',   'fa-clock',        'Pending'],
+      confirmed: ['status-confirmed', 'fa-circle-check', 'Confirmed'],
+      completed: ['status-completed', 'fa-flag-checkered','Completed'],
+      cancelled: ['status-cancelled', 'fa-ban',          'Cancelled'],
+    };
+    const [cls, icon, label] = map[status] || ['status-pending', 'fa-circle', status];
+    return `<span class="status-badge ${cls}"><i class="fa-solid ${icon}"></i>${label}</span>`;
+  }
+
+  function tripTypeLabel(t) {
+    return t === 'round_trip'
+      ? '<span class="detail-pill"><i class="fa-solid fa-arrows-left-right"></i>Round Trip</span>'
+      : '<span class="detail-pill"><i class="fa-solid fa-arrow-right"></i>One Way</span>';
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function rupee(n) {
+    return '₹ ' + parseFloat(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  // ─── Render single order card ──────────────────────────────────
+  function renderCard(o) {
+    const canCancel = ['pending', 'confirmed'].includes(o.booking_status);
+    const charges = o.charges || {};
+    const breakdown = Array.isArray(charges.breakdown) ? charges.breakdown : [];
+
+    return `
+    <div class="order-card" id="card-${o.order_number}">
+      <!-- Card Header -->
+      <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5 pb-3 border-b border-gray-100">
+        <div>
+          <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Order</span>
+          <p class="font-bold text-gray-900 text-base">${o.order_number}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          ${statusBadge(o.booking_status)}
+          ${tripTypeLabel(o.trip?.type)}
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <div class="px-5 py-4 space-y-4">
+
+        <!-- Car + Date -->
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500">
+              <i class="fa-solid fa-car text-lg"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-gray-800">${o.car?.name || '—'}</p>
+              <p class="text-xs text-gray-400">${o.trip?.passengers || 1} pax · ${o.trip?.bags || 0} bags${o.trip?.is_ac ? ' · AC' : ''}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-gray-400">Pickup date</p>
+            <p class="font-semibold text-gray-700 text-sm">${formatDate(o.schedule?.pickup_date)}</p>
+            <p class="text-xs text-gray-400">${o.schedule?.pickup_time || ''}</p>
+          </div>
+        </div>
+
+        <!-- Route -->
+        <div class="bg-gray-50 rounded-xl p-3 space-y-2">
+          <div class="route-line">
+            <div class="flex flex-col items-center">
+              <span class="dot dot-pickup"></span>
+              <span class="connector"></span>
+              <span class="dot dot-drop"></span>
+            </div>
+            <div class="space-y-2 flex-1 min-w-0">
+              <p class="text-sm text-gray-700 font-medium truncate">${o.pickup?.address || '—'}</p>
+              <p class="text-sm text-gray-700 font-medium truncate">${o.drop?.address || '—'}</p>
+            </div>
+          </div>
+          <div class="flex gap-2 text-xs text-gray-400 pt-1">
+            <span><i class="fa-solid fa-route mr-1"></i>${o.distance?.one_way_km || 0} km one-way</span>
+            ${o.trip?.type === 'round_trip' ? `<span>· ${o.distance?.total_km || 0} km total</span>` : ''}
+          </div>
+        </div>
+
+        <!-- Fare Row -->
+        <div class="flex items-center justify-between">
+          <div></div>
+          <div class="text-right">
+            <span class="text-xs px-2 py-1 rounded-lg ${o.payment?.payment_status === 'paid' ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'} font-semibold">
+              ${o.payment?.payment_status === 'paid' ? '✓ Paid' : 'Pay on Arrival'}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-2 pt-1">
+
+          ${canCancel ? `
+          <button onclick="openCancelModal('${o.order_number}')"
+            class="inline-flex items-center gap-2 border border-red-200 text-red-600 hover:bg-red-50 text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+            <i class="fa-solid fa-ban text-xs"></i> Cancel Booking
+          </button>` : ''}
+        </div>
+      </div>
+
+      <!-- Collapse: breakdown (hidden by default) -->
+      <div id="breakdown-${o.order_number}" class="border-t px-5 py-3 bg-gray-50">
+        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Fare Breakdown</p>
+        <div class="space-y-1 text-sm">
+          ${breakdown.filter(c => c.amount).map(c => `
+            <div class="flex justify-between text-gray-600">
+              <span>${c.type}</span>
+              <span class="font-medium">${rupee(c.amount)}</span>
+            </div>`).join('')}
+          ${o.coupon?.code ? `
+            <div class="flex justify-between text-green-600">
+              <span>Coupon (${o.coupon.code})</span>
+              <span class="font-medium">- ${rupee(o.coupon.discount_amount)}</span>
+            </div>` : ''}
+          <div class="border-t pt-1 mt-1 flex justify-between font-bold text-gray-900">
+            <span>Total</span>
+            <span>${rupee(o.payment?.total_amount)}</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─── Load orders from API ──────────────────────────────────────
+  async function loadOrders(page = 1) {
+    currentPage = page;
+    const token = localStorage.getItem(TOKEN_KEY);
+
+    show('loadingState');
+    hide('ordersList'); hide('emptyState'); hide('errorState'); hide('notLoggedIn'); hide('pagination');
+
+
+
+    try {
+      const headers = {};
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      
+      const searchQuery = document.getElementById('searchInput').value.trim();
+      const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
+      
+      const res = await fetch(`/api/my-orders?page=${page}&per_page=1${searchParam}`, { headers });
+      const data = await res.json();
+
+      hide('loadingState');
+
+      if (data.status !== 1) {
+        // Token expired → show login
+        if (res.status === 401) {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(USER_KEY);
+          show('notLoggedIn');
+        } else {
+          document.getElementById('errorMsg').textContent = data.message || 'Failed to load bookings.';
+          show('errorState');
+        }
+        return;
+      }
+
+      const orders = data.data || [];
+      if (orders.length === 0) {
+        show('emptyState');
+        show('searchContainer'); // Keep search visible so user can clear it
+        return;
+      }
+
+      const list = document.getElementById('ordersList');
+      list.innerHTML = orders.map(renderCard).join('');
+      show('ordersList');
+      show('searchContainer');
+
+      // Pagination
+      if (data.meta && data.meta.last_page > 1) {
+        renderPagination(data.meta);
+      }
+
+    } catch (err) {
+      hide('loadingState');
+      document.getElementById('errorMsg').textContent = 'Network error. Please try again.';
+      show('errorState');
+      console.error(err);
+    }
+  }
+
+  // ─── Pagination ────────────────────────────────────────────────
+  function renderPagination(meta) {
+    const pg = document.getElementById('pagination');
+    let html = '';
+    for (let i = 1; i <= meta.last_page; i++) {
+      html += `<button onclick="loadOrders(${i})"
+        class="w-9 h-9 rounded-xl text-sm font-semibold transition-colors
+        ${i === meta.current_page ? 'bg-red-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}">
+        ${i}
+      </button>`;
+    }
+    pg.innerHTML = html;
+    show('pagination');
+  }
+
+  // ─── Detail Modal ──────────────────────────────────────────────
+  async function openDetailModal(orderNum) {
+    const modal = document.getElementById('detailModal');
+    document.getElementById('modalOrderNum').textContent = orderNum;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="text-center py-8 text-gray-400">
+        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
+        <p class="text-sm">Loading details…</p>
+      </div>`;
+    modal.classList.remove('hidden');
+
+    const token = localStorage.getItem(TOKEN_KEY);
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+
+    try {
+      const res  = await fetch(`/api/order-detail/${orderNum}`, { headers });
+      const data = await res.json();
+      if (data.status !== 1) { document.getElementById('modalBody').innerHTML = '<p class="text-red-500 text-center py-6">Failed to load.</p>'; return; }
+      const o = data.data;
+      const charges = o.charges || {};
+      const breakdown = Array.isArray(charges.breakdown) ? charges.breakdown : [];
+
+      document.getElementById('modalBody').innerHTML = `
+        <!-- Header Card -->
+        <div class="bg-gradient-to-r from-slate-800 to-slate-700 -mx-6 -mt-6 p-6 mb-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg">
+                <i class="fa-solid fa-check"></i>
+              </div>
+              <div>
+                <h3 class="text-white font-bold text-lg">Booking ${o.booking_status.toUpperCase()}</h3>
+                <p class="text-slate-300 text-xs">Your trip details are below.</p>
+              </div>
+            </div>
+            <button class="text-white/60 hover:text-white text-sm border border-white/20 px-3 py-1 rounded-lg">
+              <i class="fa-solid fa-share mr-1"></i> Share
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-3 mt-4">
+            <div class="bg-white/10 rounded-lg p-2 text-center">
+              <p class="text-slate-400 text-xs uppercase">Booking ID</p>
+              <p class="text-white font-bold text-sm">${o.order_number}</p>
+            </div>
+            <div class="bg-white/10 rounded-lg p-2 text-center">
+              <p class="text-slate-400 text-xs uppercase">PNR</p>
+              <p class="text-white font-bold text-sm">${o.pnr || 'N/A'}</p>
+            </div>
+            <div class="bg-white/10 rounded-lg p-2 text-center">
+              <p class="text-slate-400 text-xs uppercase">Booked On</p>
+              <p class="text-white font-bold text-sm">${formatDate(o.created_at)}</p>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center gap-2">
+            <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded">${o.trip?.type === 'round_trip' ? 'ROUND TRIP' : 'ONE WAY'}</span>
+            <span class="text-slate-300 text-xs">${o.distance?.total_km || o.distance?.one_way_km || 0} km</span>
+          </div>
+        </div>
+
+        <!-- Journey Details -->
+        <div class="border border-gray-100 rounded-xl p-4 mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-gray-800 flex items-center gap-2">
+              <i class="fa-solid fa-map-location-dot text-blue-500"></i> Journey Details
+            </h4>
+            <span class="text-xs text-blue-600 font-semibold">→ ${o.trip?.type === 'round_trip' ? 'Round Trip' : 'One Way'}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 mb-4">
+            <div class="bg-gray-50 rounded-lg p-2 text-center">
+              <p class="text-gray-400 text-xs">Date</p>
+              <p class="text-gray-800 font-bold text-sm">${formatDate(o.schedule?.pickup_date)}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-2 text-center">
+              <p class="text-gray-400 text-xs">Pickup Time</p>
+              <p class="text-gray-800 font-bold text-sm">${o.schedule?.pickup_time || '—'}</p>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-2 text-center">
+              <p class="text-gray-400 text-xs">Est. Duration</p>
+              <p class="text-gray-800 font-bold text-sm">${o.schedule?.duration || '—'}</p>
+            </div>
+          </div>
+          <!-- Route Timeline -->
+          <div class="space-y-4">
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center">
+                <span class="w-4 h-4 rounded-full border-2 border-green-500 bg-white flex-shrink-0"></span>
+                <span class="w-0.5 h-full bg-dashed border-l-2 border-gray-200 border-dashed my-1"></span>
+              </div>
+              <div>
+                <p class="text-xs text-green-600 font-bold uppercase">Pickup</p>
+                <p class="font-bold text-gray-800">${o.pickup?.address || '—'}</p>
+                <p class="text-xs text-gray-500">${o.pickup?.landmark || ''}</p>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center">
+                <span class="w-4 h-4 rounded-full bg-blue-600 flex-shrink-0"></span>
+              </div>
+              <div>
+                <p class="text-xs text-blue-600 font-bold uppercase">Drop</p>
+                <p class="font-bold text-gray-800">${o.drop?.address || '—'}</p>
+                <p class="text-xs text-gray-500">${o.drop?.landmark || ''}</p>
+              </div>
+            </div>
+          </div>
+          <div class="border-t mt-4 pt-3 flex justify-between items-center text-xs text-gray-500">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-user"></i>
+              <span>${o.customer?.name || '—'}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-phone"></i>
+              <span>${o.customer?.mobile || '—'}</span>
+            </div>
+            <div class="flex gap-1">
+              <span class="bg-gray-100 px-2 py-0.5 rounded">${o.trip?.passengers || 1} Pax</span>
+              <span class="bg-gray-100 px-2 py-0.5 rounded">${o.trip?.bags || 0} Bags</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle Details -->
+        <div class="border border-gray-100 rounded-xl p-4 mb-4">
+          <h4 class="font-bold text-gray-800 flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-car text-blue-500"></i> Vehicle & Driver Details
+          </h4>
+          <div class="flex gap-4">
+            <div class="w-24 h-20 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 text-2xl">
+              <i class="fa-solid fa-car"></i>
+            </div>
+            <div class="flex-1">
+              <div class="flex justify-between">
+                <h5 class="font-bold text-gray-800">${o.car?.name || '—'}</h5>
+                <span class="text-xs text-blue-600 font-semibold">Premium</span>
+              </div>
+              <p class="text-xs text-gray-500 mb-2">SUV · White</p>
+              <div class="inline-block border border-gray-300 rounded px-2 py-0.5 font-mono text-sm text-gray-700 bg-gray-50">
+                ${o.car?.registration_number || 'KL-XX-XX-XXXX'}
+              </div>
+              <div class="flex gap-3 mt-2 text-xs text-gray-500">
+                <span><i class="fa-solid fa-chair mr-1"></i>${o.car?.seats || 4} Seats</span>
+                <span><i class="fa-solid fa-suitcase mr-1"></i>${o.car?.bags || 2} Bags</span>
+                <span><i class="fa-solid fa-snowflake mr-1"></i>AC</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fare Breakup -->
+        <div class="border border-gray-100 rounded-xl p-4 mb-4">
+          <h4 class="font-bold text-gray-800 flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-file-invoice-dollar text-blue-500"></i> Fare Breakup
+          </h4>
+          <div class="space-y-2 text-sm text-gray-700">
+            ${breakdown.filter(c => c.amount).map(c => `
+              <div class="flex justify-between">
+                <span>${c.type}</span>
+                <span class="font-medium">${rupee(c.amount)}</span>
+              </div>`).join('')}
+            ${o.coupon?.code ? `
+              <div class="flex justify-between text-green-600">
+                <span>Promo Code: ${o.coupon.code}</span>
+                <span class="font-medium">- ${rupee(o.coupon.discount_amount)}</span>
+              </div>` : ''}
+            <div class="bg-blue-600 text-white -mx-4 p-4 mt-4 flex justify-between items-center rounded-b-xl">
+              <div>
+                <p class="text-xs text-blue-200">TOTAL AMOUNT</p>
+                <p class="text-2xl font-bold">${rupee(o.payment?.total_amount)}</p>
+              </div>
+              <div class="text-right text-xs">
+                <p class="font-bold">${o.payment?.payment_status === 'paid' ? 'Paid via UPI' : 'Pay on Arrival'}</p>
+                <p class="text-blue-200">${formatDate(o.created_at)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inclusions/Exclusions -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="border border-green-100 bg-green-50 rounded-xl p-4">
+            <h5 class="text-xs font-bold text-green-700 uppercase mb-2">Inclusions</h5>
+            <ul class="text-xs text-green-700 space-y-1">
+              <li><i class="fa-solid fa-check mr-1"></i> Fuel charges included</li>
+              <li><i class="fa-solid fa-check mr-1"></i> Driver bata included</li>
+              <li><i class="fa-solid fa-check mr-1"></i> GST included in total</li>
+            </ul>
+          </div>
+          <div class="border border-red-100 bg-red-50 rounded-xl p-4">
+            <h5 class="text-xs font-bold text-red-700 uppercase mb-2">Exclusions</h5>
+            <ul class="text-xs text-red-700 space-y-1">
+              <li><i class="fa-solid fa-xmark mr-1"></i> Toll & parking at actuals</li>
+              <li><i class="fa-solid fa-xmark mr-1"></i> Extra km charges if route extended</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Contact Us -->
+        <div class="border border-gray-100 rounded-xl p-4">
+          <h4 class="font-bold text-gray-800 flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-headset text-blue-500"></i> Need Help? Contact Us
+          </h4>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="border border-gray-100 rounded-lg p-2">
+              <i class="fa-solid fa-phone text-blue-500 text-lg mb-1"></i>
+              <p class="font-bold">Call Us</p>
+              <p class="text-gray-500">+91 80012 34567</p>
+            </div>
+            <div class="border border-gray-100 rounded-lg p-2 bg-green-50">
+              <i class="fa-solid fa-whatsapp text-green-500 text-lg mb-1"></i>
+              <p class="font-bold">WhatsApp</p>
+              <p class="text-gray-500">+91 80012 34567</p>
+            </div>
+            <div class="border border-gray-100 rounded-lg p-2">
+              <i class="fa-solid fa-envelope text-red-500 text-lg mb-1"></i>
+              <p class="font-bold">Email Us</p>
+              <p class="text-gray-500">support@sbd.com</p>
+            </div>
+          </div>
+        </div>`;
+    } catch(e) {
+      document.getElementById('modalBody').innerHTML = '<p class="text-red-500 text-center py-6">Network error.</p>';
+    }
+  }
+
+  function closeDetailModal() {
+    document.getElementById('detailModal').classList.add('hidden');
+  }
+
+  // ─── Cancel Modal ──────────────────────────────────────────────
+  function openCancelModal(orderNum) {
+    cancelTargetOrder = orderNum;
+    document.getElementById('cancelModal').classList.remove('hidden');
+    document.getElementById('confirmCancelBtn').onclick = doCancel;
+  }
+  function closeCancelModal() {
+    document.getElementById('cancelModal').classList.add('hidden');
+    cancelTargetOrder = null;
+  }
+
+  async function doCancel() {
+    const btn = document.getElementById('confirmCancelBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Cancelling…';
+
+    const token = localStorage.getItem(TOKEN_KEY);
+    try {
+      const res  = await fetch(`/api/cancel-order/${cancelTargetOrder}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        }
+      });
+      const data = await res.json();
+      closeCancelModal();
+      if (data.status === 1) {
+        toastr.success('Booking cancelled successfully.');
+        await loadOrders(currentPage);
+      } else {
+        toastr.error(data.message || 'Could not cancel booking.');
+      }
+    } catch(e) {
+      closeCancelModal();
+      toastr.error('Network error. Please try again.');
+    }
+  }
+
+  // ─── Utility ──────────────────────────────────────────────────
+  function show(id) { document.getElementById(id)?.classList.remove('hidden'); }
+  function hide(id) { document.getElementById(id)?.classList.add('hidden'); }
+
+  // ─── Search ────────────────────────────────────────────────────
+  let debounceTimeout;
+  document.getElementById('searchInput')?.addEventListener('input', function() {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      loadOrders(1);
+    }, 500);
+  });
+
+  // ─── Auth state sync ───────────────────────────────────────────
+  function checkAndLoad() {
+    loadOrders(1);
+  }
+
+  // Login prompt btn
+  document.getElementById('loginPromptBtn').addEventListener('click', () => {
+    document.getElementById('loginModal').classList.remove('hidden');
+  });
+
+  // After login event (reuse global event from your auth JS if available)
+  window.addEventListener('sbd:loggedIn', () => loadOrders(1));
+  window.addEventListener('sbd:loggedOut', () => {
+    hide('ordersList'); hide('pagination');
+    show('notLoggedIn');
+  });
+
+  // Init
+  checkAndLoad();
+</script>
+
+{% include 'layouts/footer.html' %}
