@@ -262,7 +262,7 @@ def search_results():
     return render_template('car_listing/index.html', cars=cars, car_types=car_types, api_base_url=API_BASE_URL)
 
 
-@app.route('/api/filter-cars')
+@app.route('/proxy/filter-cars')
 def filter_cars():
     try:
         params = request.args.to_dict()
@@ -308,7 +308,7 @@ def contact():
 # ======================
 # CONTACT API PROXY (Public)
 # ======================
-@app.route('/api/contact', methods=['POST'])
+@app.route('/proxy/contact', methods=['POST'])
 def contact_api_proxy():
     try:
         payload = request.get_json()
@@ -338,7 +338,7 @@ def contact_api_proxy():
 # ======================
 # MY ORDERS PROXY (Authenticated)
 # ======================
-@app.route('/api/my-orders')
+@app.route('/proxy/my-orders')
 def my_orders():
     try:
         headers = {
@@ -373,7 +373,7 @@ def my_orders():
 # ======================
 # CANCEL ORDER PROXY (Authenticated)
 # ======================
-@app.route('/api/cancel-order/<order_number>', methods=['POST'])
+@app.route('/proxy/cancel-order/<order_number>', methods=['POST'])
 def cancel_order(order_number):
     try:
         headers = {
@@ -405,7 +405,7 @@ def cancel_order(order_number):
 # ======================
 # ORDER DETAIL PROXY (Public)
 # ======================
-@app.route('/api/order-detail/<order_number>')
+@app.route('/proxy/order-detail/<order_number>')
 def order_detail_proxy(order_number):
     try:
         headers = {'Content-Type': 'application/json'}

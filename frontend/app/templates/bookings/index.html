@@ -301,7 +301,7 @@
       const searchQuery = document.getElementById('searchInput').value.trim();
       const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : '';
       
-      const res = await fetch(`/api/my-orders?page=${page}&per_page=1${searchParam}`, { headers });
+      const res = await fetch(`/proxy/my-orders?page=${page}&per_page=1${searchParam}`, { headers });
       const data = await res.json();
 
       hide('loadingState');
@@ -375,7 +375,7 @@
     if (token) headers['Authorization'] = 'Bearer ' + token;
 
     try {
-      const res  = await fetch(`/api/order-detail/${orderNum}`, { headers });
+      const res  = await fetch(`/proxy/order-detail/${orderNum}`, { headers });
       const data = await res.json();
       if (data.status !== 1) { document.getElementById('modalBody').innerHTML = '<p class="text-red-500 text-center py-6">Failed to load.</p>'; return; }
       const o = data.data;
@@ -606,7 +606,7 @@
 
     const token = localStorage.getItem(TOKEN_KEY);
     try {
-      const res  = await fetch(`/api/cancel-order/${cancelTargetOrder}`, {
+      const res  = await fetch(`/proxy/cancel-order/${cancelTargetOrder}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
