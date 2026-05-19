@@ -393,7 +393,10 @@ $(document).ready(function () {
        MAP INIT
     ===================================================== */
     function initRouteMap() {
-        map = new google.maps.Map(document.getElementById("routeMap"), {
+        const mapEl = document.getElementById("routeMap");
+        if (!mapEl) return;
+        
+        map = new google.maps.Map(mapEl, {
             center: { lat: 28.6139, lng: 77.2090 },
             zoom: 11
         });
@@ -584,9 +587,11 @@ $(document).ready(function () {
        AUTOCOMPLETE INIT
     ===================================================== */
     function initAutocomplete() {
+        const pickupEl = document.getElementById("pickup");
+        if (!pickupEl) return;
 
         pickupAutocomplete = new google.maps.places.Autocomplete(
-            document.getElementById("pickup"),
+            pickupEl,
             { componentRestrictions: { country: "in" } }
         );
         pickupAutocomplete.addListener("place_changed", function () {
