@@ -5,8 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>{% block title %}Best Cab Booking, Tour Packages & Outstation Taxi Service in India | SBD Booking{% endblock %}
-  </title>
+  <title>{% block title %}{{ title if title else "Best Cab Booking, Tour Packages & Outstation Taxi Service in India | SBD Booking" }}{% endblock %}</title>
   <link rel="icon" href="" type="image/x-icon" />
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Light mode forcing -->

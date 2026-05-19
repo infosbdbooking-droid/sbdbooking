@@ -1,0 +1,226 @@
+{% include 'layouts/header.html' %}
+{% include 'layouts/navbar.html' %}
+{% include 'login/login.html' %}
+
+<!-- AOS (Animate on Scroll) library for premium animations -->
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+<main class="bg-gray-50 min-h-screen">
+
+  <!-- BREADCRUMB (Matches other pages) -->
+  <div class="bg-white border-b border-gray-100 py-3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex text-xs sm:text-sm font-medium text-gray-500 items-center gap-2">
+        <a href="/" class="hover:text-[#d84e55] transition-colors">Home</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-900">About Us</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="relative bg-slate-900 overflow-hidden py-20">
+    <!-- Background Image with Overlay -->
+    <div class="absolute inset-0 z-0">
+      <img src="{{ url_for('static', filename='images/about_hero.png') }}" alt="Premium Outstation Cab Booking - SBD Tour and Travels" class="w-full h-full object-cover opacity-30 object-center">
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-transparent"></div>
+    </div>
+
+    <!-- Hero Content (Wrapped in max-w-6xl mx-auto px-4 sm:px-6 lg:px-8) -->
+    <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl" data-aos="fade-right" data-aos-duration="1000">
+        <span class="bg-[#d84e55]/20 text-[#d84e55] font-black uppercase text-xs tracking-widest px-3 py-1.5 rounded-full inline-block mb-4">
+          Welcome to SBD Tour & Travels
+        </span>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+          Reliable Outstation Cab Booking & Premium Car Rental Services
+        </h1>
+        <p class="mt-6 text-sm sm:text-base text-slate-300 font-medium leading-relaxed">
+          SBD Tour and Travels is your premier destination for dependable outstation taxi services, airport transfers, local city rentals, and customizable holiday tour packages. We connect major destinations across Madhya Pradesh and Kerala with our top-tier fleet and expert drivers.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="/" class="bg-gradient-to-r from-[#d84e55] to-[#c13d44] text-white px-8 py-3.5 rounded-xl font-bold uppercase tracking-wider text-xs shadow-[0_8px_20px_rgba(216,78,85,0.35)] hover:shadow-[0_12px_25px_rgba(216,78,85,0.45)] transition-all active:scale-95">
+            Book a Taxi Online
+          </a>
+          <a href="#story" class="border border-white/20 hover:border-white text-white px-8 py-3.5 rounded-xl font-bold uppercase tracking-wider text-xs bg-white/5 hover:bg-white/10 transition-all">
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR (Matches page width) -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 -mt-8">
+    <div class="bg-white border border-gray-100 py-10 shadow-lg rounded-2xl">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-gray-100">
+        <div class="pt-4 md:pt-0" data-aos="zoom-in" data-aos-duration="600" data-aos-delay="100">
+          <p class="text-3xl sm:text-4xl font-black text-gray-900">50,000+</p>
+          <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-widest mt-1">Successful Trips</p>
+        </div>
+        <div class="pt-4 md:pt-0" data-aos="zoom-in" data-aos-duration="600" data-aos-delay="200">
+          <p class="text-3xl sm:text-4xl font-black text-gray-900">150+</p>
+          <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-widest mt-1">Verified Fleets</p>
+        </div>
+        <div class="pt-4 md:pt-0" data-aos="zoom-in" data-aos-duration="600" data-aos-delay="300">
+          <p class="text-3xl sm:text-4xl font-black text-gray-900">25+</p>
+          <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-widest mt-1">Cities Served</p>
+        </div>
+        <div class="pt-4 md:pt-0" data-aos="zoom-in" data-aos-duration="600" data-aos-delay="400">
+          <p class="text-3xl sm:text-4xl font-black text-gray-900">4.9/5</p>
+          <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-widest mt-1">User Rating</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR STORY SECTION (SEO Focused Text) -->
+  <section id="story" class="py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <!-- Image Left -->
+      <div class="lg:col-span-5 relative" data-aos="fade-right" data-aos-duration="1000">
+        <div class="absolute -top-4 -left-4 w-24 h-24 bg-red-100 rounded-2xl -z-10"></div>
+        <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-100 rounded-2xl -z-10"></div>
+        <img src="{{ url_for('static', filename='images/about_hero.png') }}" alt="Outstation Cabs Madhya Pradesh Kerala - SBD Tour & Travels" class="rounded-3xl shadow-xl w-full object-cover aspect-[4/3]">
+      </div>
+      
+      <!-- Content Right -->
+      <div class="lg:col-span-7 space-y-6" data-aos="fade-left" data-aos-duration="1000">
+        <span class="text-xs font-black uppercase text-[#d84e55] tracking-widest">About Our Journey</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">Leading the Way in Affordable Car Rentals & Outstation Taxi Booking</h2>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          At <strong>SBD Tour and Travels</strong>, we started with a mission to simplify the booking of outstation taxis, one-way cabs, and long-term car rentals. Over the years, we have emerged as a highly rated service provider, especially famous for connecting scenic and religious tourism hubs like Kochi, Munnar, Jabalpur, Amarkantak, and beyond.
+        </p>
+        <p class="text-sm text-gray-600 leading-relaxed">
+          Whether you need a sleek Sedan for airport transfers, a comfortable SUV for family outstation trips, or a spacious Tempo Traveller for group excursions, our fleet is fully equipped to meet your needs. We emphasize transparent pricing, clean vehicles, and courteous, background-verified chauffeurs to ensure your absolute comfort and safety.
+        </p>
+        <div class="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-full bg-red-50 text-[#d84e55] flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-shield-halved"></i>
+            </span>
+            <div>
+              <p class="font-bold text-gray-800 text-xs sm:text-sm">Verified Vehicle Safety</p>
+              <p class="text-[11px] text-gray-400">Regular GPS & brake tests</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center flex-shrink-0">
+              <i class="fa-solid fa-clock"></i>
+            </span>
+            <div>
+              <p class="font-bold text-gray-800 text-xs sm:text-sm">Punctual Pickups</p>
+              <p class="text-[11px] text-gray-400">Ontime pickup guarantee</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CORE VALUES -->
+  <section class="bg-white py-16 border-t border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-12" data-aos="fade-up" data-aos-duration="800">
+        <span class="text-xs font-black uppercase text-[#d84e55] tracking-widest">Our Foundation</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-gray-900 mt-2">Why SBD is Your Trusted Travel Partner</h2>
+        <p class="text-gray-500 text-xs sm:text-sm mt-3">We hold ourselves to strict operational standards to deliver outstanding car rental service across India.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Value 1 -->
+        <div class="border border-gray-100 rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
+          <div class="w-12 h-12 bg-red-50 text-[#d84e55] group-hover:bg-[#d84e55] group-hover:text-white rounded-xl flex items-center justify-center text-xl transition-all duration-300 mb-6">
+            <i class="fa-solid fa-heart"></i>
+          </div>
+          <h3 class="text-base sm:text-lg font-black text-gray-900 mb-3">Customer-Centric Approach</h3>
+          <p class="text-gray-500 text-xs sm:text-sm leading-relaxed">
+            Your travel preferences are unique. SBD offers customized outstation tour packages, flexible route stops, and easy online cancellation with immediate refunds.
+          </p>
+        </div>
+
+        <!-- Value 2 -->
+        <div class="border border-gray-100 rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+          <div class="w-12 h-12 bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white rounded-xl flex items-center justify-center text-xl transition-all duration-300 mb-6">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <h3 class="text-base sm:text-lg font-black text-gray-900 mb-3">Safety & Security Standard</h3>
+          <p class="text-gray-500 text-xs sm:text-sm leading-relaxed">
+            Safety is our highest priority. All booking cars are GPS-tracked, deep cleaned before departure, and driven by background-verified regional chauffeurs.
+          </p>
+        </div>
+
+        <!-- Value 3 -->
+        <div class="border border-gray-100 rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-duration="800" data-aos-delay="300">
+          <div class="w-12 h-12 bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white rounded-xl flex items-center justify-center text-xl transition-all duration-300 mb-6">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+          <h3 class="text-base sm:text-lg font-black text-gray-900 mb-3">Transparent Booking Rates</h3>
+          <p class="text-gray-500 text-xs sm:text-sm leading-relaxed">
+            Enjoy fixed and transparent pricing model. Tolls, state taxes, parking charges, and driver allowances are calculated clearly before you pay.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SHOWCASE -->
+  <section class="py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-12" data-aos="fade-up" data-aos-duration="800">
+      <span class="text-xs font-black uppercase text-[#d84e55] tracking-widest">Our Key Highlights</span>
+      <h2 class="text-2xl sm:text-3xl font-black text-gray-900 mt-2">Tailored for Comfort & Outstation Journeys</h2>
+      <p class="text-gray-500 text-xs sm:text-sm mt-3">We ensure premium services come standard on all one-way and round-trip rentals.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:border-[#d84e55]/50 transition-all duration-300" data-aos="fade-up" data-aos-duration="600" data-aos-delay="50">
+        <i class="fa-solid fa-snowflake text-2xl text-blue-500 mb-4 block"></i>
+        <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-2">Climate-Controlled Fleet</h4>
+        <p class="text-xs text-gray-500 leading-relaxed">All our outstation taxies and family cabs are fitted with powerful air-conditioning for smooth summer travels.</p>
+      </div>
+      <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:border-[#d84e55]/50 transition-all duration-300" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+        <i class="fa-solid fa-headset text-2xl text-[#d84e55] mb-4 block"></i>
+        <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-2">24/7 Booking Support</h4>
+        <p class="text-xs text-gray-500 leading-relaxed">Need help on a midnight ride? Our team is active day and night to answer all queries and dispatch replacement cars.</p>
+      </div>
+      <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:border-[#d84e55]/50 transition-all duration-300" data-aos="fade-up" data-aos-duration="600" data-aos-delay="150">
+        <i class="fa-solid fa-route text-2xl text-green-500 mb-4 block"></i>
+        <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-2">Flexible Stop Routing</h4>
+        <p class="text-xs text-gray-500 leading-relaxed">Add secondary destinations, halt at your favorite highway restaurants, and custom route your trip without extra penalties.</p>
+      </div>
+      <div class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:border-[#d84e55]/50 transition-all duration-300" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+        <i class="fa-solid fa-user-tie text-2xl text-amber-500 mb-4 block"></i>
+        <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-2">Verified Tour Drivers</h4>
+        <p class="text-xs text-gray-500 leading-relaxed">Our tour drivers double as regional guides, fluent in major routes and local culture across MP and Kerala.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="bg-slate-900 py-16 text-center relative overflow-hidden">
+    <div class="absolute inset-0 bg-[#d84e55] opacity-5 -z-10 mix-blend-color-dodge"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="max-w-3xl mx-auto space-y-6" data-aos="zoom-in" data-aos-duration="800">
+        <h2 class="text-2xl sm:text-3xl font-black text-white">Experience Convenient Cab Booking with SBD</h2>
+        <p class="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+          Book clean cars, check dynamic outstation fare estimations, and enjoy a safe journey. Let SBD Tour and Travels handle the driving.
+        </p>
+        <div class="pt-4">
+          <a href="/" class="bg-gradient-to-r from-[#d84e55] to-[#c13d44] text-white px-10 py-4 rounded-xl font-bold uppercase tracking-wider text-xs shadow-[0_8px_20px_rgba(216,78,85,0.4)] hover:shadow-[0_12px_25px_rgba(216,78,85,0.5)] transition-all inline-block active:scale-95">
+            Book Your Cab Today
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    AOS.init({ duration: 1000, once: true });
+  });
+</script>
+
+{% include 'layouts/footer.html' %}

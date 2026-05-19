@@ -1,0 +1,145 @@
+{% include 'layouts/header.html' %}
+{% include 'layouts/navbar.html' %}
+{% include 'login/login.html' %}
+
+<main class="bg-gray-50 min-h-screen">
+
+  <!-- BREADCRUMB (Matches other pages) -->
+  <div class="bg-white border-b border-gray-100 py-3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex text-xs sm:text-sm font-medium text-gray-500 items-center gap-2">
+        <a href="/" class="hover:text-[#d84e55] transition-colors">Home</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-900">Help & Support</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- HERO HEADER -->
+  <section class="bg-slate-900 text-white py-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+      <div class="max-w-2xl">
+        <span class="bg-[#d84e55]/20 text-[#d84e55] font-black uppercase text-xs tracking-widest px-3 py-1.5 rounded-full inline-block mb-3">
+          24/7 Customer Care
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight">Help & Support Center</h1>
+        <p class="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed">
+          Have queries about your booking, route calculation, or vehicle availability? Reach out to us via direct call or WhatsApp messaging for instant assistance.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK CHANNELS (Call and WhatsApp) -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <!-- CALL CARD -->
+      <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+        <div>
+          <div class="w-14 h-14 bg-red-50 text-[#d84e55] group-hover:bg-[#d84e55] group-hover:text-white rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 mb-6">
+            <i class="fa-solid fa-phone-volume"></i>
+          </div>
+          <h2 class="text-xl font-black text-gray-900 mb-3">Call Support Helpline</h2>
+          <p class="text-gray-500 text-sm leading-relaxed mb-6">
+            Speak directly with our support specialists. Ideal for urgent ride requests, active trip support, or direct booking queries.
+          </p>
+        </div>
+        <a href="tel:+918224894319" class="w-full text-center bg-gradient-to-r from-[#d84e55] to-[#c13d44] text-white py-4 rounded-2xl font-bold uppercase tracking-wider text-xs shadow-[0_8px_20px_rgba(216,78,85,0.3)] hover:shadow-[0_12px_25px_rgba(216,78,85,0.4)] transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-phone"></i> Call +91 8224894319
+        </a>
+      </div>
+
+      <!-- WHATSAPP CARD -->
+      <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
+        <div>
+          <div class="w-14 h-14 bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white rounded-2xl flex items-center justify-center text-2xl transition-all duration-300 mb-6">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <h2 class="text-xl font-black text-gray-900 mb-3">WhatsApp Chat Support</h2>
+          <p class="text-gray-500 text-sm leading-relaxed mb-6">
+            Message us on WhatsApp for fast response. Send your booking details, request trip receipts, check vehicle photos, or share live coordinates.
+          </p>
+        </div>
+        <a href="https://wa.me/918224894319?text=Hello%20SBD%20Tour%20and%20Travels%2C%20I%20need%20assistance%20regarding%20my%20cab%20booking." target="_blank" class="w-full text-center bg-gradient-to-r from-emerald-500 to-green-600 text-white py-4 rounded-2xl font-bold uppercase tracking-wider text-xs shadow-[0_8px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_12px_25px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2">
+          <i class="fa-brands fa-whatsapp text-lg"></i> Chat on WhatsApp
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQS ACCORDION -->
+  <section class="bg-white border-t border-gray-100 py-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-black uppercase text-[#d84e55] tracking-widest">Self Help</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-gray-900 mt-2">Frequently Asked Questions</h2>
+        <p class="text-gray-500 text-xs sm:text-sm mt-3">Quickly find answers to common questions regarding taxi fares, stops, and bookings.</p>
+      </div>
+
+      <!-- FAQ List (AlpineJS for smooth interactive toggle) -->
+      <div class="max-w-6xl mx-auto space-y-4" x-data="{ active: null }">
+        
+        <!-- FAQ 1 -->
+        <div class="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300" :class="active === 1 ? 'border-red-200 shadow-md' : 'bg-gray-50/50'">
+          <button @click="active = active === 1 ? null : 1" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none">
+            <span class="font-bold text-gray-900 text-sm sm:text-base">How do I make a cab booking with SBD?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-300" :class="active === 1 ? 'rotate-180 text-[#d84e55]' : ''"></i>
+          </button>
+          <div x-show="active === 1" x-collapse x-cloak class="px-6 pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-4">
+            Booking a cab is easy. Go to our homepage, enter your pickup city, destination, travel date, and preferred pickup time. Select your vehicle from our premium listing (Sedans, SUVs, or Tempo Travellers) and complete the registration/login step. Once confirmed, you can track it under the 'Bookings' tab.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300" :class="active === 2 ? 'border-red-200 shadow-md' : 'bg-gray-50/50'">
+          <button @click="active = active === 2 ? null : 2" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none">
+            <span class="font-bold text-gray-900 text-sm sm:text-base">Are toll taxes and parking fees included in the fare?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-300" :class="active === 2 ? 'rotate-180 text-[#d84e55]' : ''"></i>
+          </button>
+          <div x-show="active === 2" x-collapse x-cloak class="px-6 pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-4">
+            Yes, our outstation booking engine automatically factors in driver allowances, base distance rates, and platform fees. Standard tolls, parking charges, and state permits are generally included in your final fare summary to avoid surprise expenses.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300" :class="active === 3 ? 'border-red-200 shadow-md' : 'bg-gray-50/50'">
+          <button @click="active = active === 3 ? null : 3" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none">
+            <span class="font-bold text-gray-900 text-sm sm:text-base">What is the booking cancellation policy?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-300" :class="active === 3 ? 'rotate-180 text-[#d84e55]' : ''"></i>
+          </button>
+          <div x-show="active === 3" x-collapse x-cloak class="px-6 pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-4">
+            You can cancel your booking up to 24 hours prior to the scheduled pickup time with no penalty and receive a full refund. For cancellations within 24 hours of pickup, a nominal fee may apply. You can easily initiate cancellations directly from your 'Bookings' panel.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300" :class="active === 4 ? 'border-red-200 shadow-md' : 'bg-gray-50/50'">
+          <button @click="active = active === 4 ? null : 4" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none">
+            <span class="font-bold text-gray-900 text-sm sm:text-base">When will I receive my driver and vehicle details?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-300" :class="active === 4 ? 'rotate-180 text-[#d84e55]' : ''"></i>
+          </button>
+          <div x-show="active === 4" x-collapse x-cloak class="px-6 pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-4">
+            We dispatch driver coordinates, contact details, and vehicle registration numbers 2 to 4 hours prior to your scheduled pickup time. This will be sent directly to your registered mobile number via SMS or WhatsApp, and will also update in your booking history.
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300" :class="active === 5 ? 'border-red-200 shadow-md' : 'bg-gray-50/50'">
+          <button @click="active = active === 5 ? null : 5" class="w-full text-left px-6 py-5 flex justify-between items-center focus:outline-none">
+            <span class="font-bold text-gray-900 text-sm sm:text-base">Can I book one-way drops?</span>
+            <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-300" :class="active === 5 ? 'rotate-180 text-[#d84e55]' : ''"></i>
+          </button>
+          <div x-show="active === 5" x-collapse x-cloak class="px-6 pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-4">
+            Yes! SBD provides dedicated one-way outstation taxi services. You only pay for the distance traveled one-way, with no obligation to pay for the return journey.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% include 'layouts/footer.html' %}

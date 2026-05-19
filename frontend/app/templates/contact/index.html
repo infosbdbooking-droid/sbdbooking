@@ -1,0 +1,252 @@
+{% include 'layouts/header.html' %}
+{% include 'layouts/navbar.html' %}
+{% include 'login/login.html' %}
+
+<main class="bg-gray-50 min-h-screen">
+
+  <!-- BREADCRUMB (Matches other pages) -->
+  <div class="bg-white border-b border-gray-100 py-3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex text-xs sm:text-sm font-medium text-gray-500 items-center gap-2">
+        <a href="/" class="hover:text-[#d84e55] transition-colors">Home</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-900">Contact Us</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- HERO HEADER -->
+  <section class="bg-slate-900 text-white py-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+      <div class="max-w-2xl">
+        <span class="bg-[#d84e55]/20 text-[#d84e55] font-black uppercase text-xs tracking-widest px-3 py-1.5 rounded-full inline-block mb-3">
+          Get In Touch
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight">Contact SBD Tour & Travels</h1>
+        <p class="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed">
+          Need a custom tour package quotation or want to partner with us? Reach out directly via our physical address, phone helpline, or WhatsApp.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CONTACT SECTION -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16" x-data="contactFormHandler()">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      
+      <!-- LEFT COLUMN: CONTACT DETAILS -->
+      <div class="lg:col-span-5 space-y-8">
+        <div>
+          <h2 class="text-2xl font-black text-gray-900 tracking-tight">Reach Our Office</h2>
+          <p class="text-gray-500 text-xs sm:text-sm mt-2 leading-relaxed">
+            Our support desk is active 24 hours a day, 7 days a week to handle all your taxi dispatches and booking adjustments.
+          </p>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Address Item -->
+          <div class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-2xl bg-red-50 text-[#d84e55] flex items-center justify-center flex-shrink-0 text-lg">
+              <i class="fa-solid fa-location-dot"></i>
+            </span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Head Office Address</p>
+              <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                LINK ROAD KOTMA MANMARI,<br>
+                DISTRICT ANUPPUR, MADHYA PRADESH - 484334
+              </p>
+            </div>
+          </div>
+
+          <!-- Phone Item -->
+          <div class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 text-lg">
+              <i class="fa-solid fa-phone"></i>
+            </span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Customer Care Helpline</p>
+              <a href="tel:+918224894319" class="text-xs text-[#d84e55] hover:underline font-bold mt-1 block">
+                +91 8224894319
+              </a>
+              <p class="text-[10px] text-gray-400 mt-0.5">Available for direct calls 24/7</p>
+            </div>
+          </div>
+
+          <!-- WhatsApp Item -->
+          <div class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 text-lg">
+              <i class="fa-brands fa-whatsapp text-xl"></i>
+            </span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">WhatsApp Chat</p>
+              <a href="https://wa.me/918224894319?text=Hello%20SBD%20Tour%20and%20Travels" target="_blank" class="text-xs text-emerald-600 hover:underline font-bold mt-1 block">
+                +91 8224894319
+              </a>
+              <p class="text-[10px] text-gray-400 mt-0.5">Message us for rapid updates</p>
+            </div>
+          </div>
+
+          <!-- Email Item -->
+          <div class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0 text-lg">
+              <i class="fa-solid fa-envelope"></i>
+            </span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Official Email</p>
+              <a href="mailto:sbdbookingonline@gmail.com" class="text-xs text-purple-600 hover:underline font-medium mt-1 block">
+                sbdbookingonline@gmail.com
+              </a>
+            </div>
+          </div>
+
+          <!-- Working Hours -->
+          <div class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0 text-lg">
+              <i class="fa-solid fa-clock"></i>
+            </span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Operating Hours</p>
+              <p class="text-xs text-gray-500 mt-1">Cab Booking: 24 Hours / 7 Days</p>
+              <p class="text-[10px] text-gray-400">Office Admin Support: 9:00 AM - 9:00 PM</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: INTERACTIVE SEND MESSAGE FORM -->
+      <div class="lg:col-span-7 bg-white border border-gray-100 rounded-3xl p-8 shadow-sm relative">
+        
+        <!-- Form View -->
+        <div x-show="!submitted">
+          <h3 class="text-xl font-black text-gray-900 tracking-tight mb-2">Send a Message</h3>
+          <p class="text-gray-500 text-xs sm:text-sm mb-6">Fill out the contact form below and we will get back to you within 2-4 business hours.</p>
+
+          <form @submit.prevent="submitForm" class="space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Your Name</label>
+                <input type="text" x-model="name" required placeholder="Enter full name" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#d84e55] focus:bg-white transition-all">
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Email Address</label>
+                <input type="email" x-model="email" required placeholder="name@example.com" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#d84e55] focus:bg-white transition-all">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Phone Number</label>
+                <input type="tel" x-model="phone" required placeholder="10-digit mobile number" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#d84e55] focus:bg-white transition-all">
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Subject</label>
+                <input type="text" x-model="subject" required placeholder="Inquiry topic" class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#d84e55] focus:bg-white transition-all">
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Your Message</label>
+              <textarea x-model="message" required rows="5" placeholder="Write your message details..." class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#d84e55] focus:bg-white transition-all resize-none"></textarea>
+            </div>
+
+            <button type="submit" :disabled="loading" class="w-full text-center bg-gradient-to-r from-[#d84e55] to-[#c13d44] text-white py-4 rounded-xl font-bold uppercase tracking-wider text-xs shadow-[0_8px_20px_rgba(216,78,85,0.3)] hover:shadow-[0_12px_25px_rgba(216,78,85,0.4)] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              <span x-show="!loading">Submit Message</span>
+              <span x-show="loading" x-cloak class="flex items-center justify-center gap-2">
+                <i class="fa-solid fa-spinner fa-spin"></i> Submitting...
+              </span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Submission Success View -->
+        <div x-show="submitted" x-cloak class="flex flex-col items-center justify-center py-16 text-center space-y-6">
+          <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-4xl shadow-sm">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+          <div>
+            <h4 class="text-xl font-black text-gray-900">Message Sent Successfully!</h4>
+            <p class="text-gray-500 text-xs sm:text-sm mt-2 max-w-sm">
+              Thank you, <span class="font-bold text-gray-800" x-text="name"></span>. Our customer care representative will contact you shortly at <span class="font-bold text-gray-800" x-text="phone"></span>.
+            </p>
+          </div>
+          <button @click="submitted = false; name=''; email=''; phone=''; subject=''; message=''" class="border border-gray-200 hover:border-gray-300 text-gray-600 px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all">
+            Send Another Message
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- GOOGLE MAP EMBED (Kotma, MP) -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <div class="bg-white border border-gray-100 rounded-3xl p-4 shadow-sm">
+      <iframe class="w-full h-96 rounded-2xl shadow-inner border-0" 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3648.974868222956!2d81.96677927588147!3d23.20392341019011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398687fa1871fd63%3A0xe54d87bf841eb93a!2sKotma%2C%20Madhya%20Pradesh%20484334!5e0!3m2!1sen!2sin!4v1716104400000!5m2!1sen!2sin" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </section>
+
+  <script>
+    function contactFormHandler() {
+      return {
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+        submitted: false,
+        loading: false,
+        async submitForm() {
+          this.loading = true;
+          try {
+            const response = await fetch('/api/contact', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                full_name: this.name,
+                email: this.email,
+                phone: this.phone,
+                subject: this.subject,
+                message: this.message
+              })
+            });
+            
+            const res = await response.json();
+            if (res.status === 1) {
+              this.submitted = true;
+              if (window.showToast) {
+                showToast("Success", "Your message has been sent successfully!", "success");
+              }
+            } else {
+              if (window.showToast) {
+                showToast("Error", res.message || "Failed to submit message.", "error");
+              } else {
+                alert(res.message || "Failed to submit message.");
+              }
+            }
+          } catch (err) {
+            console.error(err);
+            if (window.showToast) {
+              showToast("Error", "Something went wrong. Please try again.", "error");
+            } else {
+              alert("Something went wrong. Please try again.");
+            }
+          } finally {
+            this.loading = false;
+          }
+        }
+      }
+    }
+  </script>
+
+</main>
+
+{% include 'layouts/footer.html' %}

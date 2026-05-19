@@ -11,6 +11,8 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\CarTypeController;
 use App\Http\Controllers\CabOrderWebController;
 use App\Http\Controllers\SliderController;
+use App\Http\Controllers\ContactMessageController;
+
 
 
 Route::prefix('panel')->group(function () {
@@ -120,6 +122,15 @@ Route::prefix('panel')->group(function () {
             Route::post('/{id}/update', [SliderController::class, 'update'])->name('sliders.update'); // using POST for file uploads
             Route::delete('/{id}', [SliderController::class, 'destroy'])->name('sliders.destroy');
             Route::post('/{id}/changeStatus', [SliderController::class, 'changeStatus'])->name('sliders.changeStatus');
+        });
+
+        # Contact Messages
+        Route::prefix('contact-messages')->group(function () {
+            Route::get('/', [ContactMessageController::class, 'index'])->name('contactMessages.index');
+            Route::get('/data', [ContactMessageController::class, 'index'])->name('contactMessages.data');
+            Route::get('/{id}', [ContactMessageController::class, 'show'])->name('contactMessages.show');
+            Route::post('/{id}/update', [ContactMessageController::class, 'update'])->name('contactMessages.update');
+            Route::delete('/{id}', [ContactMessageController::class, 'destroy'])->name('contactMessages.destroy');
         });
 
         # Settings

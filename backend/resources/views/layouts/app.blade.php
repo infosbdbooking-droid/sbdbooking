@@ -130,6 +130,16 @@
                             </div>
                 @endcan
 
+                @can('contact_messages')
+                            <a href="{{ route('contactMessages.index') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg transition
+                                                                                               {{ request()->is('panel/contact-messages*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-gray-600 hover:bg-blue-50' }}">
+                                <i class="fas fa-envelope"></i>
+                                Contact Messages
+                            </a>
+                @endcan
+
                 @can('settings')
                             <a href="{{ route('settings') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg transition
                                                                                                {{ request()->is('settings*')

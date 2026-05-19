@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\CabOrderController;
 use App\Http\Controllers\Api\ChargeCalculationController;
 use App\Http\Controllers\Api\SliderController;
+use App\Http\Controllers\Api\ContactMessageController;
 
 
 /*
@@ -34,6 +35,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/car-types', [CarController::class, 'carTypes']);
     Route::post('/carDetails', [CarController::class, 'carDetails']);
     Route::get('/sliders', [SliderController::class, 'getActiveSliders']);
+    Route::post('/contact', [ContactMessageController::class, 'store']);
 
     // Charge Calculation endpoints
     Route::post('/calculate-charges', [ChargeCalculationController::class, 'calculateCharges']);

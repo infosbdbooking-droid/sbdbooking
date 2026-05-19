@@ -282,6 +282,60 @@ def bookings():
 
 
 # ======================
+# ABOUT US PAGE
+# ======================
+@app.route('/about')
+def about():
+    return render_template('about/index.html', title="About Us | SBD Tour and Travels", api_base_url=API_BASE_URL)
+
+
+# ======================
+# HELP / FAQ PAGE
+# ======================
+@app.route('/help')
+def help_page():
+    return render_template('help/index.html', title="Help & Support | SBD Tour and Travels", api_base_url=API_BASE_URL)
+
+
+# ======================
+# CONTACT US PAGE
+# ======================
+@app.route('/contact')
+def contact():
+    return render_template('contact/index.html', title="Contact Us | SBD Tour and Travels", api_base_url=API_BASE_URL)
+
+
+# ======================
+# CONTACT API PROXY (Public)
+# ======================
+@app.route('/api/contact', methods=['POST'])
+def contact_api_proxy():
+    try:
+        payload = request.get_json()
+        if not payload:
+            return jsonify({"status": 0, "message": "Invalid request data"}), 400
+
+        api_url = f"{API_BASE_URL}/contact"
+        response = requests.post(api_url, json=payload, timeout=10)
+
+        try:
+            data = response.json()
+        except ValueError:
+            print("CONTACT API PROXY ERROR: non-json response", response.status_code, response.text)
+            return jsonify({
+                "status": 0,
+                "message": "Invalid response from API",
+                "debug": response.text[:500]
+            }), 502
+
+        return jsonify(data), response.status_code
+
+    except Exception as e:
+        print("CONTACT API PROXY ERROR:", e)
+        return jsonify({"status": 0, "message": "Failed to submit contact message"}), 500
+
+
+# ======================
 # MY ORDERS PROXY (Authenticated)
 # ======================
 @app.route('/api/my-orders')
