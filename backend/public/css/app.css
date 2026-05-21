@@ -11,8 +11,8 @@ html {
 }
 
 body {
-  background-color: #F2F3F5 !important;
-  font-weight: 100 !important;
+  background-color: #F8FAFC !important;
+  font-weight: 400 !important;
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   margin: 0;
@@ -20,7 +20,7 @@ body {
 }
 
 aside {
-  background-color: white !important;
+  /* Tailwind handles background */
 }
 /* ========================================================
    Hide Side navbar before page ready 
@@ -314,3 +314,91 @@ div.dt-container .dt-paging .dt-paging-button.current:hover {
   border-radius: 15px !important;
   background-color: #c6d0ff !important;
 }
+
+/* ========================================================
+   Travel Portal Specific Components & RedBus Aesthetics
+   ======================================================== */
+
+/* Custom scrollbars for menus and active columns */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Light theme card scrollbars */
+.card-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.card-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.card-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 2px;
+}
+.card-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* Beautiful dynamic trip route lines */
+.trip-route-line {
+  position: relative;
+  padding-left: 20px;
+}
+.trip-route-line::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 10px;
+  bottom: 10px;
+  width: 1.5px;
+  border-left: 1.5px dashed #cbd5e1;
+}
+.trip-route-point {
+  position: relative;
+}
+.trip-route-point::before {
+  content: '';
+  position: absolute;
+  left: -18px;
+  top: 4.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #d84e55;
+  box-shadow: 0 0 0 3px rgba(216, 78, 85, 0.2);
+}
+.trip-route-point.drop::before {
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  border-radius: 1.5px;
+}
+
+/* Premium Card hover styles */
+.hover-premium {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
+  border-color: rgba(216, 78, 85, 0.12) !important;
+}
+
+/* Soft text shadow and background glows */
+.text-glow-red {
+  text-shadow: 0 0 8px rgba(216, 78, 85, 0.25);
+}
+.glow-card-red:hover {
+  box-shadow: 0 10px 25px -5px rgba(216, 78, 85, 0.08), 0 8px 10px -6px rgba(216, 78, 85, 0.04);
+}
+
