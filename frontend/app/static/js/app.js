@@ -667,10 +667,22 @@ $(document).ready(function () {
     /* =====================================================
        INIT
     ===================================================== */
-    setTimeout(() => {
+    // Initialize Google Maps and Autocomplete when the API is ready
+if (typeof executeWhenGoogleMapsReady === 'function') {
+    executeWhenGoogleMapsReady(() => {
         initRouteMap();
         initAutocomplete();
-    }, 800);
+    });
+} else {
+    // Fallback: poll for google.maps availability
+    const interval = setInterval(() => {
+        if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+            clearInterval(interval);
+            initRouteMap();
+            initAutocomplete();
+        }
+    }, 200);
+}
 
     /* =====================================================
        CURRENT LOCATION (PICKUP ONLY)
@@ -787,21 +799,27 @@ $(document).ready(function () {
 
                     if (data.charges_breakdown && data.charges_breakdown.length > 0) {
                         data.charges_breakdown.forEach(charge => {
-                            let label = charge.charge_title;
+                            const mainLabel = charge.charge_title;
                             const isIncluded = Math.round(charge.amount) === 0;
 
-                            // Format details if not a flat/included charge
+                            // Build sub-detail text (shown smaller below label)
+                            let detailText = '';
                             if (charge.unit !== 'Flat' && !isIncluded) {
-                                label += ` (${charge.quantity} ${charge.unit} × ${data.currency || '₹'}${charge.rate})`;
+                                detailText = `${charge.quantity} ${charge.unit} × ${data.currency || '₹'}${charge.rate}`;
                             }
+
+                            let minBadge = '';
                             if (charge.is_minimum_applied) {
-                                label += ` <span class="text-[10px] text-red-500 bg-red-50 px-1 rounded ml-1">Min. Applied</span>`;
+                                minBadge = `<span class="text-[10px] text-red-500 bg-red-50 px-1 rounded ml-1">Min. Applied</span>`;
                             }
 
                             html += `
-              <div class="flex justify-between items-center text-gray-700 py-0.5">
-                <span>${label}</span>
-                <span class="font-medium">${isIncluded ? 'Included' : (data.currency || '₹') + ' ' + Math.round(charge.amount)}</span>
+              <div class="flex justify-between items-start text-gray-700 py-0.5 gap-2">
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium leading-tight">${mainLabel}${minBadge}</div>
+                  ${detailText ? `<div class="text-xs text-gray-400 leading-tight truncate">${detailText}</div>` : ''}
+                </div>
+                <span class="font-medium text-sm whitespace-nowrap flex-shrink-0">${isIncluded ? 'Included' : (data.currency || '₹') + ' ' + Math.round(charge.amount)}</span>
               </div>`;
                         });
                     } else {

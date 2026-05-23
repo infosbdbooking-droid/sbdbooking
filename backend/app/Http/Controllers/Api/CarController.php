@@ -42,8 +42,8 @@ class CarController extends Controller
                 ? asset('images/car/' . $car->car_photos)
                 : null;
             
-            // Find Per KM Charge
-            $perKmCharge = $car->charges->first(function($charge) {
+            // Find all Per KM Charges
+            $perKmCharges = $car->charges->filter(function($charge) {
                 return $charge->chargeType && $charge->chargeType->charges_type === 'Per KM Charges';
             });
             
@@ -52,7 +52,21 @@ class CarController extends Controller
                 return $charge->chargeType && $charge->chargeType->charges_type === 'Driver Allowance';
             });
             
-            $car->per_km_fare = $perKmCharge ? $perKmCharge->amount : ($car->min_trip_amount ?: '12');
+            if ($perKmCharges->isNotEmpty()) {
+                $min = $perKmCharges->min('amount');
+                $max = $perKmCharges->max('amount');
+                
+                $minFormatted = (int)round($min);
+                $maxFormatted = (int)round($max);
+                
+                if ($minFormatted != $maxFormatted) {
+                    $car->per_km_fare = $minFormatted . ' - ' . $maxFormatted;
+                } else {
+                    $car->per_km_fare = $minFormatted;
+                }
+            } else {
+                $car->per_km_fare = (int)round($car->min_trip_amount ?: 12);
+            }
             $car->driver_allowance = $driverAllowance ? $driverAllowance->amount : '0';
             
             return $car;

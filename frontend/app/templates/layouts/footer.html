@@ -90,8 +90,32 @@
   src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <!-- ========== GOOGLE MAPS (Places API) ========== -->
+<script>
+  window.googleMapsLoaded = false;
+  window.googleMapsCallbacks = [];
+  
+  function initGoogleMaps() {
+    window.googleMapsLoaded = true;
+    while (window.googleMapsCallbacks && window.googleMapsCallbacks.length > 0) {
+      const cb = window.googleMapsCallbacks.shift();
+      try {
+        cb();
+      } catch (e) {
+        console.error("Error in Google Maps callback:", e);
+      }
+    }
+  }
+
+  function executeWhenGoogleMapsReady(callback) {
+    if (window.googleMapsLoaded && typeof google !== 'undefined') {
+      callback();
+    } else {
+      window.googleMapsCallbacks.push(callback);
+    }
+  }
+</script>
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmaR3DSseRPUCCvGT0Ru8aK-Jrm39NlTE&libraries=places" async defer></script>
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmaR3DSseRPUCCvGT0Ru8aK-Jrm39NlTE&libraries=places&callback=initGoogleMaps" async defer></script>
 
 <!-- ========== CUSTOM APP JS ========== -->
 <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>

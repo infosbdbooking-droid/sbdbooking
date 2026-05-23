@@ -158,9 +158,10 @@
     }
 
     // Google Places Autocomplete for Homepage
-    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+    function initHomeAutocomplete() {
       const homeFrom = document.getElementById('home_from');
       const homeTo = document.getElementById('home_to');
+      if (!homeFrom || !homeTo) return;
       
       const options = {
         types: ['(cities)'],
@@ -191,6 +192,17 @@
       homeFrom.addEventListener('focus', () => setTimeout(syncWidth, 10));
       homeTo.addEventListener('focus', () => setTimeout(syncWidth, 10));
       window.addEventListener('resize', syncWidth);
+    }
+
+    if (typeof executeWhenGoogleMapsReady === 'function') {
+      executeWhenGoogleMapsReady(initHomeAutocomplete);
+    } else {
+      // Fallback
+      setTimeout(() => {
+        if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+          initHomeAutocomplete();
+        }
+      }, 800);
     }
   });
 </script>
