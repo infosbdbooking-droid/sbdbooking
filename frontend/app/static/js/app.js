@@ -98,9 +98,7 @@ $(document).ready(function () {
                         let socialHTML = '';
                         const socialLinks = [
                             { name: 'facebook', icon: 'fa-facebook-f', color: 'blue' },
-                            { name: 'twitter', icon: 'fa-twitter', color: 'blue' },
-                            { name: 'instagram', icon: 'fa-instagram', color: 'pink' },
-                            { name: 'youtube', icon: 'fa-youtube', color: 'red' }
+                            { name: 'instagram', icon: 'fa-instagram', color: 'pink' }
                         ];
 
                         socialLinks.forEach(social => {
@@ -912,6 +910,48 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
     }
 
     // =====================================================
+    // ROUND TRIP DATE/TIME VALIDATION
+    // =====================================================
+    function validateRoundTripSchedule() {
+        const tripType = $("#trip_type").val();
+        if (tripType !== "round") return true;
+
+        const pickupDate = $("#pickupDate").val();
+        const pickupTime = $("#pickupTime").val();
+        const returnDate = $("#returnDate").val();
+        const returnTime = $("#returnTime").val();
+
+        if (!pickupDate || !pickupTime || !returnDate || !returnTime) return true;
+
+        if (pickupDate === returnDate) {
+            if (pickupTime === returnTime) {
+                showToast("Warning", "We can't do this. Return date and time cannot be the same as pickup date and time.", "warning");
+                return false;
+            }
+
+            // Extract minutes for comparison
+            const getMinutes = (timeStr) => {
+                const parts = timeStr.split(' ');
+                const timePart = parts[0];
+                const ampm = parts[1];
+                let [hours, minutes] = timePart.split(':').map(Number);
+                if (ampm === "PM" && hours < 12) hours += 12;
+                if (ampm === "AM" && hours === 12) hours = 0;
+                return hours * 60 + minutes;
+            };
+
+            const pickupMins = getMinutes(pickupTime);
+            const returnMins = getMinutes(returnTime);
+
+            if (returnMins < pickupMins) {
+                showToast("Warning", "We can't do this. Return time cannot be earlier than pickup time.", "warning");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // =====================================================
     // DATE PICKER INIT
     // =====================================================
     // Initialize Date Pickers (Merged & Cleaned)
@@ -923,6 +963,7 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
         disableMobile: true,
         onChange: function() { 
             if (window.CAR_DATA) renderFareBreakdown(window.CAR_DATA); 
+            validateRoundTripSchedule();
         }
     });
 
@@ -938,6 +979,7 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
                 returnDatePicker.set("minDate", selectedDates[0]);
             }
             updateAvailableTimeSlots();
+            validateRoundTripSchedule();
         }
     });
 
@@ -946,6 +988,7 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
     // Time Slots Listeners
     $("#pickupTime, #returnTime").on("change", function() {
         if (window.CAR_DATA) renderFareBreakdown(window.CAR_DATA);
+        validateRoundTripSchedule();
     });
 
     // AC Toggle
@@ -1763,6 +1806,10 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
         const originalText = btn.text();
 
         // Basic Validation
+        if (!validateRoundTripSchedule()) {
+            return;
+        }
+
         const pickup = $("#pickup").val();
         const drop = $("#drop").val();
         const custName = $("#custName").val();
