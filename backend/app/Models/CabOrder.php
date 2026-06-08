@@ -85,9 +85,12 @@ class CabOrder extends Model
         // Payment
         'payment_status',
         'payment_method',
+        'advance_payment',
 
         // Driver
         'driver_id',
+        'driver_name',
+        'driver_mobile',
     ];
 
     protected $casts = [
@@ -115,6 +118,16 @@ class CabOrder extends Model
     public function car(): BelongsTo
     {
         return $this->belongsTo(Car::class, 'car_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(CabOrderPayment::class, 'cab_order_id')->orderBy('created_at', 'desc');
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(CabOrderActivity::class, 'cab_order_id')->orderBy('created_at', 'desc');
     }
 
     /* ===================== HELPERS ===================== */

@@ -100,6 +100,46 @@ class CabOrderController extends Controller
             ], 422);
         }
 
+        // Custom validation: Round trip pickup and return schedule validation
+        if ($request->trip_type === 'round_trip') {
+            if ($request->pickup_date === $request->return_date) {
+                if ($request->pickup_time === $request->return_time) {
+                    return response()->json([
+                        'status' => 0,
+                        'message' => "We can't do this. Return date and time cannot be the same as pickup date and time.",
+                    ], 422);
+                }
+
+                $parseMinutes = function ($timeStr) {
+                    if (!$timeStr) return 0;
+                    $parts = explode(' ', $timeStr);
+                    $timePart = $parts[0] ?? '';
+                    $ampm = $parts[1] ?? '';
+                    $timeSubParts = explode(':', $timePart);
+                    $hours = (int)($timeSubParts[0] ?? 0);
+                    $minutes = (int)($timeSubParts[1] ?? 0);
+                    
+                    if (strtoupper($ampm) === 'PM' && $hours < 12) {
+                        $hours += 12;
+                    }
+                    if (strtoupper($ampm) === 'AM' && $hours === 12) {
+                        $hours = 0;
+                    }
+                    return $hours * 60 + $minutes;
+                };
+
+                $pickupMins = $parseMinutes($request->pickup_time);
+                $returnMins = $parseMinutes($request->return_time);
+
+                if ($returnMins < $pickupMins) {
+                    return response()->json([
+                        'status' => 0,
+                        'message' => "We can't do this. Return time cannot be earlier than pickup time.",
+                    ], 422);
+                }
+            }
+        }
+
         try {
             // ─── Auth: optional sanctum customer ──────────────────────
             $customer = null;

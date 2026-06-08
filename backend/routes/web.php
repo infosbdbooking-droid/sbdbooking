@@ -40,6 +40,12 @@ Route::prefix('panel')->group(function () {
             Route::post('/{id}/cancel', [CabOrderWebController::class, 'cancelBooking'])->name('cabOrders.cancel');
             Route::get('/{id}', [CabOrderWebController::class, 'show'])->name('cabOrders.show');
             Route::get('/{id}/invoice', [CabOrderWebController::class, 'downloadInvoice'])->name('cabOrders.invoice');
+            
+            // New routes for CRM workflows
+            Route::post('/{id}/approve-setup', [CabOrderWebController::class, 'approveAndSetupPayment'])->name('cabOrders.approveSetup');
+            Route::post('/{id}/collect-payment', [CabOrderWebController::class, 'collectPayment'])->name('cabOrders.collectPayment');
+            Route::post('/{id}/assign-driver', [CabOrderWebController::class, 'assignDriver'])->name('cabOrders.assignDriver');
+            Route::post('/{id}/update-status', [CabOrderWebController::class, 'updateStatus'])->name('cabOrders.updateStatus');
         });
 
 

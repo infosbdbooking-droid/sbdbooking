@@ -13,6 +13,20 @@
         </div>
     </div>
 
+    @if(session('success'))
+        <div class="mb-6 p-4 bg-green-100 border border-green-200 text-green-800 rounded-lg shadow-sm">
+            <h4 class="font-semibold text-sm mb-1">Success</h4>
+            <p class="text-xs">{{ session('success') }}</p>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-6 p-4 bg-red-100 border border-red-200 text-red-800 rounded-lg shadow-sm">
+            <h4 class="font-semibold text-sm mb-1">Error</h4>
+            <p class="text-xs">{{ session('error') }}</p>
+        </div>
+    @endif
+
     @if($errors->any())
         <div class="mb-6 p-4 bg-red-100 border border-red-200 text-red-800 rounded-lg shadow-sm">
             <h4 class="font-semibold text-sm mb-1">Please fix the following validation errors:</h4>
@@ -688,6 +702,8 @@
                 this.customerId = cust.id;
                 this.selectedCustomerName = cust.name;
                 this.selectedCustomerMobile = cust.mobile;
+                this.customerName = cust.name;
+                this.customerMobile = cust.mobile;
                 this.customerQuery = cust.name;
                 this.showDropdown = false;
             },
@@ -696,6 +712,8 @@
                 this.customerId = '';
                 this.selectedCustomerName = '';
                 this.selectedCustomerMobile = '';
+                this.customerName = '';
+                this.customerMobile = '';
                 this.customerQuery = '';
                 this.searchCustomers();
             },
