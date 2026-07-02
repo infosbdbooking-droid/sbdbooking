@@ -12,6 +12,20 @@ use App\Http\Controllers\CarTypeController;
 use App\Http\Controllers\CabOrderWebController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\BlogCategoryController;
+use App\Http\Controllers\BlogTagController;
+use App\Http\Controllers\BlogCommentController;
+use App\Http\Controllers\BlogSettingsController;
+use App\Http\Controllers\SeoPageController;
+use App\Http\Controllers\SeoServiceCategoryController;
+use App\Http\Controllers\SeoStateController;
+use App\Http\Controllers\SeoCityController;
+use App\Http\Controllers\SeoRouteController;
+use App\Http\Controllers\SeoFaqController;
+use App\Http\Controllers\SeoSettingsController;
+
+
 
 
 
@@ -137,6 +151,129 @@ Route::prefix('panel')->group(function () {
             Route::get('/{id}', [ContactMessageController::class, 'show'])->name('contactMessages.show');
             Route::post('/{id}/update', [ContactMessageController::class, 'update'])->name('contactMessages.update');
             Route::delete('/{id}', [ContactMessageController::class, 'destroy'])->name('contactMessages.destroy');
+        });
+
+        # Blogs Management
+        Route::prefix('blogs')->group(function () {
+            Route::get('/dashboard', [BlogController::class, 'dashboard'])->name('blogs.dashboard');
+            Route::get('/', [BlogController::class, 'index'])->name('blogs.index');
+            Route::get('/data', [BlogController::class, 'getData'])->name('blogs.data');
+            Route::get('/create', [BlogController::class, 'create'])->name('blogs.create');
+            Route::post('/store', [BlogController::class, 'store'])->name('blogs.store');
+            Route::get('/{id}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
+            Route::put('/{id}', [BlogController::class, 'update'])->name('blogs.update');
+            Route::delete('/{id}', [BlogController::class, 'destroy'])->name('blogs.destroy');
+            Route::get('/{id}', [BlogController::class, 'show'])->name('blogs.show');
+            Route::post('/{id}/duplicate', [BlogController::class, 'duplicate'])->name('blogs.duplicate');
+            Route::post('/bulk-action', [BlogController::class, 'bulkAction'])->name('blogs.bulkAction');
+            Route::post('/{id}/changeFeatured', [BlogController::class, 'changeFeatured'])->name('blogs.changeFeatured');
+            Route::post('/{id}/changeStatus', [BlogController::class, 'changeStatus'])->name('blogs.changeStatus');
+        });
+
+        Route::prefix('blog-categories')->group(function () {
+            Route::get('/', [BlogCategoryController::class, 'view'])->name('blogCategories.index');
+            Route::get('/data', [BlogCategoryController::class, 'index'])->name('blogCategories.data');
+            Route::post('/store', [BlogCategoryController::class, 'store'])->name('blogCategories.store');
+            Route::get('/{id}/edit', [BlogCategoryController::class, 'edit'])->name('blogCategories.edit');
+            Route::put('/{id}', [BlogCategoryController::class, 'update'])->name('blogCategories.update');
+            Route::delete('/{id}', [BlogCategoryController::class, 'destroy'])->name('blogCategories.destroy');
+            Route::post('/{id}/changeStatus', [BlogCategoryController::class, 'changeStatus'])->name('blogCategories.changeStatus');
+        });
+
+        Route::prefix('blog-tags')->group(function () {
+            Route::get('/', [BlogTagController::class, 'view'])->name('blogTags.index');
+            Route::get('/data', [BlogTagController::class, 'index'])->name('blogTags.data');
+            Route::post('/store', [BlogTagController::class, 'store'])->name('blogTags.store');
+            Route::get('/{id}/edit', [BlogTagController::class, 'edit'])->name('blogTags.edit');
+            Route::put('/{id}', [BlogTagController::class, 'update'])->name('blogTags.update');
+            Route::delete('/{id}', [BlogTagController::class, 'destroy'])->name('blogTags.destroy');
+        });
+
+        Route::prefix('blog-comments')->group(function () {
+            Route::get('/', [BlogCommentController::class, 'view'])->name('blogComments.index');
+            Route::get('/data', [BlogCommentController::class, 'index'])->name('blogComments.data');
+            Route::post('/{id}/approve', [BlogCommentController::class, 'approve'])->name('blogComments.approve');
+            Route::post('/{id}/reject', [BlogCommentController::class, 'reject'])->name('blogComments.reject');
+            Route::delete('/{id}', [BlogCommentController::class, 'destroy'])->name('blogComments.destroy');
+            Route::post('/bulk-action', [BlogCommentController::class, 'bulkAction'])->name('blogComments.bulkAction');
+        });
+
+        Route::prefix('blog-settings')->group(function () {
+            Route::get('/', [BlogSettingsController::class, 'index'])->name('blogSettings.index');
+            Route::post('/update', [BlogSettingsController::class, 'update'])->name('blogSettings.update');
+        });
+
+        # SEO Landing Pages Management
+        Route::prefix('seo')->group(function () {
+            Route::get('/dashboard', [SeoPageController::class, 'dashboard'])->name('seoPages.dashboard');
+            Route::get('/', [SeoPageController::class, 'index'])->name('seoPages.index');
+            Route::get('/data', [SeoPageController::class, 'getData'])->name('seoPages.data');
+            Route::get('/create', [SeoPageController::class, 'create'])->name('seoPages.create');
+            Route::post('/store', [SeoPageController::class, 'store'])->name('seoPages.store');
+            Route::get('/{id}/edit', [SeoPageController::class, 'edit'])->name('seoPages.edit');
+            Route::put('/{id}', [SeoPageController::class, 'update'])->name('seoPages.update');
+            Route::delete('/{id}', [SeoPageController::class, 'destroy'])->name('seoPages.destroy');
+            Route::get('/{id}', [SeoPageController::class, 'show'])->name('seoPages.show');
+            Route::post('/{id}/duplicate', [SeoPageController::class, 'duplicate'])->name('seoPages.duplicate');
+            Route::post('/bulk-action', [SeoPageController::class, 'bulkAction'])->name('seoPages.bulkAction');
+            Route::post('/{id}/changeFeatured', [SeoPageController::class, 'changeFeatured'])->name('seoPages.changeFeatured');
+            Route::post('/{id}/changeStatus', [SeoPageController::class, 'changeStatus'])->name('seoPages.changeStatus');
+        });
+
+        Route::prefix('seo-service-categories')->group(function () {
+            Route::get('/', [SeoServiceCategoryController::class, 'view'])->name('seoServiceCategories.index');
+            Route::get('/data', [SeoServiceCategoryController::class, 'index'])->name('seoServiceCategories.data');
+            Route::post('/store', [SeoServiceCategoryController::class, 'store'])->name('seoServiceCategories.store');
+            Route::get('/{id}/edit', [SeoServiceCategoryController::class, 'edit'])->name('seoServiceCategories.edit');
+            Route::put('/{id}', [SeoServiceCategoryController::class, 'update'])->name('seoServiceCategories.update');
+            Route::delete('/{id}', [SeoServiceCategoryController::class, 'destroy'])->name('seoServiceCategories.destroy');
+            Route::post('/{id}/changeStatus', [SeoServiceCategoryController::class, 'changeStatus'])->name('seoServiceCategories.changeStatus');
+        });
+
+        Route::prefix('seo-states')->group(function () {
+            Route::get('/', [SeoStateController::class, 'view'])->name('seoStates.index');
+            Route::get('/data', [SeoStateController::class, 'index'])->name('seoStates.data');
+            Route::post('/store', [SeoStateController::class, 'store'])->name('seoStates.store');
+            Route::get('/{id}/edit', [SeoStateController::class, 'edit'])->name('seoStates.edit');
+            Route::put('/{id}', [SeoStateController::class, 'update'])->name('seoStates.update');
+            Route::delete('/{id}', [SeoStateController::class, 'destroy'])->name('seoStates.destroy');
+            Route::post('/{id}/changeStatus', [SeoStateController::class, 'changeStatus'])->name('seoStates.changeStatus');
+        });
+
+        Route::prefix('seo-cities')->group(function () {
+            Route::get('/', [SeoCityController::class, 'view'])->name('seoCities.index');
+            Route::get('/data', [SeoCityController::class, 'index'])->name('seoCities.data');
+            Route::post('/store', [SeoCityController::class, 'store'])->name('seoCities.store');
+            Route::get('/{id}/edit', [SeoCityController::class, 'edit'])->name('seoCities.edit');
+            Route::put('/{id}', [SeoCityController::class, 'update'])->name('seoCities.update');
+            Route::delete('/{id}', [SeoCityController::class, 'destroy'])->name('seoCities.destroy');
+            Route::post('/{id}/changeStatus', [SeoCityController::class, 'changeStatus'])->name('seoCities.changeStatus');
+            Route::get('/by-state/{state_id}', [SeoCityController::class, 'getCitiesByState'])->name('seoCities.byState');
+        });
+
+        Route::prefix('seo-routes')->group(function () {
+            Route::get('/', [SeoRouteController::class, 'view'])->name('seoRoutes.index');
+            Route::get('/data', [SeoRouteController::class, 'index'])->name('seoRoutes.data');
+            Route::post('/store', [SeoRouteController::class, 'store'])->name('seoRoutes.store');
+            Route::get('/{id}/edit', [SeoRouteController::class, 'edit'])->name('seoRoutes.edit');
+            Route::put('/{id}', [SeoRouteController::class, 'update'])->name('seoRoutes.update');
+            Route::delete('/{id}', [SeoRouteController::class, 'destroy'])->name('seoRoutes.destroy');
+            Route::post('/{id}/changeStatus', [SeoRouteController::class, 'changeStatus'])->name('seoRoutes.changeStatus');
+        });
+
+        Route::prefix('seo-faqs')->group(function () {
+            Route::get('/', [SeoFaqController::class, 'view'])->name('seoFaqs.index');
+            Route::get('/data', [SeoFaqController::class, 'index'])->name('seoFaqs.data');
+            Route::post('/store', [SeoFaqController::class, 'store'])->name('seoFaqs.store');
+            Route::get('/{id}/edit', [SeoFaqController::class, 'edit'])->name('seoFaqs.edit');
+            Route::put('/{id}', [SeoFaqController::class, 'update'])->name('seoFaqs.update');
+            Route::delete('/{id}', [SeoFaqController::class, 'destroy'])->name('seoFaqs.destroy');
+            Route::post('/{id}/changeStatus', [SeoFaqController::class, 'changeStatus'])->name('seoFaqs.changeStatus');
+        });
+
+        Route::prefix('seo-settings')->group(function () {
+            Route::get('/', [SeoSettingsController::class, 'index'])->name('seoSettings.index');
+            Route::post('/update', [SeoSettingsController::class, 'update'])->name('seoSettings.update');
         });
 
         # Settings

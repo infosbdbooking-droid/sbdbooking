@@ -139,6 +139,213 @@
                     @endcan
                 </div>
 
+                <!-- SECTION 2.5: BLOG MANAGEMENT -->
+                <div class="space-y-1">
+                    <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
+                        Blog Portal
+                    </div>
+
+                    @can('blogs_dashboard')
+                        <div x-data="{ open: {{ Request::is('panel/blogs*') || Request::is('panel/blog-categories*') || Request::is('panel/blog-tags*') || Request::is('panel/blog-comments*') || Request::is('panel/blog-settings*') ? 'true' : 'false' }} }">
+                            <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200
+                                {{ Request::is('panel/blogs*') || Request::is('panel/blog-categories*') || Request::is('panel/blog-tags*') || Request::is('panel/blog-comments*') || Request::is('panel/blog-settings*')
+                                    ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
+                                    : 'text-[#b5b5c3] hover:text-white hover:bg-white/5' }}">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-blog text-base"></i>
+                                    <span>Blog Management</span>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200"
+                                    :class="open ? 'rotate-180' : ''"></i>
+                            </button>
+
+                            <div x-show="open" x-transition class="mt-1 pl-4 space-y-1 border-l border-[#282836]/60 ml-6">
+                                @can('blogs_dashboard')
+                                    <a href="{{ route('blogs.dashboard') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('blogs.dashboard')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-chart-pie text-[10px]"></i>
+                                        Blogs Dashboard
+                                    </a>
+                                @endcan
+
+                                @can('blogs')
+                                    <a href="{{ route('blogs.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('blogs.index') || Request::routeIs('blogs.show')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-list text-[10px]"></i>
+                                        All Blogs
+                                    </a>
+                                    <a href="{{ route('blogs.create') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('blogs.create')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-plus text-[10px]"></i>
+                                        Add New Blog
+                                    </a>
+                                @endcan
+
+                                @can('blog_categories')
+                                    <a href="{{ route('blogCategories.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('blogCategories.index')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-folder text-[10px]"></i>
+                                        Categories
+                                    </a>
+                                @endcan
+
+                                @can('blog_tags')
+                                    <a href="{{ route('blogTags.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('blogTags.index')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-tags text-[10px]"></i>
+                                        Tags
+                                    </a>
+                                @endcan
+
+                                @can('blog_comments')
+                                    <a href="{{ route('blogComments.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('blogComments.index')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-comments text-[10px]"></i>
+                                        Comments
+                                    </a>
+                                @endcan
+
+                                @can('blog_settings')
+                                    <a href="{{ route('blogSettings.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('blogSettings.index')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-cogs text-[10px]"></i>
+                                        Blog Settings
+                                    </a>
+                                @endcan
+                            </div>
+                        </div>
+                    @endcan
+                </div>
+
+                <!-- SECTION 2.6: SEO LANDING PAGES -->
+                <div class="space-y-1">
+                    <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
+                        SEO Portal
+                    </div>
+
+                    @can('seo_dashboard')
+                        <div x-data="{ open: {{ Request::is('panel/seo*') || Request::is('panel/seo-service-categories*') || Request::is('panel/seo-states*') || Request::is('panel/seo-cities*') || Request::is('panel/seo-routes*') || Request::is('panel/seo-faqs*') || Request::is('panel/seo-settings*') ? 'true' : 'false' }}, openMasters: false }">
+                            <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200
+                                {{ Request::is('panel/seo*') || Request::is('panel/seo-service-categories*') || Request::is('panel/seo-states*') || Request::is('panel/seo-cities*') || Request::is('panel/seo-routes*') || Request::is('panel/seo-faqs*') || Request::is('panel/seo-settings*')
+                                    ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
+                                    : 'text-[#b5b5c3] hover:text-white hover:bg-white/5' }}">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-globe-americas text-base"></i>
+                                    <span>SEO Landing Pages</span>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200"
+                                    :class="open ? 'rotate-180' : ''"></i>
+                            </button>
+
+                            <div x-show="open" x-transition class="mt-1 pl-4 space-y-1 border-l border-[#282836]/60 ml-6">
+                                @can('seo_dashboard')
+                                    <a href="{{ route('seoPages.dashboard') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('seoPages.dashboard')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-chart-pie text-[10px]"></i>
+                                        Dashboard
+                                    </a>
+                                @endcan
+
+                                @can('seo_pages')
+                                    <a href="{{ route('seoPages.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('seoPages.index') || Request::routeIs('seoPages.show')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-list text-[10px]"></i>
+                                        All SEO Pages
+                                    </a>
+                                    <a href="{{ route('seoPages.create') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('seoPages.create')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-plus text-[10px]"></i>
+                                        Add New SEO Page
+                                    </a>
+                                @endcan
+
+                                <!-- Masters Submenu -->
+                                <div>
+                                    <button type="button" @click="openMasters = !openMasters" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-[#92929f] hover:text-white hover:bg-white/5 transition-all duration-150">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-database text-[10px]"></i>
+                                            <span>Masters</span>
+                                        </div>
+                                        <i class="fas fa-chevron-down text-[8px] transition-transform duration-200" :class="openMasters ? 'rotate-180' : ''"></i>
+                                    </button>
+                                    <div x-show="openMasters" x-transition class="mt-1 pl-3 space-y-1 border-l border-white/10 ml-2">
+                                        @can('seo_service_categories')
+                                            <a href="{{ route('seoServiceCategories.index') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] transition-all duration-150
+                                                {{ Request::routeIs('seoServiceCategories.index')
+                                                    ? 'text-[#d84e55] font-bold'
+                                                    : 'text-[#92929f] hover:text-white' }}">
+                                                Service Categories
+                                            </a>
+                                        @endcan
+                                        @can('seo_states')
+                                            <a href="{{ route('seoStates.index') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] transition-all duration-150
+                                                {{ Request::routeIs('seoStates.index')
+                                                    ? 'text-[#d84e55] font-bold'
+                                                    : 'text-[#92929f] hover:text-white' }}">
+                                                States
+                                            </a>
+                                        @endcan
+                                        @can('seo_cities')
+                                            <a href="{{ route('seoCities.index') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] transition-all duration-150
+                                                {{ Request::routeIs('seoCities.index')
+                                                    ? 'text-[#d84e55] font-bold'
+                                                    : 'text-[#92929f] hover:text-white' }}">
+                                                Cities
+                                            </a>
+                                        @endcan
+                                        @can('seo_routes')
+                                            <a href="{{ route('seoRoutes.index') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] transition-all duration-150
+                                                {{ Request::routeIs('seoRoutes.index')
+                                                    ? 'text-[#d84e55] font-bold'
+                                                    : 'text-[#92929f] hover:text-white' }}">
+                                                Popular Routes
+                                            </a>
+                                        @endcan
+                                        @can('seo_faqs')
+                                            <a href="{{ route('seoFaqs.index') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] transition-all duration-150
+                                                {{ Request::routeIs('seoFaqs.index')
+                                                    ? 'text-[#d84e55] font-bold'
+                                                    : 'text-[#92929f] hover:text-white' }}">
+                                                FAQs
+                                            </a>
+                                        @endcan
+                                    </div>
+                                </div>
+
+                                @can('seo_settings')
+                                    <a href="{{ route('seoSettings.index') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::routeIs('seoSettings.index')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-cogs text-[10px]"></i>
+                                        Settings
+                                    </a>
+                                @endcan
+                            </div>
+                        </div>
+                    @endcan
+                </div>
+
                 <!-- SECTION 3: SYSTEM CONTROL -->
                 <div class="space-y-1">
                     <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
