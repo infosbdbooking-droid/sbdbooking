@@ -1,0 +1,303 @@
+{% include 'layouts/header.html' %}
+{% include 'layouts/navbar.html' %}
+{% include 'login/login.html' %}
+
+<main class="bg-gray-50 min-h-screen">
+
+  <!-- BREADCRUMB -->
+  <div class="bg-white border-b border-gray-100 py-3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex text-xs sm:text-sm font-medium text-gray-500 items-center gap-2">
+        <a href="/" class="hover:text-[#d84e55] transition-colors">Home</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <a href="/blogs" class="hover:text-[#d84e55] transition-colors">Blogs</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-900 truncate max-w-[200px]" title="{{ blog.title }}">{{ blog.title }}</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ARTICLE HERO SECTION -->
+  {% if blog.featured_image_url %}
+    <div class="w-full bg-slate-900 h-64 md:h-96 relative">
+      <img src="{{ blog.featured_image_url }}" alt="{{ blog.title }}" class="w-full h-full object-cover opacity-50">
+      <div class="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-transparent"></div>
+    </div>
+  {% endif %}
+
+  <!-- CONTENT SECTION -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 {% if blog.featured_image_url %}-mt-16{% endif %}">
+
+    <!-- CATEGORY PILLS SLIDER -->
+    <div class="relative flex items-center bg-white border border-gray-100 rounded-3xl p-3 shadow-sm mb-8">
+      <!-- Left Arrow -->
+      <button type="button" id="slideLeftBtn" class="w-8 h-8 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-gray-900 border border-gray-100 rounded-full hover:bg-gray-50 transition-all focus:outline-none">
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+      </button>
+
+      <!-- Scrollable Wrapper -->
+      <div id="categorySlider" class="flex-1 overflow-x-auto whitespace-nowrap mx-3 scroll-smooth gap-2 flex py-0.5" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <style>
+          #categorySlider::-webkit-scrollbar {
+            display: none;
+          }
+        </style>
+        
+        <a href="/blogs" 
+           class="inline-block px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border bg-white text-gray-700 border-gray-200 hover:bg-gray-50 transition-all duration-200">
+          All Categories
+        </a>
+
+        {% for cat in categories %}
+          <a href="/blogs?category={{ cat.slug }}" 
+             class="inline-block px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all duration-200
+             {{ 'bg-[#00a854] text-white border-transparent' if blog.category.slug == cat.slug else 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50' }}">
+            {{ cat.category_name }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <!-- Right Arrow -->
+      <button type="button" id="slideRightBtn" class="w-8 h-8 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-gray-900 border border-gray-100 rounded-full hover:bg-gray-50 transition-all focus:outline-none">
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- LEFT COLUMN: ARTICLE BODY (12 Cols) -->
+      <div class="lg:col-span-12 space-y-8">
+        
+        <!-- Main Card -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-sm">
+          
+          <!-- Category & Meta -->
+          <div class="flex flex-wrap items-center gap-3 text-xs font-semibold text-gray-400 mb-4">
+            <span class="bg-[#d84e55]/10 text-[#d84e55] px-3 py-1 rounded-full text-[10px] uppercase font-bold">
+              {{ blog.category.category_name if blog.category else 'General' }}
+            </span>
+            <span>•</span>
+            <span>By <strong class="text-gray-700">{{ blog.author }}</strong></span>
+            <span>•</span>
+            <span>Published on {{ blog.published_at[:10] if blog.published_at else '-' }}</span>
+            <span>•</span>
+            <span><i class="far fa-eye mr-1"></i>{{ blog.view_count }} Views</span>
+          </div>
+
+          <!-- Title -->
+          <h1 class="text-2xl sm:text-3xl font-black text-gray-900 leading-tight mb-6">
+            {{ blog.title }}
+          </h1>
+
+          <hr class="border-gray-100 my-6">
+
+          <!-- Body Content -->
+          <div class="prose max-w-none text-sm text-gray-800 leading-relaxed font-sans select-text">
+            {{ blog.content|safe }}
+          </div>
+
+          <!-- Tags list -->
+          {% if tags %}
+            <div class="mt-8 pt-6 border-t border-gray-100">
+              <span class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-3">Tags:</span>
+              <div class="flex flex-wrap gap-2">
+                {% for tag in tags %}
+                  <span class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm transition">
+                    #{{ tag.name }}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- COMMENTS SECTION -->
+        <div class="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+          <h3 class="text-base font-black text-gray-900 tracking-tight border-b pb-3 flex items-center gap-2">
+            <span>Comments</span>
+            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full font-bold">{{ comments|length }}</span>
+          </h3>
+
+          <!-- Comments List -->
+          <div class="space-y-4">
+            {% for comment in comments %}
+              <div class="bg-gray-50/50 border border-gray-100 p-5 rounded-2xl">
+                <div class="flex justify-between items-start gap-4">
+                  <div>
+                    <h5 class="text-xs font-bold text-gray-800">{{ comment.name }}</h5>
+                    <span class="text-[9px] text-gray-400 font-semibold mt-0.5 block">{{ comment.created_at[:10] if comment.created_at else '-' }}</span>
+                  </div>
+                  <span class="w-8 h-8 rounded-full bg-[#d84e55]/10 text-[#d84e55] flex items-center justify-center text-xs font-bold font-sans">
+                    {{ comment.name[0]|upper }}
+                  </span>
+                </div>
+                <p class="text-xs text-gray-600 mt-3 leading-relaxed">
+                  {{ comment.comment }}
+                </p>
+              </div>
+            {% else %}
+              <p class="text-xs text-gray-500 italic py-4">No approved comments yet. Be the first to start the discussion!</p>
+            {% endfor %}
+          </div>
+
+          <!-- Add Comment Form -->
+          {% if blog.allow_comments %}
+            <div class="pt-6 border-t border-gray-100" x-data="commentFormHandler({{ blog.id }})">
+              <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Leave a Comment</h4>
+              <p class="text-[11px] text-gray-400 mb-4">Your email address will not be published. Required fields are marked *</p>
+
+              <form @submit.prevent="submitComment" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Name <span class="text-[#d84e55]">*</span></label>
+                    <input type="text" x-model="name" required placeholder="Enter your name" 
+                           class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#d84e55] focus:bg-white transition-all">
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Email <span class="text-[#d84e55]">*</span></label>
+                    <input type="email" x-model="email" required placeholder="name@example.com" 
+                           class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-[#d84e55] focus:bg-white transition-all">
+                  </div>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Comment <span class="text-[#d84e55]">*</span></label>
+                  <textarea x-model="comment" required rows="4" placeholder="Write comment here..." 
+                            class="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#d84e55] focus:bg-white transition-all resize-none"></textarea>
+                </div>
+
+                <button type="submit" :disabled="loading" 
+                        class="bg-gradient-to-r from-[#d84e55] to-[#c13d44] text-white px-6 py-3 rounded-xl font-bold uppercase tracking-wider text-xs shadow hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  <span x-show="!loading">Post Comment</span>
+                  <span x-show="loading" x-cloak class="flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Submitting...
+                  </span>
+                </button>
+              </form>
+            </div>
+          {% else %}
+            <div class="bg-gray-50 border p-4 rounded-2xl text-center text-xs text-gray-500 italic">
+              Comments are disabled for this post.
+            </div>
+          {% endif %}
+        <!-- Related Articles Section (Full Width) -->
+        {% if related %}
+          <div class="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-sm">
+            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider border-b pb-2.5 mb-6">Related Articles</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {% for post in related %}
+                <article class="border border-gray-50 rounded-2xl overflow-hidden hover:shadow-md transition duration-300 flex flex-col h-full group">
+                  <div class="h-32 bg-gray-100 overflow-hidden relative">
+                    {% if post.featured_image_url %}
+                      <img src="{{ post.featured_image_url }}" alt="{{ post.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    {% else %}
+                      <div class="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50 text-[10px] font-bold">No Cover</div>
+                    {% endif %}
+                  </div>
+                  <div class="p-4 flex-1 flex flex-col justify-between space-y-2">
+                    <h4 class="text-xs font-black text-gray-800 group-hover:text-[#d84e55] transition-colors line-clamp-2">
+                      <a href="/blogs/{{ post.slug }}">{{ post.title }}</a>
+                    </h4>
+                    <span class="text-[9px] text-gray-400 font-semibold mt-1 block">{{ post.published_at[:10] if post.published_at else '-' }}</span>
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Need Outstation Cab Booking? Full-width CTA Banner -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-8 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-[#d84e55] opacity-10 rounded-full"></div>
+          <div class="space-y-2 text-center md:text-left">
+            <h4 class="text-base font-black uppercase tracking-wider">Need Outstation Cab Booking?</h4>
+            <p class="text-xs text-slate-300 max-w-xl leading-relaxed">Book comfortable Sedans, SUVs, or Tempo travellers with professional drivers. Get immediate fares calculation now!</p>
+          </div>
+          <a href="/" class="bg-[#d84e55] hover:bg-[#c13d44] text-white px-8 py-3.5 rounded-xl font-bold uppercase tracking-wider text-xs shadow transition-all flex-shrink-0 active:scale-95">Book Online</a>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- JS Comment & Slider Handler script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const slider = document.getElementById('categorySlider');
+      const leftBtn = document.getElementById('slideLeftBtn');
+      const rightBtn = document.getElementById('slideRightBtn');
+
+      if (slider && leftBtn && rightBtn) {
+        leftBtn.addEventListener('click', function () {
+          slider.scrollLeft -= 150;
+        });
+        rightBtn.addEventListener('click', function () {
+          slider.scrollLeft += 150;
+        });
+
+        // Auto scroll active element into view
+        const activeElement = slider.querySelector('.bg-\\[\\#00a854\\]');
+        if (activeElement) {
+          const offsetLeft = activeElement.offsetLeft - slider.offsetLeft;
+          slider.scrollLeft = offsetLeft - (slider.clientWidth / 2) + (activeElement.clientWidth / 2);
+        }
+      }
+    });
+
+    function commentFormHandler(blogId) {
+      return {
+        name: '',
+        email: '',
+        comment: '',
+        loading: false,
+        async submitComment() {
+          this.loading = true;
+          try {
+            const response = await fetch(`/proxy/blogs/${blogId}/comment`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                name: this.name,
+                email: this.email,
+                comment: this.comment
+              })
+            });
+
+            const res = await response.json();
+            if (res.status === 1) {
+              if (window.toastr) {
+                toastr.success(res.message);
+              } else {
+                alert(res.message);
+              }
+              this.name = '';
+              this.email = '';
+              this.comment = '';
+            } else {
+              if (window.toastr) {
+                toastr.error(res.message || "Failed to submit comment.");
+              } else {
+                alert(res.message || "Failed to submit comment.");
+              }
+            }
+          } catch(err) {
+            console.error(err);
+            if (window.toastr) {
+              toastr.error("Something went wrong. Please try again.");
+            } else {
+              alert("Something went wrong. Please try again.");
+            }
+          } finally {
+            this.loading = false;
+          }
+        }
+      }
+    }
+  </script>
+
+</main>
+
+{% include 'layouts/footer.html' %}

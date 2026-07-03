@@ -5,7 +5,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>{% block title %}{{ title if title else "Best Cab Booking, Tour Packages & Outstation Taxi Service in India | SBD Booking" }}{% endblock %}</title>
+  <title>{{ title if title else "Best Cab Booking, Tour Packages & Outstation Taxi Service in India | SBD Booking" }}</title>
+  {% if meta_description %}
+    <meta name="description" content="{{ meta_description }}" />
+  {% endif %}
+  {% if meta_keywords %}
+    <meta name="keywords" content="{{ meta_keywords }}" />
+  {% endif %}
+  {% if canonical_url %}
+    <link rel="canonical" href="{{ canonical_url }}" />
+  {% endif %}
+  {% if schema_type and page %}
+    <!-- Structured Schema Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "{{ schema_type }}",
+      "name": "{{ page.title }}",
+      "description": "{{ meta_description }}",
+      "url": "{{ request.url }}",
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "SBD Booking"
+      }
+    }
+    </script>
+  {% endif %}
   <link rel="icon" href="" type="image/x-icon" />
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Light mode forcing -->

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto py-6 max-w-7xl" x-data="manualBookingApp()" @update-map-data.window="handleMapData($event.detail)">
+<div class="container mx-auto py-6 max-w-7xl" x-data="manualBookingApp()" @update-map-data.window="handleMapData($event.detail)" @route-loading.window="loadingRoute = true; routeError = false" @route-error.window="loadingRoute = false; routeError = true">
     <!-- Header -->
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
@@ -284,14 +284,26 @@
                     <!-- Map Container -->
                     <div id="routeMap" class="w-full h-64 rounded-xl border border-gray-200 mb-4 overflow-hidden z-0 bg-gray-100"></div>
 
+                    <!-- Route loading banner -->
+                    <div x-show="loadingRoute" class="mb-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg px-4 py-3 text-sm flex items-center gap-2">
+                        <i class="fas fa-spinner fa-spin text-xs"></i>
+                        <span>Calculating route and distance, please wait...</span>
+                    </div>
+
+                    <!-- Route error banner -->
+                    <div x-show="routeError && !loadingRoute" class="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle text-xs"></i>
+                        <span>Failed to calculate route distance. Please verify addresses on map.</span>
+                    </div>
+
                     <!-- Travel Time Info Banner -->
-                    <div class="mb-4 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm flex items-center justify-between" x-show="travelTime">
+                    <div class="mb-4 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm flex items-center justify-between" x-show="travelTime && !loadingRoute">
                         <span class="font-semibold text-gray-700">Estimated Travel Time</span>
                         <strong><span class="text-blue-700" x-text="travelTime"></span></strong>
                     </div>
 
                     <!-- Trip Distance Details -->
-                    <div class="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 space-y-2 mb-4" x-show="totalKm > 0">
+                    <div class="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 space-y-2 mb-4" x-show="totalKm > 0 && !loadingRoute">
                         <div class="font-bold text-gray-800 mb-2">Trip Distance Details</div>
                         <div class="flex justify-between items-center pb-2 border-b border-gray-200">
                             <span>Pickup &rarr; Drop</span>
@@ -636,6 +648,8 @@
             returnKm: 0,
             totalKm: 0,
             travelTime: '',
+            loadingRoute: false,
+            routeError: false,
 
             // Schedule
             pickupDate: '',
@@ -781,6 +795,8 @@
             },
 
             handleMapData(data) {
+                this.loadingRoute = false;
+                this.routeError = false;
                 this.pickupAddress = data.pickupAddress || this.pickupAddress;
                 this.dropAddress = data.dropAddress || this.dropAddress;
                 this.returnPickupAddress = data.returnPickupAddress || this.returnPickupAddress;
@@ -1070,6 +1086,8 @@
 
         if (!A_lat || !B_lat) return;
 
+        window.dispatchEvent(new CustomEvent('route-loading'));
+
         const tripType = overrideTripType || document.querySelector('input[name="trip_type"]').value || 'one_way';
         const returnLocationType = document.querySelector('input[name="return_location_type"]:checked')?.value || 'same';
         const C_lat = parseFloat(document.querySelector('input[name="return_pickup_lat"]').value) || 0;
@@ -1094,7 +1112,10 @@
         }
 
         directionsService.route(request, function(result, status) {
-            if (status !== 'OK') return;
+            if (status !== 'OK') {
+                window.dispatchEvent(new CustomEvent('route-error'));
+                return;
+            }
             directionsRenderer.setDirections(result);
 
             let totalKm = 0;

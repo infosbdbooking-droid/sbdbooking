@@ -1,0 +1,218 @@
+{% include 'layouts/header.html' %}
+{% include 'layouts/navbar.html' %}
+{% include 'login/login.html' %}
+
+<main class="bg-gray-50 min-h-screen">
+
+  <!-- BREADCRUMB -->
+  <div class="bg-white border-b border-gray-100 py-3">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex text-xs sm:text-sm font-medium text-gray-500 items-center gap-2">
+        <a href="/" class="hover:text-[#d84e55] transition-colors">Home</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-900">Blogs</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <section class="bg-slate-900 text-white py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left">
+      <div class="max-w-2xl">
+        <span class="bg-[#d84e55]/20 text-[#d84e55] font-black uppercase text-xs tracking-widest px-3 py-1.5 rounded-full inline-block mb-3">
+          Our Travel Stories
+        </span>
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight">SBD Travel Blog</h1>
+        <p class="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed">
+          Stay updated with the latest travel tips, tour packages guidance, route guides, and customer travel diaries.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENT SECTION -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <!-- CATEGORY PILLS SLIDER -->
+    <div class="relative flex items-center bg-white border border-gray-100 rounded-3xl p-3 shadow-sm mb-8">
+      <!-- Left Arrow -->
+      <button type="button" id="slideLeftBtn" class="w-8 h-8 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-gray-900 border border-gray-100 rounded-full hover:bg-gray-50 transition-all focus:outline-none">
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+      </button>
+
+      <!-- Scrollable Wrapper -->
+      <div id="categorySlider" class="flex-1 overflow-x-auto whitespace-nowrap mx-3 scroll-smooth gap-2 flex py-0.5" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <style>
+          #categorySlider::-webkit-scrollbar {
+            display: none;
+          }
+        </style>
+        
+        <a href="/blogs{% if search %}?search={{ search }}{% endif %}" 
+           class="inline-block px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all duration-200
+           {{ 'bg-[#00a854] text-white border-transparent' if not active_category_slug else 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50' }}">
+          All Categories
+        </a>
+
+        {% for cat in categories %}
+          <a href="/blogs?category={{ cat.slug }}{% if search %}&search={{ search }}{% endif %}" 
+             class="inline-block px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full border transition-all duration-200
+             {{ 'bg-[#00a854] text-white border-transparent' if active_category_slug == cat.slug else 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50' }}">
+            {{ cat.category_name }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <!-- Right Arrow -->
+      <button type="button" id="slideRightBtn" class="w-8 h-8 flex-shrink-0 flex items-center justify-center text-gray-400 hover:text-gray-900 border border-gray-100 rounded-full hover:bg-gray-50 transition-all focus:outline-none">
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- LEFT COLUMN: BLOGS LISTING (12 Cols) -->
+      <div class="lg:col-span-12 space-y-8">
+        
+        <!-- Search Info Banner -->
+        {% if search or active_category_slug %}
+          <div class="bg-blue-50 border border-blue-100 text-blue-800 text-xs sm:text-sm p-4 rounded-2xl flex items-center justify-between">
+            <div>
+              Showing results for 
+              {% if search %}<strong>"{{ search }}"</strong>{% endif %}
+              {% if active_category_slug %}
+                in 
+                <strong>
+                  {% for cat in categories %}
+                    {% if cat.slug == active_category_slug %}
+                      {{ cat.category_name }}
+                    {% endif %}
+                  {% endfor %}
+                </strong>
+              {% endif %}
+            </div>
+            <a href="/blogs" class="text-blue-600 hover:text-blue-800 font-bold hover:underline">Clear Filters</a>
+          </div>
+        {% endif %}
+
+        <!-- Blogs Grid -->
+        {% if blogs_data.get('data') %}
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for blog in blogs_data.get('data', []) %}
+              <article class="bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full group">
+                <!-- Featured Image -->
+                <div class="h-48 overflow-hidden bg-gray-100 relative">
+                  {% if blog.featured_image_url %}
+                    <img src="{{ blog.featured_image_url }}" alt="{{ blog.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                  {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-gray-400 font-bold text-xs uppercase bg-gray-100">No Cover Image</div>
+                  {% endif %}
+                  <span class="absolute top-3 left-3 bg-[#d84e55] text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full shadow-sm">
+                    {{ blog.category.category_name if blog.category else 'General' }}
+                  </span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="p-6 flex-1 flex flex-col justify-between">
+                  <div class="space-y-3">
+                    <!-- Meta info -->
+                    <div class="flex items-center text-[10px] text-gray-400 font-semibold gap-3">
+                      <span><i class="far fa-user mr-1"></i>{{ blog.author }}</span>
+                      <span>•</span>
+                      <span><i class="far fa-clock mr-1"></i>{{ blog.published_at[:10] if blog.published_at else '-' }}</span>
+                      <span>•</span>
+                      <span><i class="far fa-eye mr-1"></i>{{ blog.view_count }} Views</span>
+                    </div>
+
+                    <!-- Title -->
+                    <h3 class="text-base font-black text-gray-900 leading-snug line-clamp-2 group-hover:text-[#d84e55] transition-colors">
+                      <a href="/blogs/{{ blog.slug }}">{{ blog.title }}</a>
+                    </h3>
+
+                    <!-- Description -->
+                    <p class="text-xs text-gray-500 leading-relaxed line-clamp-3">
+                      {{ blog.short_description or 'Read full stories, travel instructions, and routing guidelines inside SBD booking portal.' }}
+                    </p>
+                  </div>
+
+                  <!-- Button -->
+                  <div class="pt-4 mt-auto border-t border-gray-50">
+                    <a href="/blogs/{{ blog.slug }}" class="text-[#d84e55] hover:text-[#c13d44] text-xs font-bold flex items-center gap-1">
+                      Read Full Article <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+
+          <!-- Pagination -->
+          {% if blogs_data.get('last_page', 1) > 1 %}
+            <div class="flex items-center justify-between border-t border-gray-200 pt-6">
+              <div>
+                <p class="text-xs text-gray-500">
+                  Page <span class="font-bold text-gray-900">{{ blogs_data.get('current_page') }}</span> of <span class="font-bold text-gray-900">{{ blogs_data.get('last_page') }}</span>
+                </p>
+              </div>
+              <div class="flex gap-2">
+                {% if blogs_data.get('current_page') > 1 %}
+                  <a href="/blogs?page={{ blogs_data.get('current_page') - 1 }}{% if active_category_slug %}&category={{ active_category_slug }}{% endif %}{% if search %}&search={{ search }}{% endif %}" 
+                     class="px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition-all">
+                    <i class="fa-solid fa-chevron-left mr-1"></i> Previous
+                  </a>
+                {% endif %}
+                
+                {% if blogs_data.get('current_page') < blogs_data.get('last_page') %}
+                  <a href="/blogs?page={{ blogs_data.get('current_page') + 1 }}{% if active_category_slug %}&category={{ active_category_slug }}{% endif %}{% if search %}&search={{ search }}{% endif %}" 
+                     class="px-4 py-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold rounded-xl transition-all">
+                    Next <i class="fa-solid fa-chevron-right mr-1"></i>
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+        {% else %}
+          <div class="bg-white border border-gray-100 rounded-3xl p-12 text-center shadow-sm">
+            <div class="w-16 h-16 bg-red-50 text-[#d84e55] rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+              <i class="fa-solid fa-book-open"></i>
+            </div>
+            <h3 class="text-lg font-black text-gray-900">No blog posts found</h3>
+            <p class="text-gray-500 text-xs sm:text-sm mt-2 max-w-md mx-auto">We couldn't find any articles matching your search query or filters. Try adjusting your parameters.</p>
+            <a href="/blogs" class="mt-6 inline-block bg-gradient-to-r from-[#d84e55] to-[#c13d44] text-white px-6 py-2.5 rounded-xl font-bold uppercase tracking-wider text-xs shadow hover:opacity-95 transition-all">View All Blogs</a>
+          </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Slider control script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const slider = document.getElementById('categorySlider');
+      const leftBtn = document.getElementById('slideLeftBtn');
+      const rightBtn = document.getElementById('slideRightBtn');
+
+      if (slider && leftBtn && rightBtn) {
+        leftBtn.addEventListener('click', function () {
+          slider.scrollLeft -= 150;
+        });
+        rightBtn.addEventListener('click', function () {
+          slider.scrollLeft += 150;
+        });
+
+        // Auto scroll active element into view
+        const activeElement = slider.querySelector('.bg-\\[\\#00a854\\]');
+        if (activeElement) {
+          const offsetLeft = activeElement.offsetLeft - slider.offsetLeft;
+          slider.scrollLeft = offsetLeft - (slider.clientWidth / 2) + (activeElement.clientWidth / 2);
+        }
+      }
+    });
+  </script>
+
+</main>
+
+{% include 'layouts/footer.html' %}

@@ -418,13 +418,23 @@ $(document).ready(function () {
 
         if (!A_lat || !B_lat) return;
 
+        // Show loading state
+        $("#distanceKm").html('<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i> Calculating...');
+        $("#travelTime").html('<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i> Calculating...');
+        $("#tripDetails").removeClass("hidden").html('<div class="text-xs text-gray-500 py-1"><i class="fas fa-spinner fa-spin mr-1"></i> Fetching optimal route...</div>');
+
         directionsService.route({
             origin: { lat: A_lat, lng: A_lng },
             destination: { lat: B_lat, lng: B_lng },
             travelMode: google.maps.TravelMode.DRIVING
         }, function (result, status) {
 
-            if (status !== "OK") return;
+            if (status !== "OK") {
+                $("#distanceKm").text("Error");
+                $("#travelTime").text("Error");
+                $("#tripDetails").html('<div class="text-xs text-red-500 font-semibold py-1">Failed to calculate route. Please try again.</div>');
+                return;
+            }
 
             directionsRenderer.setDirections(result);
 
@@ -497,6 +507,11 @@ $(document).ready(function () {
 
         if (!A_lat || !B_lat || !C_lat || !D_lat) return;
 
+        // Show loading state
+        $("#distanceKm").html('<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i> Calculating...');
+        $("#travelTime").html('<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i> Calculating...');
+        $("#tripDetails").removeClass("hidden").html('<div class="text-xs text-gray-500 py-1"><i class="fas fa-spinner fa-spin mr-1"></i> Fetching optimal round trip route...</div>');
+
         directionsService.route({
             origin: { lat: A_lat, lng: A_lng },
             destination: { lat: A_lat, lng: A_lng },
@@ -508,7 +523,12 @@ $(document).ready(function () {
             travelMode: google.maps.TravelMode.DRIVING
         }, function (result, status) {
 
-            if (status !== "OK") return;
+            if (status !== "OK") {
+                $("#distanceKm").text("Error");
+                $("#travelTime").text("Error");
+                $("#tripDetails").html('<div class="text-xs text-red-500 font-semibold py-1">Failed to calculate round trip route. Please try again.</div>');
+                return;
+            }
 
             directionsRenderer.setDirections(result);
 

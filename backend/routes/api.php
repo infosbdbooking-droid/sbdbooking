@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\CabOrderController;
 use App\Http\Controllers\Api\ChargeCalculationController;
 use App\Http\Controllers\Api\SliderController;
 use App\Http\Controllers\Api\ContactMessageController;
+use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\SeoPageController;
+
 
 
 /*
@@ -36,6 +39,16 @@ Route::prefix('v1')->group(function () {
     Route::post('/carDetails', [CarController::class, 'carDetails']);
     Route::get('/sliders', [SliderController::class, 'getActiveSliders']);
     Route::post('/contact', [ContactMessageController::class, 'store']);
+
+    // Blogs endpoints
+    Route::get('/blogs', [BlogController::class, 'getActiveBlogs']);
+    Route::get('/blogs/categories', [BlogController::class, 'getCategories']);
+    Route::get('/blogs/{slug}', [BlogController::class, 'getBlogDetail']);
+    Route::post('/blogs/{id}/comment', [BlogController::class, 'addComment']);
+
+    // SEO landing pages endpoints
+    Route::get('/seo-page/{slug}', [SeoPageController::class, 'getSeoPageDetail']);
+
 
     // Charge Calculation endpoints
     Route::post('/calculate-charges', [ChargeCalculationController::class, 'calculateCharges']);
