@@ -522,9 +522,17 @@
                     <!-- User Profile Info with Interactive Dropdown -->
                     <div class="relative" x-data="{ userMenuOpen: false }" @click.away="userMenuOpen = false">
                         <button @click="userMenuOpen = !userMenuOpen" class="flex items-center gap-2 pl-3 border-l border-slate-100 hover:bg-slate-50/50 p-1.5 rounded-xl transition duration-150 text-left focus:outline-none select-none cursor-pointer">
-                            <div class="w-8 h-8 rounded-full bg-[#d84e55] text-white flex items-center justify-center font-bold text-xs uppercase shadow-sm ring-2 ring-red-50/50">
-                                {{ substr(auth()->user()->name ?? 'Hommlie Shop', 0, 1) }}
-                            </div>
+                            @if(auth()->user()->isVendor() && auth()->user()->company_logo)
+                                <div class="w-8 h-8 rounded-full overflow-hidden ring-2 ring-yellow-400/60 shadow-sm flex-shrink-0">
+                                    <img src="{{ asset('images/vendor_logos/' . basename(auth()->user()->company_logo)) }}"
+                                         alt="Company Logo"
+                                         class="w-full h-full object-cover">
+                                </div>
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-[#d84e55] text-white flex items-center justify-center font-bold text-xs uppercase shadow-sm ring-2 ring-red-50/50">
+                                    {{ substr(auth()->user()->name ?? 'Hommlie Shop', 0, 1) }}
+                                </div>
+                            @endif
                             <div class="hidden md:flex flex-col leading-none">
                                 <span class="text-xs font-bold text-slate-700">{{ auth()->user()->name ?? 'Hommlie Shop' }}</span>
                                 <span class="text-[9px] text-[#d84e55] font-bold mt-0.5">Online</span>

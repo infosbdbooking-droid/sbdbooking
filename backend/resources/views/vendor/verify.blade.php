@@ -37,9 +37,9 @@
         <div class="relative group">
             <div class="w-24 h-24 rounded-2xl overflow-hidden bg-slate-100 border-2 border-slate-200 flex items-center justify-center">
                 @if($user->company_logo)
-                    <img src="/storage/{{ $user->company_logo }}" alt="Company Logo" class="w-full h-full object-cover">
+                    <img src="{{ asset('images/' . $user->company_logo) }}" alt="Company Logo" class="w-full h-full object-cover">
                 @elseif($user->photo)
-                    <img src="/storage/{{ $user->photo }}" alt="Vendor Photo" class="w-full h-full object-cover">
+                    <img src="{{ asset('images/' . $user->photo) }}" alt="Vendor Photo" class="w-full h-full object-cover">
                 @else
                     <i class="fas fa-store text-4xl text-slate-300"></i>
                 @endif

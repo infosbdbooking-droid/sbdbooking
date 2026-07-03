@@ -223,50 +223,42 @@ class VendorController extends Controller
             // Document uploads using direct file move to public_path
             if ($request->hasFile('aadhaar_file')) {
                 if ($user->aadhaar_file) {
-                    $oldPath = public_path('storage/' . $user->aadhaar_file);
-                    if (file_exists($oldPath)) {
-                        @unlink($oldPath);
-                    }
+                    $oldPath = public_path('images/' . $user->aadhaar_file);
+                    if (file_exists($oldPath)) @unlink($oldPath);
                 }
-                $file = $request->file('aadhaar_file');
+                $file     = $request->file('aadhaar_file');
                 $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('storage/vendor_docs/aadhaar'), $fileName);
+                $file->move(public_path('images/vendor_docs/aadhaar'), $fileName);
                 $user->aadhaar_file = 'vendor_docs/aadhaar/' . $fileName;
             }
             if ($request->hasFile('pan_file')) {
                 if ($user->pan_file) {
-                    $oldPath = public_path('storage/' . $user->pan_file);
-                    if (file_exists($oldPath)) {
-                        @unlink($oldPath);
-                    }
+                    $oldPath = public_path('images/' . $user->pan_file);
+                    if (file_exists($oldPath)) @unlink($oldPath);
                 }
-                $file = $request->file('pan_file');
+                $file     = $request->file('pan_file');
                 $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('storage/vendor_docs/pan'), $fileName);
+                $file->move(public_path('images/vendor_docs/pan'), $fileName);
                 $user->pan_file = 'vendor_docs/pan/' . $fileName;
             }
             if ($request->hasFile('photo')) {
                 if ($user->photo) {
-                    $oldPath = public_path('storage/' . $user->photo);
-                    if (file_exists($oldPath)) {
-                        @unlink($oldPath);
-                    }
+                    $oldPath = public_path('images/' . $user->photo);
+                    if (file_exists($oldPath)) @unlink($oldPath);
                 }
-                $file = $request->file('photo');
+                $file     = $request->file('photo');
                 $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('storage/vendor_photos'), $fileName);
+                $file->move(public_path('images/vendor_photos'), $fileName);
                 $user->photo = 'vendor_photos/' . $fileName;
             }
             if ($request->hasFile('company_logo')) {
                 if ($user->company_logo) {
-                    $oldPath = public_path('storage/' . $user->company_logo);
-                    if (file_exists($oldPath)) {
-                        @unlink($oldPath);
-                    }
+                    $oldPath = public_path('images/' . $user->company_logo);
+                    if (file_exists($oldPath)) @unlink($oldPath);
                 }
-                $file = $request->file('company_logo');
+                $file     = $request->file('company_logo');
                 $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('storage/vendor_logos'), $fileName);
+                $file->move(public_path('images/vendor_logos'), $fileName);
                 $user->company_logo = 'vendor_logos/' . $fileName;
             }
 
