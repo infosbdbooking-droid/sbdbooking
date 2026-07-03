@@ -11,6 +11,45 @@
   <link rel="icon" type="image/x-icon" href="{{ asset('images/favicon.svg') }}">
   <!-- CSS Links -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Premium Indigo/Purple Sidebar Override */
+    #sidebar {
+      background-color: #141029 !important;
+      border-right-color: #241d49 !important;
+    }
+    #sidebar div, #sidebar nav, #sidebar hr {
+      border-color: #241d49 !important;
+    }
+    /* Active main links background override */
+    #sidebar .bg-\[\#d84e55\] {
+      background-color: #2d254f !important;
+      border-left-width: 0px !important;
+      padding-left: 1rem !important;
+      box-shadow: none !important;
+    }
+    /* Submenus container border */
+    #sidebar .border-\[\#282836\]\/60 {
+      border-color: #241d49 !important;
+    }
+    /* Active sub-links inside menu folders */
+    #sidebar .bg-\[\#d84e55\]\/10 {
+      background-color: rgba(167, 139, 250, 0.12) !important;
+      color: #a78bfa !important;
+      border-left-color: #a78bfa !important;
+    }
+    #sidebar .text-\[\#d84e55\] {
+      color: #a78bfa !important;
+    }
+    #sidebar a:hover, #sidebar button:hover {
+      background-color: rgba(255, 255, 255, 0.05) !important;
+      color: #ffffff !important;
+    }
+    /* Google Translate offset override */
+    body {
+      top: 0px !important;
+      position: static !important;
+    }
+  </style>
   <script>
     function preventDarkMode() {
       if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -131,5 +170,3 @@
     });
   </script>
 </head>
-
-<body class="">

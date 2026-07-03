@@ -145,6 +145,39 @@ Route::prefix('panel')->group(function () {
             Route::post('/{id}/approve', [VendorController::class, 'approve'])->name('vendors.approve');
             Route::post('/{id}/reject', [VendorController::class, 'reject'])->name('vendors.reject');
             Route::post('/{id}/commission', [VendorController::class, 'updateCommission'])->name('vendors.commission');
+            Route::get('/{id}/show', [VendorController::class, 'show'])->name('vendors.show');
+        });
+
+        # Vendor Wallet & Settlements (Vendor Portal)
+        Route::prefix('vendor/wallet')->group(function () {
+            Route::get('/', [VendorController::class, 'walletDashboard'])->name('vendor.wallet');
+            Route::post('/settlement-request', [VendorController::class, 'storeSettlementRequest'])->name('vendor.settlement.request');
+        });
+
+        # Finance Management (Admin Portal)
+        Route::prefix('finance')->group(function () {
+            // 1. Vendor Wallets (Landing Page)
+            Route::get('/vendor-wallets', [VendorController::class, 'vendorWalletsIndex'])->name('finance.vendor-wallets.index');
+            Route::get('/vendor-wallets/{vendor_id}', [VendorController::class, 'vendorFinanceDashboard'])->name('finance.vendor-wallets.show');
+            
+            // 2. Settlement Requests
+            Route::get('/settlements', [VendorController::class, 'adminSettlementsIndex'])->name('finance.settlements.index');
+            Route::post('/settlements/{id}/approve', [VendorController::class, 'adminSettlementApprove'])->name('finance.settlements.approve');
+            Route::post('/settlements/{id}/reject', [VendorController::class, 'adminSettlementReject'])->name('finance.settlements.reject');
+            
+            // 3. Commission History
+            Route::get('/commissions', [VendorController::class, 'adminCommissionsIndex'])->name('finance.commissions.index');
+            
+            // 4. Payment Transactions
+            Route::get('/transactions', [VendorController::class, 'adminTransactionsIndex'])->name('finance.transactions.index');
+            
+            // 5. Reports
+            Route::get('/reports', [VendorController::class, 'financeReportsIndex'])->name('finance.reports.index');
+            Route::get('/reports/export', [VendorController::class, 'financeReportsExport'])->name('finance.reports.export');
+            
+            // Actions & Adjustments
+            Route::post('/vendor-wallets/{vendor_id}/adjust', [VendorController::class, 'vendorWalletAdjust'])->name('finance.vendor-wallets.adjust');
+            Route::post('/vendor-wallets/{vendor_id}/status', [VendorController::class, 'vendorWalletStatusUpdate'])->name('finance.vendor-wallets.status');
         });
 
 

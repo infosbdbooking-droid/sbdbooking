@@ -21,25 +21,25 @@
            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
 
             <!-- Logo -->
-            <div class="h-20 flex flex-col items-center justify-center border-b border-[#282836] px-6 gap-1">
+            <div class="h-14 flex flex-col items-center justify-center border-b border-[#282836] px-6 gap-1">
                 <a href="{{ route('dashboard') }}" class="flex items-center justify-center">
-                    @if(session('logo'))
-                        <img src="{{ asset('images/logo/' . session('logo')) }}" alt="Logo" class="h-10 object-contain brightness-110">
+                    @if(session('logo') && file_exists(public_path('images/logo/' . session('logo'))))
+                        <img src="{{ asset('images/logo/' . session('logo')) }}" alt="Logo" class="h-8 object-contain brightness-110">
                     @else
-                        <span class="text-white font-black text-lg tracking-wider">Hommlie Shop</span>
+                        <span class="text-white font-black text-base tracking-wider uppercase">SBD BOOKING</span>
                     @endif
                 </a>
             </div>
 
             <!-- ADMIN/VENDOR Pill Badge -->
-            <div class="px-4 py-3 border-b border-[#282836]/60 bg-[#15151e]/50">
+            <div class="px-4 py-2 border-b border-[#282836]/60 bg-[#15151e]/50">
                 @if(auth()->user()->isVendor())
-                    <div class="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider py-2 px-4 rounded-xl shadow-lg border border-yellow-200/20">
+                    <div class="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider py-1.5 px-4 rounded-xl shadow-lg border border-yellow-200/20">
                         <i class="fas fa-store text-[10px]"></i>
                         VENDOR
                     </div>
                 @else
-                    <div class="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 font-extrabold text-xs uppercase tracking-wider py-2 px-4 rounded-xl shadow-lg border border-yellow-200/20">
+                    <div class="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 font-extrabold text-xs uppercase tracking-wider py-1.5 px-4 rounded-xl shadow-lg border border-yellow-200/20">
                         <i class="fas fa-key text-[10px]"></i>
                         ADMIN
                     </div>
@@ -47,7 +47,7 @@
             </div>
 
             <!-- Menu -->
-            <nav class="flex-1 p-4 space-y-5 text-sm font-semibold overflow-y-auto custom-scrollbar">
+            <nav class="flex-1 pt-1.5 px-4 pb-4 space-y-2 text-sm font-semibold overflow-y-auto custom-scrollbar">
 
                 @if(auth()->user()->isVendor())
                     <!-- SECTION: VENDOR PORTAL -->
@@ -106,14 +106,20 @@
                                 <i class="fas fa-car text-base transition-transform group-hover:scale-110"></i>
                                 <span>Car Fleet</span>
                             </a>
+
+                            <!-- Wallet & Settlements -->
+                            <a href="{{ route('vendor.wallet') }}" class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
+                                {{ request()->is('panel/vendor/wallet')
+                                    ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
+                                    : 'text-[#b5b5c3] hover:text-white hover:bg-white/5' }}">
+                                <i class="fas fa-wallet text-base transition-transform group-hover:scale-110"></i>
+                                <span>My Wallet</span>
+                            </a>
                         @endif
                     </div>
                 @else
-                    <!-- SECTION 1: CORE PORTAL -->
-                    <div class="space-y-1">
-                        <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
-                            Core Portal
-                        </div>
+                    <!-- SINGLE ADMIN PORTAL CONTAINER -->
+                    <div class="space-y-1 w-full">
 
                         @can('dashboard')
                             <a href="{{ route('dashboard') }}" class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
@@ -157,14 +163,9 @@
                             </div>
                         </div>
                     @endcan
-                </div>
 
                 @if(auth()->user()->roles && strtolower(auth()->user()->roles->title) === 'admin')
                 <!-- SECTION 2: FLEET & CUSTOMIZATION -->
-                <div class="space-y-1">
-                    <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
-                        Fleet & Inventory
-                    </div>
 
                     @can('charges_type')
                         <a href="{{ route('chargesType') }}" class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
@@ -205,13 +206,8 @@
                             <span>Sliders</span>
                         </a>
                     @endcan
-                </div>
 
                 <!-- SECTION 2.5: BLOG MANAGEMENT -->
-                <div class="space-y-1">
-                    <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
-                        Blog Portal
-                    </div>
 
                     @can('blogs_dashboard')
                         <div x-data="{ open: {{ Request::is('panel/blogs*') || Request::is('panel/blog-categories*') || Request::is('panel/blog-tags*') || Request::is('panel/blog-comments*') || Request::is('panel/blog-settings*') ? 'true' : 'false' }} }">
@@ -297,13 +293,8 @@
                             </div>
                         </div>
                     @endcan
-                </div>
 
                 <!-- SECTION 2.6: SEO LANDING PAGES -->
-                <div class="space-y-1">
-                    <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
-                        SEO Portal
-                    </div>
 
                     @can('seo_dashboard')
                         <div x-data="{ open: {{ Request::is('panel/seo*') || Request::is('panel/seo-service-categories*') || Request::is('panel/seo-states*') || Request::is('panel/seo-cities*') || Request::is('panel/seo-routes*') || Request::is('panel/seo-faqs*') || Request::is('panel/seo-settings*') ? 'true' : 'false' }}, openMasters: false }">
@@ -412,13 +403,8 @@
                             </div>
                         </div>
                     @endcan
-                </div>
 
                 <!-- SECTION 3: SYSTEM CONTROL -->
-                <div class="space-y-1">
-                    <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
-                        System & Access
-                    </div>
 
                     @can('access')
                         <div x-data="{ open: {{ Request::is('access*') || Request::is('panel/access*') ? 'true' : 'false' }} }">
@@ -467,6 +453,66 @@
                         </div>
                     @endcan
 
+                    <!-- Redesigned Finance Portal Dropdown for Admin -->
+                    @can('settlements')
+                        <div x-data="{ openFinance: {{ Request::is('panel/finance*') ? 'true' : 'false' }} }" class="mt-1">
+                            <button @click="openFinance = !openFinance" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200
+                                {{ Request::is('panel/finance*')
+                                    ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
+                                    : 'text-[#b5b5c3] hover:text-white hover:bg-white/5' }}">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-coins text-base"></i>
+                                    <span>Finance Management</span>
+                                </div>
+                                <i class="fas fa-chevron-down text-xs transition-transform duration-200"
+                                    :class="openFinance ? 'rotate-180' : ''"></i>
+                            </button>
+
+                            <div x-show="openFinance" x-transition class="mt-1 pl-4 space-y-1 border-l border-[#282836]/60 ml-6">
+                                <a href="{{ route('finance.vendor-wallets.index') }}"
+                                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                    {{ Request::routeIs('finance.vendor-wallets.index') || Request::is('panel/finance/vendor-wallets*')
+                                        ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                        : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                    <i class="fas fa-wallet text-[10px]"></i>
+                                    <span>Vendor Wallets</span>
+                                </a>
+                                <a href="{{ route('finance.settlements.index') }}"
+                                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                    {{ Request::routeIs('finance.settlements.index')
+                                        ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                        : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                    <i class="fas fa-hand-holding-usd text-[10px]"></i>
+                                    <span>Settlement Requests</span>
+                                </a>
+                                <a href="{{ route('finance.commissions.index') }}"
+                                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                    {{ Request::routeIs('finance.commissions.index')
+                                        ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                        : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                    <i class="fas fa-percentage text-[10px]"></i>
+                                    <span>Commission History</span>
+                                </a>
+                                <a href="{{ route('finance.transactions.index') }}"
+                                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                    {{ Request::routeIs('finance.transactions.index')
+                                        ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                        : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                    <i class="fas fa-exchange-alt text-[10px]"></i>
+                                    <span>Payment Transactions</span>
+                                </a>
+                                <a href="{{ route('finance.reports.index') }}"
+                                    class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                    {{ Request::routeIs('finance.reports.index')
+                                        ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                        : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                    <i class="fas fa-chart-line text-[10px]"></i>
+                                    <span>Reports</span>
+                                </a>
+                            </div>
+                        </div>
+                    @endcan
+
                     @can('contact_messages')
                         <a href="{{ route('contactMessages.index') }}" class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
                             {{ request()->is('panel/contact-messages*')
@@ -506,7 +552,7 @@
              :class="sidebarOpen ? 'lg:ml-64' : 'lg:ml-0'">
 
             <!-- Header -->
-            <header class="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 shadow-sm z-30">
+            <header class="sticky top-0 h-16 bg-white/95 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6 shadow-sm z-30">
                 <button @click="sidebarOpen = !sidebarOpen"
                     class="p-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition">
                     <i class="fas fa-bars"></i>

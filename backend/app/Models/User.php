@@ -85,6 +85,16 @@ class User extends Authenticatable
         return $this->hasMany(CabOrder::class, 'vendor_id');
     }
 
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class, 'user_id');
+    }
+
+    public function settlements()
+    {
+        return $this->hasMany(SettlementRequest::class, 'vendor_id');
+    }
+
     public function isVendor()
     {
         return $this->roles && strtolower($this->roles->title) === 'vendor';

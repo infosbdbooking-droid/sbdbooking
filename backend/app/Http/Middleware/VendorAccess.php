@@ -20,6 +20,8 @@ class VendorAccess
         'vendor.verify',
         'vendor.verify.submit',
         'logout',
+        'vendor.wallet',
+        'vendor.settlement.request',
     ];
 
     /**

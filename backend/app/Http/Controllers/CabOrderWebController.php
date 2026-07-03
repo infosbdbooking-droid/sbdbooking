@@ -19,7 +19,7 @@ class CabOrderWebController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $query = CabOrder::with(['customer', 'car'])
+        $query = CabOrder::with(['customer', 'car', 'vendor'])
             ->orderBy('created_at', 'desc');
 
         // Vendors only see their own bookings
@@ -628,6 +628,44 @@ class CabOrderWebController extends Controller
                     'commission_amount' => $commAmount,
                     'vendor_earnings' => $vendorEarnings,
                 ]);
+
+                // Process Wallet Transactions
+                $walletService = app(\App\Services\WalletService::class);
+                $hasWalletTx = \App\Models\WalletTransaction::where('reference_id', $order->id)
+                    ->where('reference_type', \App\Models\CabOrder::class)
+                    ->exists();
+
+                if (!$hasWalletTx) {
+                    $isCash = strtolower($order->payment_method) === 'cash';
+
+                    if ($isCash) {
+                        // For Cash, vendor keeps full cash. Debit only the admin commission.
+                        $walletService->debit(
+                            $vendor,
+                            $commAmount,
+                            'admin_commission',
+                            $order,
+                            "Admin commission deduction for Cash booking: #{$order->order_number}"
+                        );
+                    } else {
+                        // For Online, credit the full amount and debit the commission
+                        $walletService->credit(
+                            $vendor,
+                            $totalAmount,
+                            'booking_fare',
+                            $order,
+                            "Ride fare credit for Online booking: #{$order->order_number}"
+                        );
+
+                        $walletService->debit(
+                            $vendor,
+                            $commAmount,
+                            'admin_commission',
+                            $order,
+                            "Admin commission deduction for Online booking: #{$order->order_number}"
+                        );
+                    }
+                }
 
                 // Also log activity
                 \App\Models\CabOrderActivity::create([
