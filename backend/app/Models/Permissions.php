@@ -7,6 +7,7 @@ class Permissions extends Model
     #Columns Name 
     protected $fillable = [
         'title',
+        'route_prefix',
         'deleted_at'
     ];
 }

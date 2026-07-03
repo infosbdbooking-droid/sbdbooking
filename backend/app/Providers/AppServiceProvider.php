@@ -26,6 +26,17 @@ class AppServiceProvider extends ServiceProvider
 
         // Define Gate::before to intercept all checks
         Gate::before(function (?User $user, $ability) {
+            if ($user && $user->isVendor()) {
+                // If they are not approved yet, they can ONLY access the dashboard
+                if ($user->profile_status !== 'Approved') {
+                    if ($ability === 'dashboard') {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+            // Fallback to dynamic, role-assigned permissions from the session/database
             $permissions = Session::get('permission_titles', []);
             if (in_array($ability, $permissions)) {
                 return true;

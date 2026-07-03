@@ -12,7 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'vendor.access' => \App\Http\Middleware\VendorAccess::class,
+        ]);
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\VendorAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

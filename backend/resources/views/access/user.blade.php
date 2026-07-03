@@ -33,7 +33,7 @@
         </div>
         <!-- ADD USER MODAL -->
         <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 ">
-            <div class="bg-white w-full max-w-3xl mx-auto p-6 rounded-lg shadow-lg relative">
+            <div class="bg-white w-full max-w-3xl mx-auto p-6 rounded-lg shadow-lg relative max-h-[90vh] overflow-y-auto">
                 <button type="button"
                     class="absolute closeUserModal top-4 right-4 text-gray-500 hover:text-gray-700 text-xl">
                     &times;
@@ -63,6 +63,7 @@
                             class="select2 w-full h-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-500">
                         </select>
                     </div>
+
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Password<span
                                 class="text-black-500">*</span></label>
@@ -216,14 +217,17 @@
                     $('#name').val(data.name);
                     $('#email').val(data.email);
                     $('#password').val('');
+
                     const updateUrl = "{{ route('access.user.update', ':id') }}".replace(':id', data.id);
                     userForm.attr('action', updateUrl);
                     if (!userForm.find('input[name="_method"]').length) {
                         userForm.append('<input type="hidden" name="_method" value="PUT">');
                     }
+                    
                     fetchRole().then(() => {
                         $('#role').val(data.role_id).trigger('change');
                     });
+                    
                     submitBtn.text('Update User');
                     $('#userModalTitle').text('Edit User');
                     userModal.removeClass('hidden').addClass('flex');

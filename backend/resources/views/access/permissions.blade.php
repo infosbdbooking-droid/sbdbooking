@@ -24,6 +24,7 @@
                             <tr>
                                 <th>SR No.</th>
                                 <th>Title</th>
+                                <th>Route Prefix</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -42,10 +43,18 @@
                 <form id="permissionForm" action="{{ route('access.permissions.store') }}" method="POST">
                     @csrf
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Title <span
-                                class="text-black-500">*</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-black-500">*</span></label>
                         <input type="text" name="title" id="title"
                             class="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Route Prefix
+                            <span class="text-xs text-gray-400 ml-1">(comma-separated, e.g: cabOrders,car)</span>
+                        </label>
+                        <input type="text" name="route_prefix" id="route_prefix"
+                            placeholder="e.g. cabOrders  or  access,users,vendors"
+                            class="w-full px-3 py-2 border-b border-gray-300 focus:outline-none focus:border-blue-500">
+                        <p class="text-xs text-gray-400 mt-1">This links a permission to which route group it protects. Leave blank if not needed.</p>
                     </div>
                     <div class="flex justify-end gap-2">
                         <button type="button"
@@ -116,6 +125,14 @@
                     {
                         data: 'title',
                         name: 'title'
+                    },
+                    {
+                        data: 'route_prefix',
+                        name: 'route_prefix',
+                        render: function (data) {
+                            if (!data) return '<span class="text-gray-400 text-xs">—</span>';
+                            return data.split(',').map(p => `<code class="bg-gray-100 text-xs px-1.5 py-0.5 rounded">${p.trim()}</code>`).join(' ');
+                        }
                     },
                     {
                         data: null,
@@ -205,6 +222,7 @@
 
                 $.get(editUrl, function (data) {
                     $('#title').val(data.title);
+                    $('#route_prefix').val(data.route_prefix || '');
                     $('#permissionModal h2').text('Edit Permission');
                     $('.addBtn').text('Update Permission');
                     $('#permissionModal').removeClass('hidden').addClass('flex');

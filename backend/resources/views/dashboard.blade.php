@@ -2,6 +2,32 @@
 
 @section('content')
 <div class="space-y-6 pb-10" x-data="{ search: '', statusFilter: 'all' }">
+
+    @if(auth()->user()->isVendor() && auth()->user()->profile_status !== 'Approved')
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm text-left">
+            <div class="flex items-start sm:items-center gap-3">
+                <div class="p-2.5 bg-amber-100 text-amber-700 rounded-xl">
+                    <i class="fas fa-exclamation-triangle text-base"></i>
+                </div>
+                <div>
+                    @if(auth()->user()->profile_status === 'Rejected')
+                        <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider">Profile Verification Rejected</h4>
+                        <p class="text-xs text-amber-700 font-semibold mt-0.5">
+                            Reason: "{{ auth()->user()->rejection_reason }}". Please update your profile details and re-submit for approval.
+                        </p>
+                    @else
+                        <h4 class="text-xs font-bold text-amber-800 uppercase tracking-wider">Profile Pending Approval</h4>
+                        <p class="text-xs text-amber-700 font-semibold mt-0.5">
+                            Your account is currently under review. Please complete your profile details and wait for admin approval to access all features.
+                        </p>
+                    @endif
+                </div>
+            </div>
+            <a href="{{ route('vendor.verify') }}" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-sm transition duration-150 shrink-0 text-center">
+                <i class="fas fa-edit mr-1"></i> Update Profile
+            </a>
+        </div>
+    @endif
     
     <!-- 1. TOP SUMMARY CARDS (4-Column Grid) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

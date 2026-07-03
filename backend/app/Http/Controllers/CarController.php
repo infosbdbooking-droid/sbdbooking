@@ -8,6 +8,7 @@ use App\Models\CarType;
 use App\Models\ChargesType;
 use App\Models\CarCharge;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 
 use Illuminate\Support\Facades\Storage;
@@ -18,9 +19,17 @@ class CarController extends Controller
     {
         try {
             if ($request->ajax()) {
-                $data = Car::join('car_type', 'car.car_type_id', '=', 'car_type.id')
+                $query = Car::join('car_type', 'car.car_type_id', '=', 'car_type.id')
                     ->select('car.*', 'car_type.car_type')
                     ->orderBy('car.id', 'DESC');
+
+                // Vendors only see their own cars
+                $user = Auth::user();
+                if ($user && $user->isVendor()) {
+                    $query->where('car.vendor_id', $user->id);
+                }
+
+                $data = $query;
 
                 return DataTables::of($data)
                     ->addIndexColumn()
@@ -128,6 +137,12 @@ class CarController extends Controller
             $car->rating_value = $request->rating_value;
             $car->rating_count = $request->rating_count;
             $car->min_trip_amount = $request->min_trip_amount;
+
+            // Auto-assign vendor_id if the logged-in user is a vendor
+            $user = Auth::user();
+            if ($user && $user->isVendor()) {
+                $car->vendor_id = $user->id;
+            }
 
             // JSON save
             $car->booking_includes = $request->booking_includes

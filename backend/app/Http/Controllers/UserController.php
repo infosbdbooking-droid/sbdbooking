@@ -116,35 +116,35 @@ class UserController extends Controller
         }
     }
 
-    #Update 
-   public function update(Request $request, $id)
+    #Update
+    public function update(Request $request, $id)
     {
         try {
-                $validator = Validator::make($request->all(), [
-                    'name' => 'required|string|max:255',
-                    'email' => 'required|email|unique:users,email,' . $id,
-                    'role' => 'required|exists:roles,id',
-                    'password' => 'nullable|min:6'
-                ]);
-                if ($validator->fails()) {
-                    return response()->json([
-                        'success' => false,
-                        'errors' => $validator->errors()
-                    ], 422);
-                }
-                $data = $validator->validated(); 
-                $user = User::findOrFail($id);
-                $user->name = $data['name'];
-                $user->email = $data['email'];
-                $user->role_id = $data['role'];
-                if (!empty($data['password'])) {
-                    $user->password = Hash::make($data['password']);
-                }
-                $user->save();
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $id,
+                'role' => 'required|exists:roles,id',
+                'password' => 'nullable|min:6'
+            ]);
+            if ($validator->fails()) {
                 return response()->json([
-                    'success' => true,
-                    'message' => 'User updated successfully.'
-                ]);
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+            $data = $validator->validated(); 
+            $user = User::findOrFail($id);
+            $user->name = $data['name'];
+            $user->email = $data['email'];
+            $user->role_id = $data['role'];
+            if (!empty($data['password'])) {
+                $user->password = Hash::make($data['password']);
+            }
+            $user->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'User updated successfully.'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

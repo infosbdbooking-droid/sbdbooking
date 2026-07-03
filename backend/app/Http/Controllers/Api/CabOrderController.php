@@ -218,6 +218,7 @@ class CabOrderController extends Controller
 
                 'car_id' => $car->id,
                 'car_name' => $car->car_name,
+                'vendor_id' => $car->vendor_id,
 
                 'trip_type' => $request->trip_type,
                 'stay_duration' => $request->stay_duration ?? 'short',

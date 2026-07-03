@@ -36,6 +36,7 @@ class PermissionsController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
+                'route_prefix' => 'nullable|string|max:500',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -45,8 +46,13 @@ class PermissionsController extends Controller
             }
             $permissions = new Permissions();
             $permissions->title = $request->title;
+            $permissions->route_prefix = $request->route_prefix;
 
             $permissions->save();
+
+            // Clear the route map cache so middleware picks up the new permission immediately
+            \Illuminate\Support\Facades\Cache::forget('vendor_route_ability_map');
+
             return response()->json([
                 'success' => true,
                 'message' => 'Permissions Add successfully'
@@ -77,6 +83,7 @@ class PermissionsController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
+                'route_prefix' => 'nullable|string|max:500',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -86,8 +93,13 @@ class PermissionsController extends Controller
             }
             $permission = Permissions::findOrFail($id);
             $permission->update([
-                'title' => $request->title
+                'title'        => $request->title,
+                'route_prefix' => $request->route_prefix,
             ]);
+
+            // Clear the route map cache so middleware picks up changes immediately
+            \Illuminate\Support\Facades\Cache::forget('vendor_route_ability_map');
+
             return response()->json([
                 'success' => true,
                 'message' => 'Permission updated successfully.'

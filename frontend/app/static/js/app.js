@@ -330,6 +330,20 @@ $(document).ready(function () {
         );
     }
 
+    function geocodeAddress(address, callback) {
+        if (!address) return;
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: address, componentRestrictions: { country: "in" } }, function (results, status) {
+            if (status === "OK" && results[0]) {
+                const lat = results[0].geometry.location.lat();
+                const lng = results[0].geometry.location.lng();
+                callback(lat, lng);
+            } else {
+                console.warn("Geocoding failed for: " + address + " Status: " + status);
+            }
+        });
+    }
+
     /* =====================================================
        TRIP BUTTON LOGIC
     ===================================================== */
@@ -614,11 +628,19 @@ $(document).ready(function () {
         );
         pickupAutocomplete.addListener("place_changed", function () {
             const p = pickupAutocomplete.getPlace();
-            if (!p.geometry) return;
-            $("#pickup_lat").val(p.geometry.location.lat());
-            $("#pickup_lng").val(p.geometry.location.lng());
-            map.setCenter(p.geometry.location);
-            drawRoute();
+            if (p && p.geometry) {
+                $("#pickup_lat").val(p.geometry.location.lat());
+                $("#pickup_lng").val(p.geometry.location.lng());
+                map.setCenter(p.geometry.location);
+                drawRoute();
+            } else {
+                geocodeAddress($("#pickup").val(), function(lat, lng) {
+                    $("#pickup_lat").val(lat);
+                    $("#pickup_lng").val(lng);
+                    map.setCenter({lat, lng});
+                    drawRoute();
+                });
+            }
         });
 
         dropAutocomplete = new google.maps.places.Autocomplete(
@@ -627,10 +649,17 @@ $(document).ready(function () {
         );
         dropAutocomplete.addListener("place_changed", function () {
             const p = dropAutocomplete.getPlace();
-            if (!p.geometry) return;
-            $("#drop_lat").val(p.geometry.location.lat());
-            $("#drop_lng").val(p.geometry.location.lng());
-            drawRoute();
+            if (p && p.geometry) {
+                $("#drop_lat").val(p.geometry.location.lat());
+                $("#drop_lng").val(p.geometry.location.lng());
+                drawRoute();
+            } else {
+                geocodeAddress($("#drop").val(), function(lat, lng) {
+                    $("#drop_lat").val(lat);
+                    $("#drop_lng").val(lng);
+                    drawRoute();
+                });
+            }
         });
 
         const returnPickupAuto = new google.maps.places.Autocomplete(
@@ -639,21 +668,35 @@ $(document).ready(function () {
         );
         returnPickupAuto.addListener("place_changed", function () {
             const p = returnPickupAuto.getPlace();
-            if (!p.geometry) return;
+            if (p && p.geometry) {
+                const dLat = parseFloat($("#drop_lat").val());
+                const dLng = parseFloat($("#drop_lng").val());
+                const rLat = p.geometry.location.lat();
+                const rLng = p.geometry.location.lng();
 
-            const dLat = parseFloat($("#drop_lat").val());
-            const dLng = parseFloat($("#drop_lng").val());
-            const rLat = p.geometry.location.lat();
-            const rLng = p.geometry.location.lng();
+                if (getDistanceKm(dLat, dLng, rLat, rLng) > 5) {
+                    $.toastr.error("Return pickup must be within 5 km from drop");
+                    $("#return_pickup").val("");
+                    return;
+                }
 
-            if (getDistanceKm(dLat, dLng, rLat, rLng) > 5) {
-                $.toastr.error("Return pickup must be within 5 km from drop");
-                $("#return_pickup").val("");
-                return;
+                $("#return_pickup_lat").val(rLat);
+                $("#return_pickup_lng").val(rLng);
+            } else {
+                geocodeAddress($("#return_pickup").val(), function(rLat, rLng) {
+                    const dLat = parseFloat($("#drop_lat").val());
+                    const dLng = parseFloat($("#drop_lng").val());
+
+                    if (getDistanceKm(dLat, dLng, rLat, rLng) > 5) {
+                        $.toastr.error("Return pickup must be within 5 km from drop");
+                        $("#return_pickup").val("");
+                        return;
+                    }
+
+                    $("#return_pickup_lat").val(rLat);
+                    $("#return_pickup_lng").val(rLng);
+                });
             }
-
-            $("#return_pickup_lat").val(rLat);
-            $("#return_pickup_lng").val(rLng);
         });
 
         const returnDropAuto = new google.maps.places.Autocomplete(
@@ -662,23 +705,81 @@ $(document).ready(function () {
         );
         returnDropAuto.addListener("place_changed", function () {
             const p = returnDropAuto.getPlace();
-            if (!p.geometry) return;
+            if (p && p.geometry) {
+                const A_lat = parseFloat($("#pickup_lat").val());
+                const A_lng = parseFloat($("#pickup_lng").val());
+                const rLat = p.geometry.location.lat();
+                const rLng = p.geometry.location.lng();
 
-            const A_lat = parseFloat($("#pickup_lat").val());
-            const A_lng = parseFloat($("#pickup_lng").val());
-            const rLat = p.geometry.location.lat();
-            const rLng = p.geometry.location.lng();
+                if (getDistanceKm(A_lat, A_lng, rLat, rLng) > 10) {
+                    $.toastr.error("Return drop must be within 10 km from pickup");
+                    $("#return_drop").val("");
+                    return;
+                }
 
-            if (getDistanceKm(A_lat, A_lng, rLat, rLng) > 10) {
-                $.toastr.error("Return drop must be within 10 km from pickup");
-                $("#return_drop").val("");
-                return;
+                $("#return_drop_lat").val(rLat);
+                $("#return_drop_lng").val(rLng);
+
+                drawFullRoundTrip();
+            } else {
+                geocodeAddress($("#return_drop").val(), function(rLat, rLng) {
+                    const A_lat = parseFloat($("#pickup_lat").val());
+                    const A_lng = parseFloat($("#pickup_lng").val());
+
+                    if (getDistanceKm(A_lat, A_lng, rLat, rLng) > 10) {
+                        $.toastr.error("Return drop must be within 10 km from pickup");
+                        $("#return_drop").val("");
+                        return;
+                    }
+
+                    $("#return_drop_lat").val(rLat);
+                    $("#return_drop_lng").val(rLng);
+
+                    drawFullRoundTrip();
+                });
             }
+        });
 
-            $("#return_drop_lat").val(rLat);
-            $("#return_drop_lng").val(rLng);
+        // Add blur / change handlers for direct inputs geocoding
+        $("#pickup").on("change blur", function() {
+            const val = $(this).val();
+            setTimeout(function() {
+                if (val && !$("#pickup_lat").val()) {
+                    geocodeAddress(val, function(lat, lng) {
+                        $("#pickup_lat").val(lat);
+                        $("#pickup_lng").val(lng);
+                        if (map) map.setCenter({lat, lng});
+                        drawRoute();
+                    });
+                }
+            }, 300);
+        });
 
-            drawFullRoundTrip();
+        $("#drop").on("change blur", function() {
+            const val = $(this).val();
+            setTimeout(function() {
+                if (val && !$("#drop_lat").val()) {
+                    geocodeAddress(val, function(lat, lng) {
+                        $("#drop_lat").val(lat);
+                        $("#drop_lng").val(lng);
+                        drawRoute();
+                    });
+                }
+            }, 300);
+        });
+
+        // Clear coordinates on empty inputs
+        $("#pickup").on("input", function() {
+            if (!$(this).val()) {
+                $("#pickup_lat").val("");
+                $("#pickup_lng").val("");
+            }
+        });
+        $("#drop").on("input", function() {
+            if (!$(this).val()) {
+                $("#drop_lat").val("");
+                $("#drop_lng").val("");
+            }
         });
     }
 

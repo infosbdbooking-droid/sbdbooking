@@ -87,6 +87,13 @@ class CabOrder extends Model
         'payment_method',
         'advance_payment',
 
+        // Vendor
+        'vendor_id',
+        'commission_type',
+        'commission_rate',
+        'commission_amount',
+        'vendor_earnings',
+
         // Driver
         'driver_id',
         'driver_name',
@@ -109,6 +116,11 @@ class CabOrder extends Model
     ];
 
     /* ===================== RELATIONSHIPS ===================== */
+
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'vendor_id');
+    }
 
     public function customer(): BelongsTo
     {

@@ -8,6 +8,7 @@ use App\Models\Car;
 use App\Models\Customer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class CabOrderWebController extends Controller
@@ -17,9 +18,16 @@ class CabOrderWebController extends Controller
      */
     public function index()
     {
-        $orders = CabOrder::with(['customer', 'car'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $user = Auth::user();
+        $query = CabOrder::with(['customer', 'car'])
+            ->orderBy('created_at', 'desc');
+
+        // Vendors only see their own bookings
+        if ($user && $user->isVendor()) {
+            $query->where('vendor_id', $user->id);
+        }
+
+        $orders = $query->paginate(15);
             
         return view('cabOrders.index', compact('orders'));
     }
@@ -203,6 +211,7 @@ class CabOrderWebController extends Controller
 
                 'car_id' => $car->id,
                 'car_name' => $car->car_name,
+                'vendor_id' => $car->vendor_id,
 
                 'trip_type' => $request->trip_type,
                 'stay_duration' => $request->stay_duration ?? 'short',
@@ -595,6 +604,40 @@ class CabOrderWebController extends Controller
         $order = CabOrder::findOrFail($id);
         $oldStatus = $order->booking_status;
         $order->update(['booking_status' => $request->status]);
+
+        // Auto calculate vendor commission on booking completion
+        if ($request->status === 'completed' && $order->vendor_id) {
+            $vendor = \App\Models\User::find($order->vendor_id);
+            if ($vendor && $vendor->isVendor()) {
+                $totalAmount = (float)$order->total_amount;
+                $commType = $vendor->commission_type ?: 'percentage';
+                
+                if ($commType === 'percentage') {
+                    $commRate = (float)($vendor->commission_percentage !== null ? $vendor->commission_percentage : 10.00);
+                    $commAmount = round(($totalAmount * $commRate) / 100, 2);
+                } else {
+                    $commRate = (float)($vendor->flat_commission !== null ? $vendor->flat_commission : 0.00);
+                    $commAmount = round($commRate, 2);
+                }
+                
+                $vendorEarnings = max(0, $totalAmount - $commAmount);
+
+                $order->update([
+                    'commission_type' => $commType,
+                    'commission_rate' => $commRate,
+                    'commission_amount' => $commAmount,
+                    'vendor_earnings' => $vendorEarnings,
+                ]);
+
+                // Also log activity
+                \App\Models\CabOrderActivity::create([
+                    'cab_order_id' => $order->id,
+                    'event' => 'Commission Calculated',
+                    'description' => "Vendor commission calculated: " . ucfirst($commType) . " rate {$commRate}. Commission: ₹{$commAmount}, Vendor Earnings: ₹{$vendorEarnings}.",
+                    'performed_by' => 'System',
+                ]);
+            }
+        }
 
         // Map status to timeline event name
         $eventMap = [

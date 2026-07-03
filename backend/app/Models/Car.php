@@ -12,6 +12,7 @@ class Car extends Model
     protected $table = 'car';
 
     protected $fillable = [
+        'vendor_id',
         'car_type_id',
         'car_name',
         'car_seats',
@@ -36,6 +37,11 @@ class Car extends Model
     ];
 
     /* ================= RELATIONSHIPS ================= */
+
+    public function vendor()
+    {
+        return $this->belongsTo(User::class, 'vendor_id');
+    }
 
     public function carType()
     {

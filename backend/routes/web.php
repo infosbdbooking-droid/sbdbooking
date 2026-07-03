@@ -24,6 +24,7 @@ use App\Http\Controllers\SeoCityController;
 use App\Http\Controllers\SeoRouteController;
 use App\Http\Controllers\SeoFaqController;
 use App\Http\Controllers\SeoSettingsController;
+use App\Http\Controllers\VendorController;
 
 
 
@@ -41,6 +42,12 @@ Route::prefix('panel')->group(function () {
         # Dashboard
         Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
+        # Vendor Verification Lock Screen
+        Route::get('/vendor/verify', function () {
+            return view('vendor.verify');
+        })->name('vendor.verify');
+        Route::post('/vendor/verify/submit', [VendorController::class, 'submitProfile'])->name('vendor.verify.submit');
+ 
         # Logout
         Route::get('/signout', [ActionController::class, 'logout'])->name('logout');
 
@@ -129,6 +136,15 @@ Route::prefix('panel')->group(function () {
             Route::get('/user/{id}/edit', [UserController::class, 'edit'])->name('access.user.edit');
             Route::put('/user/{id}', [UserController::class, 'update'])->name('access.user.update');
             Route::delete('/user/{id}', [UserController::class, 'destroy'])->name('access.user.destroy');
+        });
+
+        # Vendor Management
+        Route::prefix('vendors')->group(function () {
+            Route::get('/', [VendorController::class, 'index'])->name('vendors.index');
+            Route::get('/data', [VendorController::class, 'index'])->name('vendors.data');
+            Route::post('/{id}/approve', [VendorController::class, 'approve'])->name('vendors.approve');
+            Route::post('/{id}/reject', [VendorController::class, 'reject'])->name('vendors.reject');
+            Route::post('/{id}/commission', [VendorController::class, 'updateCommission'])->name('vendors.commission');
         });
 
 

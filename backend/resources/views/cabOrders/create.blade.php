@@ -1007,6 +1007,20 @@
     // =====================================================
     // GOOGLE MAPS & AUTOCOMPLETE LOGIC
     // =====================================================
+    function geocodeAddress(address, callback) {
+        if (!address) return;
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: address, componentRestrictions: { country: "in" } }, function (results, status) {
+            if (status === "OK" && results[0]) {
+                const lat = results[0].geometry.location.lat();
+                const lng = results[0].geometry.location.lng();
+                callback(lat, lng);
+            } else {
+                console.warn("Geocoding failed for: " + address + " Status: " + status);
+            }
+        });
+    }
+
     let map, directionsService, directionsRenderer;
     let pickupAutocomplete, dropAutocomplete, returnPickupAuto, returnDropAuto;
 
@@ -1039,42 +1053,99 @@
 
         pickupAutocomplete.addListener("place_changed", function() {
             const place = pickupAutocomplete.getPlace();
-            if (place.geometry) {
+            if (place && place.geometry) {
                 document.querySelector('input[name="pickup_lat"]').value = place.geometry.location.lat();
                 document.querySelector('input[name="pickup_lng"]').value = place.geometry.location.lng();
                 document.querySelector('input[name="pickup_address"]').dispatchEvent(new Event('input')); // Update Alpine model
                 window.drawFullRoute();
+            } else {
+                geocodeAddress(document.getElementById("pickup_address").value, function(lat, lng) {
+                    document.querySelector('input[name="pickup_lat"]').value = lat;
+                    document.querySelector('input[name="pickup_lng"]').value = lng;
+                    document.querySelector('input[name="pickup_address"]').dispatchEvent(new Event('input'));
+                    window.drawFullRoute();
+                });
             }
         });
 
         dropAutocomplete.addListener("place_changed", function() {
             const place = dropAutocomplete.getPlace();
-            if (place.geometry) {
+            if (place && place.geometry) {
                 document.querySelector('input[name="drop_lat"]').value = place.geometry.location.lat();
                 document.querySelector('input[name="drop_lng"]').value = place.geometry.location.lng();
                 document.querySelector('input[name="drop_address"]').dispatchEvent(new Event('input'));
                 window.drawFullRoute();
+            } else {
+                geocodeAddress(document.getElementById("drop_address").value, function(lat, lng) {
+                    document.querySelector('input[name="drop_lat"]').value = lat;
+                    document.querySelector('input[name="drop_lng"]').value = lng;
+                    document.querySelector('input[name="drop_address"]').dispatchEvent(new Event('input'));
+                    window.drawFullRoute();
+                });
             }
         });
 
         returnPickupAuto.addListener("place_changed", function() {
             const place = returnPickupAuto.getPlace();
-            if (place.geometry) {
+            if (place && place.geometry) {
                 document.querySelector('input[name="return_pickup_lat"]').value = place.geometry.location.lat();
                 document.querySelector('input[name="return_pickup_lng"]').value = place.geometry.location.lng();
                 document.querySelector('input[name="return_pickup_address"]').dispatchEvent(new Event('input'));
                 window.drawFullRoute();
+            } else {
+                geocodeAddress(document.getElementById("return_pickup_address").value, function(lat, lng) {
+                    document.querySelector('input[name="return_pickup_lat"]').value = lat;
+                    document.querySelector('input[name="return_pickup_lng"]').value = lng;
+                    document.querySelector('input[name="return_pickup_address"]').dispatchEvent(new Event('input'));
+                    window.drawFullRoute();
+                });
             }
         });
 
         returnDropAuto.addListener("place_changed", function() {
             const place = returnDropAuto.getPlace();
-            if (place.geometry) {
+            if (place && place.geometry) {
                 document.querySelector('input[name="return_drop_lat"]').value = place.geometry.location.lat();
                 document.querySelector('input[name="return_drop_lng"]').value = place.geometry.location.lng();
                 document.querySelector('input[name="return_drop_address"]').dispatchEvent(new Event('input'));
                 window.drawFullRoute();
+            } else {
+                geocodeAddress(document.getElementById("return_drop_address").value, function(lat, lng) {
+                    document.querySelector('input[name="return_drop_lat"]').value = lat;
+                    document.querySelector('input[name="return_drop_lng"]').value = lng;
+                    document.querySelector('input[name="return_drop_address"]').dispatchEvent(new Event('input'));
+                    window.drawFullRoute();
+                });
             }
+        });
+
+        // Add blur / change handlers for direct inputs geocoding
+        document.getElementById("pickup_address").addEventListener("blur", function() {
+            const val = this.value;
+            setTimeout(function() {
+                if (val && !parseFloat(document.querySelector('input[name="pickup_lat"]').value)) {
+                    geocodeAddress(val, function(lat, lng) {
+                        document.querySelector('input[name="pickup_lat"]').value = lat;
+                        document.querySelector('input[name="pickup_lng"]').value = lng;
+                        document.querySelector('input[name="pickup_address"]').dispatchEvent(new Event('input'));
+                        window.drawFullRoute();
+                    });
+                }
+            }, 300);
+        });
+
+        document.getElementById("drop_address").addEventListener("blur", function() {
+            const val = this.value;
+            setTimeout(function() {
+                if (val && !parseFloat(document.querySelector('input[name="drop_lat"]').value)) {
+                    geocodeAddress(val, function(lat, lng) {
+                        document.querySelector('input[name="drop_lat"]').value = lat;
+                        document.querySelector('input[name="drop_lng"]').value = lng;
+                        document.querySelector('input[name="drop_address"]').dispatchEvent(new Event('input'));
+                        window.drawFullRoute();
+                    });
+                }
+            }, 300);
         });
     }
 

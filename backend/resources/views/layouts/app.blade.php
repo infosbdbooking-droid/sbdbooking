@@ -31,24 +31,31 @@
                 </a>
             </div>
 
-            <!-- ADMIN Pill Badge -->
+            <!-- ADMIN/VENDOR Pill Badge -->
             <div class="px-4 py-3 border-b border-[#282836]/60 bg-[#15151e]/50">
-                <div class="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 font-extrabold text-xs uppercase tracking-wider py-2 px-4 rounded-xl shadow-lg border border-yellow-200/20">
-                    <i class="fas fa-key text-[10px]"></i>
-                    ADMIN
-                </div>
+                @if(auth()->user()->isVendor())
+                    <div class="flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-amber-400 text-slate-950 font-extrabold text-xs uppercase tracking-wider py-2 px-4 rounded-xl shadow-lg border border-yellow-200/20">
+                        <i class="fas fa-store text-[10px]"></i>
+                        VENDOR
+                    </div>
+                @else
+                    <div class="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 font-extrabold text-xs uppercase tracking-wider py-2 px-4 rounded-xl shadow-lg border border-yellow-200/20">
+                        <i class="fas fa-key text-[10px]"></i>
+                        ADMIN
+                    </div>
+                @endif
             </div>
 
             <!-- Menu -->
             <nav class="flex-1 p-4 space-y-5 text-sm font-semibold overflow-y-auto custom-scrollbar">
 
-                <!-- SECTION 1: CORE PORTAL -->
-                <div class="space-y-1">
-                    <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
-                        Core Portal
-                    </div>
+                @if(auth()->user()->isVendor())
+                    <!-- SECTION: VENDOR PORTAL -->
+                    <div class="space-y-1">
+                        <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
+                            Vendor Portal
+                        </div>
 
-                    @can('dashboard')
                         <a href="{{ route('dashboard') }}" class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
                             {{ request()->is('dashboard') || request()->is('panel/dashboard')
                                 ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
@@ -56,7 +63,67 @@
                             <i class="fas fa-chart-line text-base transition-transform group-hover:scale-110"></i>
                             <span>Dashboard</span>
                         </a>
-                    @endcan
+
+                        <a href="{{ route('vendor.verify') }}" class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
+                            {{ request()->is('panel/vendor/verify')
+                                ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
+                                : 'text-[#b5b5c3] hover:text-white hover:bg-white/5' }}">
+                            <i class="fas fa-user-cog text-base transition-transform group-hover:scale-110"></i>
+                            <span>Profile</span>
+                        </a>
+
+                        @if(auth()->user()->profile_status === 'Approved')
+                            <!-- Manage Orders -->
+                            <div x-data="{ open: {{ Request::is('orders*') || Request::is('cab-orders*') || Request::is('panel/cab-orders*') ? 'true' : 'false' }} }">
+                                <button @click="open = !open" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200
+                                    {{ Request::is('orders*') || Request::is('cab-orders*') || Request::is('panel/cab-orders*')
+                                        ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
+                                        : 'text-[#b5b5c3] hover:text-white hover:bg-white/5' }}">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-ticket-alt text-base"></i>
+                                        <span>Manage Orders</span>
+                                    </div>
+                                    <i class="fas fa-chevron-down text-xs transition-transform duration-200"
+                                        :class="open ? 'rotate-180' : ''"></i>
+                                </button>
+
+                                <div x-show="open" x-transition class="mt-1 pl-4 space-y-1 border-l border-[#282836]/60 ml-6">
+                                    <a href="{{ route('cabOrders') }}" class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                        {{ Request::is('cab-orders') || (Request::is('cab-orders/*') && !Request::is('cab-orders/create')) || Request::is('panel/cab-orders')
+                                            ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                            : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                        <i class="fas fa-taxi text-[10px]"></i>
+                                        Cab Bookings
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Car Fleet -->
+                            <a href="{{ route('car') }}" class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
+                                {{ request()->is('car') || request()->is('panel/car')
+                                    ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
+                                    : 'text-[#b5b5c3] hover:text-white hover:bg-white/5' }}">
+                                <i class="fas fa-car text-base transition-transform group-hover:scale-110"></i>
+                                <span>Car Fleet</span>
+                            </a>
+                        @endif
+                    </div>
+                @else
+                    <!-- SECTION 1: CORE PORTAL -->
+                    <div class="space-y-1">
+                        <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
+                            Core Portal
+                        </div>
+
+                        @can('dashboard')
+                            <a href="{{ route('dashboard') }}" class="group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200
+                                {{ request()->is('dashboard') || request()->is('panel/dashboard')
+                                    ? 'bg-[#d84e55] text-white shadow-lg border-l-4 border-[#ffb1b5] pl-3'
+                                    : 'text-[#b5b5c3] hover:text-white hover:bg-white/5' }}">
+                                <i class="fas fa-chart-line text-base transition-transform group-hover:scale-110"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        @endcan
 
                     @can('manage_orders')
                         <div x-data="{ open: {{ Request::is('orders*') || Request::is('cab-orders*') || Request::is('panel/cab-orders*') ? 'true' : 'false' }} }">
@@ -92,6 +159,7 @@
                     @endcan
                 </div>
 
+                @if(auth()->user()->roles && strtolower(auth()->user()->roles->title) === 'admin')
                 <!-- SECTION 2: FLEET & CUSTOMIZATION -->
                 <div class="space-y-1">
                     <div class="px-4 py-1.5 text-[9px] font-extrabold uppercase tracking-widest text-[#62627e]/70 bg-[#15151e]/30 rounded-md">
@@ -388,6 +456,13 @@
                                         : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
                                     Users
                                 </a>
+                                <a href="{{ route('vendors.index') }}"
+                                    class="block px-3 py-2 rounded-lg text-xs transition-all duration-150
+                                    {{ Request::is('panel/vendors*')
+                                        ? 'bg-[#d84e55]/10 text-[#d84e55] font-bold border-l-2 border-[#d84e55] pl-2'
+                                        : 'text-[#92929f] hover:text-white hover:bg-white/5' }}">
+                                    Vendor Management
+                                </a>
                             </div>
                         </div>
                     @endcan
@@ -412,6 +487,8 @@
                         </a>
                     @endcan
                 </div>
+                @endif
+                @endif
 
                 <hr class="my-4 border-[#282836]/40">
 

@@ -23,6 +23,26 @@ class User extends Authenticatable
         'email',
         'role_id',
         'password',
+        'mobile',
+        'alternate_mobile',
+        'aadhaar_number',
+        'aadhaar_file',
+        'pan_number',
+        'pan_file',
+        'photo',
+        'gst_number',
+        'address',
+        'city',
+        'state',
+        'pincode',
+        'profile_status',
+        'profile_verified_at',
+        'approved_by',
+        'rejection_reason',
+        'commission_type',
+        'commission_percentage',
+        'flat_commission',
+        'company_logo',
     ];
 
     /**
@@ -42,11 +62,37 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'profile_verified_at' => 'datetime',
     ];
 
     public function roles()
     {
         return $this->belongsTo(Roles::class, 'role_id');
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function cars()
+    {
+        return $this->hasMany(Car::class, 'vendor_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(CabOrder::class, 'vendor_id');
+    }
+
+    public function isVendor()
+    {
+        return $this->roles && strtolower($this->roles->title) === 'vendor';
+    }
+
+    public function isApprovedVendor()
+    {
+        return $this->isVendor() && $this->profile_status === 'Approved';
     }
 
 }
