@@ -852,8 +852,19 @@
                     }
 
                     if (this.pickupTime && this.returnTime) {
-                        const pTimeClean = this.pickupTime.split(' ')[0]; 
-                        const rTimeClean = this.returnTime.split(' ')[0];
+                        const to24h = (timeStr) => {
+                            const firstPart = timeStr.split(' to ')[0].trim();
+                            const parts = firstPart.split(' ');
+                            const timePart = parts[0];
+                            const ampm = parts[1] ? parts[1].toUpperCase() : '';
+                            let [h, m] = timePart.split(':').map(Number);
+                            if (ampm === "PM" && h < 12) h += 12;
+                            if (ampm === "AM" && h === 12) h = 0;
+                            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                        };
+
+                        const pTimeClean = to24h(this.pickupTime);
+                        const rTimeClean = to24h(this.returnTime);
                         
                         const start = new Date(`${this.pickupDate}T${pTimeClean}`);
                         const end = new Date(`${this.returnDate}T${rTimeClean}`);

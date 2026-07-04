@@ -163,6 +163,55 @@ class CabOrderController extends Controller
             $returnKm = ($request->return_km && (float)$request->return_km > 0) ? (float)$request->return_km : $oneWayKm;
             $totalKmForCalc = $oneWayKm + $returnKm;
 
+            // Calculate hours and days for stay charges
+            $hours = 0;
+            $days = 1;
+
+            if ($request->trip_type === 'round_trip' && $request->pickup_date && $request->pickup_time && $request->return_date && $request->return_time) {
+                $to24h = function($timeStr) {
+                    $firstPart = trim(explode(' to ', $timeStr)[0]);
+                    $parts = explode(' ', $firstPart);
+                    $timePart = $parts[0];
+                    $ampm = isset($parts[1]) ? strtoupper($parts[1]) : '';
+                    $timeSubParts = explode(':', $timePart);
+                    $h = (int)($timeSubParts[0] ?? 0);
+                    $m = (int)($timeSubParts[1] ?? 0);
+                    if ($ampm === 'PM' && $h < 12) $h += 12;
+                    if ($ampm === 'AM' && $h === 12) $h = 0;
+                    return sprintf('%02d:%02d', $h, $m);
+                };
+
+                $pTimeClean = $to24h($request->pickup_time);
+                $rTimeClean = $to24h($request->return_time);
+
+                try {
+                    $pDateObj = new \DateTime($request->pickup_date);
+                    $rDateObj = new \DateTime($request->return_date);
+                    $pDateObj->setTime(0, 0, 0);
+                    $rDateObj->setTime(0, 0, 0);
+
+                    if ($rDateObj > $pDateObj) {
+                        $diffDays = $rDateObj->diff($pDateObj)->days;
+                        $days = $diffDays + 1;
+                    } else {
+                        $days = 1;
+                    }
+                } catch (\Exception $e) {
+                    $days = 1;
+                }
+
+                try {
+                    $startDate = new \DateTime($request->pickup_date . 'T' . $pTimeClean);
+                    $endDate = new \DateTime($request->return_date . 'T' . $rTimeClean);
+                    if ($endDate > $startDate) {
+                        $diffSeconds = $endDate->getTimestamp() - $startDate->getTimestamp();
+                        $hours = $diffSeconds / 3600;
+                    }
+                } catch (\Exception $e) {
+                    $hours = 0;
+                }
+            }
+
             // ─── Calculate Charges ─────────────────────────────────
             $chargesResult = $this->computeCharges(
                 carId: $request->car_id,
@@ -170,7 +219,9 @@ class CabOrderController extends Controller
                 tripType: $request->trip_type,
                 stayDuration: $request->stay_duration ?? 'short',
                 isAc: (bool) ($request->is_ac ?? false),
-                waitingMinutes: $request->waiting_minutes ?? 0
+                waitingMinutes: $request->waiting_minutes ?? 0,
+                hours: $hours,
+                days: $days
             );
 
             if (!$chargesResult['success']) {
@@ -408,7 +459,9 @@ class CabOrderController extends Controller
         string $tripType,
         string $stayDuration = 'short',
         bool $isAc = false,
-        float $waitingMinutes = 0
+        float $waitingMinutes = 0,
+        float $hours = 0,
+        int $days = 1
     ): array {
         $carCharges = CarCharge::where('car_id', $carId)->with('chargeType')->get();
 
@@ -465,6 +518,55 @@ class CabOrderController extends Controller
                     'amount' => $allowanceCharge->amount,
                 ];
                 $totalAmount += $allowanceCharge->amount;
+            }
+        }
+
+        // Stay Charges (Round Trip Only)
+        if ($tripType === 'round_trip') {
+            $stayCharge = $carCharges->first(function($ch) {
+                return (int)$ch->charges_type_id === 8 || 
+                       ($ch->chargeType && $ch->chargeType->charges_type === 'Stay Charges');
+            });
+            if ($stayCharge) {
+                $rate = (float)$stayCharge->amount;
+                $amount = 0;
+                $quantity = 1;
+                $unitLabel = 'Flat';
+                
+                // 0 - Flat, 1 - Per KM, 2 - Per Hour, 3 - Per Day
+                switch ($stayCharge->charge_unit) {
+                    case 1: // Per KM
+                        $quantity = $distanceKm;
+                        $amount = $rate * $quantity;
+                        $unitLabel = 'per KM';
+                        break;
+                    case 2: // Per Hour
+                        $quantity = $hours;
+                        $amount = $rate * $quantity;
+                        $unitLabel = 'per Hour';
+                        break;
+                    case 3: // Per Day
+                        $quantity = $days;
+                        $amount = $rate * $quantity;
+                        $unitLabel = 'per Day';
+                        break;
+                    case 0: // Flat
+                    default:
+                        $quantity = 1;
+                        $amount = $rate;
+                        $unitLabel = 'Flat';
+                        break;
+                }
+                
+                $charges[] = [
+                    'type' => 'Stay Charges',
+                    'charge_type' => $stayCharge->chargeType ? $stayCharge->chargeType->charges_type : 'Stay Charges',
+                    'rate' => $rate,
+                    'unit' => $unitLabel,
+                    'quantity' => $quantity,
+                    'amount' => round($amount, 2),
+                ];
+                $totalAmount += $amount;
             }
         }
 

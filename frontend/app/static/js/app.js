@@ -879,9 +879,20 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
 
             // Calculate exact hours for "Per Hour" charges
             if (pDateVal && pTimeVal && rDateVal && rTimeVal) {
-                // Extract "HH:mm" from "HH:mm AM to HH:mm PM"
-                const pTimeClean = pTimeVal.split(' ')[0]; 
-                const rTimeClean = rTimeVal.split(' ')[0];
+                // Helper to convert "12:00 PM to 02:00 PM" or "12:00 PM" into 24h format "12:00"
+                const to24h = (timeStr) => {
+                    const firstPart = timeStr.split(' to ')[0].trim();
+                    const parts = firstPart.split(' ');
+                    const timePart = parts[0];
+                    const ampm = parts[1] ? parts[1].toUpperCase() : '';
+                    let [h, m] = timePart.split(':').map(Number);
+                    if (ampm === "PM" && h < 12) h += 12;
+                    if (ampm === "AM" && h === 12) h = 0;
+                    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                };
+
+                const pTimeClean = to24h(pTimeVal);
+                const rTimeClean = to24h(rTimeVal);
 
                 const start = new Date(`${pDateVal}T${pTimeClean}`);
                 const end = new Date(`${rDateVal}T${rTimeClean}`);
