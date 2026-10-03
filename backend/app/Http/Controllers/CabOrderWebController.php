@@ -56,6 +56,7 @@ class CabOrderWebController extends Controller
             'is_ac' => 'nullable',
             'pickup_address' => 'required|string',
             'drop_address' => 'required|string',
+            'stops' => 'nullable',
             'pickup_date' => 'required|date',
             'pickup_time' => 'required|string',
             'passengers' => 'required|integer|min:1',
@@ -201,6 +202,17 @@ class CabOrderWebController extends Controller
             // payment_method is now VARCHAR — store the exact value from the form
             $paymentMethod = $request->payment_method ?? null;
 
+            // Multi-location stops / via locations (Uber style)
+            $stops = null;
+            if ($request->filled('stops')) {
+                $rawStops = is_string($request->stops) ? json_decode($request->stops, true) : $request->stops;
+                if (is_array($rawStops)) {
+                    $stops = array_values(array_filter($rawStops, function($s) {
+                        return !empty($s['address']);
+                    }));
+                }
+            }
+
             $order = CabOrder::create([
                 'order_number' => CabOrder::generateOrderNumber(),
                 'booking_status' => $request->booking_status,
@@ -221,6 +233,9 @@ class CabOrderWebController extends Controller
                 'pickup_address' => $request->pickup_address,
                 'pickup_lat' => (float)($request->pickup_lat ?? 0),
                 'pickup_lng' => (float)($request->pickup_lng ?? 0),
+
+                // Multi-location stops
+                'stops' => (!empty($stops) ? $stops : null),
 
                 // Drop
                 'drop_address' => $request->drop_address,
@@ -701,15 +716,22 @@ class CabOrderWebController extends Controller
     }
 
     /**
-     * Generate and download the invoice PDF.
+     * Generate and download or stream the invoice PDF.
      */
     public function downloadInvoice($id)
     {
-        $order = CabOrder::with(['customer', 'car'])->findOrFail($id);
+        $order = CabOrder::with(['customer', 'car', 'payments'])
+            ->where('id', $id)
+            ->orWhere('order_number', $id)
+            ->firstOrFail();
         
         // Using fully qualified class name to ensure it resolves
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.cab-booking', compact('order'));
         
+        if (request()->has('stream') || request()->has('print') || request()->query('view') === '1') {
+            return $pdf->stream('Invoice-' . $order->order_number . '.pdf');
+        }
+
         return $pdf->download('Invoice-' . $order->order_number . '.pdf');
     }
 }

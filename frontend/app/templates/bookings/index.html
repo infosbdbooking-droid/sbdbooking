@@ -227,16 +227,27 @@
             <div class="flex flex-col items-center">
               <span class="dot dot-pickup"></span>
               <span class="connector"></span>
+              ${(o.stops && o.stops.length > 0) ? o.stops.map(() => `
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 my-1 ring-2 ring-amber-100 flex-shrink-0"></span>
+                <span class="connector"></span>
+              `).join('') : ''}
               <span class="dot dot-drop"></span>
             </div>
             <div class="space-y-2 flex-1 min-w-0">
               <p class="text-sm text-gray-700 font-medium truncate">${o.pickup?.address || '—'}</p>
+              ${(o.stops && o.stops.length > 0) ? o.stops.map((s, idx) => `
+                <div class="flex items-center gap-1.5 text-xs text-amber-800 font-medium bg-amber-50/70 rounded px-2 py-0.5 border border-amber-100 truncate">
+                  <span class="font-bold text-[9px] bg-amber-500 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center shrink-0">${idx + 1}</span>
+                  <span class="truncate">${s.address}</span>
+                </div>
+              `).join('') : ''}
               <p class="text-sm text-gray-700 font-medium truncate">${o.drop?.address || '—'}</p>
             </div>
           </div>
-          <div class="flex gap-2 text-xs text-gray-400 pt-1">
-            <span><i class="fa-solid fa-route mr-1"></i>${o.distance?.one_way_km || 0} km one-way</span>
+          <div class="flex flex-wrap items-center gap-2 text-xs text-gray-500 pt-1">
+            <span><i class="fa-solid fa-route mr-1 text-gray-400"></i>${o.distance?.one_way_km || 0} km one-way</span>
             ${o.trip?.type === 'round_trip' ? `<span>· ${o.distance?.total_km || 0} km total</span>` : ''}
+            ${(o.stops && o.stops.length > 0) ? `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[10px] inline-flex items-center gap-1"><i class="fa-solid fa-location-dot text-[9px]"></i> ${o.stops.length} Via Stop${o.stops.length > 1 ? 's' : ''}</span>` : ''}
           </div>
         </div>
 
@@ -251,12 +262,16 @@
         </div>
 
         <!-- Actions -->
-        <div class="flex flex-wrap gap-2 pt-1">
+        <div class="flex flex-wrap items-center gap-2 pt-1">
+          <a href="http://localhost:8000/invoice/${o.order_number}?stream=1" target="_blank"
+            class="inline-flex items-center gap-1.5 border border-blue-200 text-blue-600 hover:bg-blue-50 text-sm font-semibold px-3.5 py-1.5 rounded-xl transition-colors shadow-sm">
+            <i class="fa-solid fa-file-invoice text-xs"></i> Invoice
+          </a>
 
           ${canCancel ? `
           <button onclick="openCancelModal('${o.order_number}')"
-            class="inline-flex items-center gap-2 border border-red-200 text-red-600 hover:bg-red-50 text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
-            <i class="fa-solid fa-ban text-xs"></i> Cancel Booking
+            class="inline-flex items-center gap-1.5 border border-red-200 text-red-600 hover:bg-red-50 text-sm font-semibold px-3.5 py-1.5 rounded-xl transition-colors">
+            <i class="fa-solid fa-ban text-xs"></i> Cancel
           </button>` : ''}
         </div>
       </div>
@@ -413,9 +428,16 @@
               <p class="text-white font-bold text-sm">${formatDate(o.created_at)}</p>
             </div>
           </div>
-          <div class="mt-4 flex items-center gap-2">
-            <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded">${o.trip?.type === 'round_trip' ? 'ROUND TRIP' : 'ONE WAY'}</span>
-            <span class="text-slate-300 text-xs">${o.distance?.total_km || o.distance?.one_way_km || 0} km</span>
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded">${o.trip?.type === 'round_trip' ? 'ROUND TRIP' : 'ONE WAY'}</span>
+              <span class="text-slate-300 text-xs">${o.distance?.total_km || o.distance?.one_way_km || 0} km</span>
+              ${(o.stops && o.stops.length > 0) ? `<span class="bg-amber-400 text-slate-900 text-xs font-bold px-2 py-0.5 rounded">${o.stops.length} Via Stop${o.stops.length > 1 ? 's' : ''}</span>` : ''}
+            </div>
+            <a href="http://localhost:8000/invoice/${o.order_number}?stream=1" target="_blank"
+              class="inline-flex items-center gap-1.5 bg-white text-slate-800 hover:bg-slate-100 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition">
+              <i class="fa-solid fa-file-invoice text-blue-600"></i> Invoice PDF
+            </a>
           </div>
         </div>
 
@@ -454,6 +476,18 @@
                 <p class="text-xs text-gray-500">${o.pickup?.landmark || ''}</p>
               </div>
             </div>
+            ${(o.stops && o.stops.length > 0) ? o.stops.map((s, idx) => `
+            <div class="flex gap-3">
+              <div class="flex flex-col items-center">
+                <span class="w-5 h-5 rounded-full border-2 border-amber-500 bg-amber-50 flex items-center justify-center text-[10px] font-bold text-amber-700 flex-shrink-0">${idx + 1}</span>
+                <span class="w-0.5 h-full bg-dashed border-l-2 border-gray-200 border-dashed my-1"></span>
+              </div>
+              <div>
+                <p class="text-xs text-amber-600 font-bold uppercase">Stop ${idx + 1} (Via Location)</p>
+                <p class="font-bold text-gray-800">${s.address}</p>
+              </div>
+            </div>
+            `).join('') : ''}
             <div class="flex gap-3">
               <div class="flex flex-col items-center">
                 <span class="w-4 h-4 rounded-full bg-blue-600 flex-shrink-0"></span>

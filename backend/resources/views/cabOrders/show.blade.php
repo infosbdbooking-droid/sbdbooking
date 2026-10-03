@@ -499,6 +499,15 @@
                                         <span class="text-xxs uppercase tracking-wider text-muted font-bold block mb-0.5">Pickup Location</span>
                                         <span class="fs-7 font-bold text-slate-800">{{ $order->pickup_address }}</span>
                                     </div>
+                                    @if(!empty($order->stops) && is_array($order->stops))
+                                        @foreach($order->stops as $sIndex => $sItem)
+                                            <div class="mb-4 relative">
+                                                <div class="position-absolute rounded-circle bg-warning" style="width: 10px; height: 10px; left: -21px; top: 6px;"></div>
+                                                <span class="text-xxs uppercase tracking-wider text-warning font-bold block mb-0.5">Stop {{ $sIndex + 1 }} (Via Location)</span>
+                                                <span class="fs-7 font-bold text-slate-800">{{ $sItem['address'] ?? (is_string($sItem) ? $sItem : '') }}</span>
+                                            </div>
+                                        @endforeach
+                                    @endif
                                     <div class="relative">
                                         <div class="position-absolute rounded-circle bg-success" style="width: 10px; height: 10px; left: -21px; top: 6px;"></div>
                                         <span class="text-xxs uppercase tracking-wider text-muted font-bold block mb-0.5">Drop Destination</span>
@@ -1200,6 +1209,22 @@
         let origin = pickup;
         let destination = drop;
         let waypoints = [];
+
+        @if(!empty($order->stops) && is_array($order->stops))
+            @foreach($order->stops as $stop)
+                @if(!empty($stop['lat']) && !empty($stop['lng']))
+                    waypoints.push({
+                        location: { lat: {{ (float)$stop['lat'] }}, lng: {{ (float)$stop['lng'] }} },
+                        stopover: true
+                    });
+                @elseif(!empty($stop['address']))
+                    waypoints.push({
+                        location: {!! json_encode($stop['address']) !!},
+                        stopover: true
+                    });
+                @endif
+            @endforeach
+        @endif
 
         @if($order->trip_type === 'round_trip')
             waypoints.push({

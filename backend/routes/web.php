@@ -30,6 +30,9 @@ use App\Http\Controllers\VendorController;
 
 
 
+// Public Invoice Access for Customers & Frontend
+Route::get('/invoice/{id}', [CabOrderWebController::class, 'downloadInvoice'])->name('public.invoice');
+
 Route::prefix('panel')->group(function () {
 
     Route::get('/', function () {

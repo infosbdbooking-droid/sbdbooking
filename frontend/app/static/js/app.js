@@ -421,7 +421,149 @@ $(document).ready(function () {
     }
 
     /* =====================================================
-       DRAW ONE WAY (A → B) + SAME LOCATION × 2
+       MULTI-LOCATION STOPS (UBER STYLE)
+    ===================================================== */
+    function getActiveFrontendStops() {
+        const stops = [];
+        $("#stopsContainer .stop-row").each(function () {
+            const row = $(this);
+            const address = row.find(".stop-input").val()?.trim() || "";
+            const lat = parseFloat(row.find(".stop-lat").val()) || 0;
+            const lng = parseFloat(row.find(".stop-lng").val()) || 0;
+            if (address) {
+                stops.push({ address, lat, lng });
+            }
+        });
+        return stops;
+    }
+
+    function updateStopsUI() {
+        const count = $("#stopsContainer .stop-row").length;
+        if (count > 0) {
+            $("#stopsContainer").removeClass("hidden");
+            $("#stopsCountBadge").removeClass("hidden").text(count);
+        } else {
+            $("#stopsContainer").addClass("hidden");
+            $("#stopsCountBadge").addClass("hidden").text("0");
+        }
+
+        // Re-index stops label
+        $("#stopsContainer .stop-row").each(function (idx) {
+            const index = idx + 1;
+            $(this).find(".stop-index-badge").text(index);
+            $(this).find(".stop-input").attr("placeholder", `Add Stop ${index} (via location)...`);
+            $(this).find(".remove-stop-btn").attr("title", `Remove Stop ${index}`);
+        });
+
+        if (count >= 5) {
+            $("#addStopBtn").prop("disabled", true).addClass("opacity-50 cursor-not-allowed");
+        } else {
+            $("#addStopBtn").prop("disabled", false).removeClass("opacity-50 cursor-not-allowed");
+        }
+    }
+
+    function addStopRow(initialAddress = "", initialLat = 0, initialLng = 0) {
+        const currentCount = $("#stopsContainer .stop-row").length;
+        if (currentCount >= 5) {
+            if (typeof showToast === "function") {
+                showToast("Limit Reached", "Maximum 5 intermediate stops allowed.", "warning");
+            } else {
+                alert("Maximum 5 intermediate stops allowed.");
+            }
+            return;
+        }
+
+        const index = currentCount + 1;
+        const rowId = "stop_row_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+        const inputId = "stop_input_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+
+        const html = `
+            <div id="${rowId}" class="stop-row relative flex items-center gap-2 bg-amber-50/70 hover:bg-amber-50/90 border border-amber-200/90 rounded-xl p-2 transition-all shadow-2xs group">
+               <div class="flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-white font-bold text-[10px] shadow-xs shrink-0 ring-2 ring-amber-100">
+                  <span class="stop-index-badge">${index}</span>
+               </div>
+               <div class="relative flex-1 min-w-0">
+                  <input type="text" id="${inputId}" class="stop-input w-full rounded-lg border border-amber-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-gray-800 placeholder:text-gray-400 placeholder:font-normal focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all shadow-2xs" 
+                     placeholder="Add Stop ${index} (via location)..." value="${initialAddress}">
+                  <input type="hidden" class="stop-lat" value="${initialLat}">
+                  <input type="hidden" class="stop-lng" value="${initialLng}">
+               </div>
+               <button type="button" class="remove-stop-btn text-gray-400 hover:text-red-600 hover:bg-red-50 w-7 h-7 rounded-lg flex items-center justify-center transition-all shrink-0" title="Remove Stop ${index}">
+                  <i class="fa-solid fa-xmark text-sm font-bold"></i>
+               </button>
+            </div>
+        `;
+
+        $("#stopsContainer").append(html);
+        updateStopsUI();
+
+        // Attach Google Autocomplete
+        const inputEl = document.getElementById(inputId);
+        if (inputEl && typeof google !== 'undefined' && google.maps && google.maps.places) {
+            const auto = new google.maps.places.Autocomplete(inputEl, { componentRestrictions: { country: "in" } });
+            auto.addListener("place_changed", function () {
+                const place = auto.getPlace();
+                const row = $(`#${rowId}`);
+                if (place && place.geometry) {
+                    row.find(".stop-lat").val(place.geometry.location.lat());
+                    row.find(".stop-lng").val(place.geometry.location.lng());
+                    drawRoute();
+                } else {
+                    geocodeAddress(inputEl.value, function(lat, lng) {
+                        row.find(".stop-lat").val(lat);
+                        row.find(".stop-lng").val(lng);
+                        drawRoute();
+                    });
+                }
+            });
+
+            $(inputEl).on("blur", function () {
+                const val = $(this).val();
+                const row = $(`#${rowId}`);
+                setTimeout(function() {
+                    if (val && !row.find(".stop-lat").val()) {
+                        geocodeAddress(val, function(lat, lng) {
+                            row.find(".stop-lat").val(lat);
+                            row.find(".stop-lng").val(lng);
+                            drawRoute();
+                        });
+                    }
+                }, 300);
+            });
+        }
+
+        // Focus newly added stop
+        if (!initialAddress && inputEl) {
+            inputEl.focus();
+        }
+
+        if (initialLat && initialLng) {
+            drawRoute();
+        } else if (initialAddress && (!initialLat || !initialLng)) {
+            geocodeAddress(initialAddress, function(lat, lng) {
+                const row = $(`#${rowId}`);
+                row.find(".stop-lat").val(lat);
+                row.find(".stop-lng").val(lng);
+                drawRoute();
+            });
+        }
+    }
+
+    $(document).on("click", "#addStopBtn", function () {
+        addStopRow();
+    });
+
+    $(document).on("click", ".remove-stop-btn", function () {
+        const row = $(this).closest(".stop-row");
+        row.fadeOut(150, function() {
+            $(this).remove();
+            updateStopsUI();
+            drawRoute();
+        });
+    });
+
+    /* =====================================================
+       DRAW ONE WAY (A → B) + INTERMEDIATE STOPS + SAME LOCATION × 2
     ===================================================== */
     function drawRoute() {
 
@@ -432,16 +574,31 @@ $(document).ready(function () {
 
         if (!A_lat || !B_lat) return;
 
+        // Collect all active intermediate stops
+        const stops = getActiveFrontendStops();
+        let waypoints = [];
+        stops.forEach(s => {
+            if (s.lat && s.lng) {
+                waypoints.push({ location: new google.maps.LatLng(s.lat, s.lng), stopover: true });
+            } else if (s.address) {
+                waypoints.push({ location: s.address, stopover: true });
+            }
+        });
+
         // Show loading state
         $("#distanceKm").html('<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i> Calculating...');
         $("#travelTime").html('<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i> Calculating...');
         $("#tripDetails").removeClass("hidden").html('<div class="text-xs text-gray-500 py-1"><i class="fas fa-spinner fa-spin mr-1"></i> Fetching optimal route...</div>');
 
-        directionsService.route({
+        const request = {
             origin: { lat: A_lat, lng: A_lng },
             destination: { lat: B_lat, lng: B_lng },
+            waypoints: waypoints,
+            optimizeWaypoints: false,
             travelMode: google.maps.TravelMode.DRIVING
-        }, function (result, status) {
+        };
+
+        directionsService.route(request, function (result, status) {
 
             if (status !== "OK") {
                 $("#distanceKm").text("Error");
@@ -454,47 +611,72 @@ $(document).ready(function () {
 
             const tripType = $("#trip_type").val();
             const isRound = (tripType === "round");
-            const oneWayKm = result.routes[0].legs[0].distance.value / 1000;
+            
+            let oneWayKm = 0;
+            let totalSeconds = 0;
+            let legsHtml = '';
+
+            result.routes[0].legs.forEach((leg, i) => {
+                const legKm = leg.distance.value / 1000;
+                oneWayKm += legKm;
+                totalSeconds += leg.duration.value;
+
+                let fromLabel = i === 0 ? "Pickup" : ("Stop " + i);
+                let toLabel = i === result.routes[0].legs.length - 1 ? "Drop" : ("Stop " + (i + 1));
+                legsHtml += `
+                    <div class="flex justify-between text-xs py-0.5 text-gray-600">
+                        <span>${fromLabel} → ${toLabel}</span>
+                        <strong class="text-gray-800">${legKm.toFixed(2)} km</strong>
+                    </div>
+                `;
+            });
+
             const totalKm = oneWayKm * 2; // Always double for the car return leg
+            const totalDurationSeconds = totalSeconds * 2;
 
             // UI
             $("#distanceKm").text(totalKm.toFixed(2));
             $("#distance_value").val(totalKm.toFixed(2));
 
             // ✅ Update Travel Time (Duration)
-            if (result.routes[0].legs.length > 0) {
-                const oneWaySeconds = result.routes[0].legs[0].duration.value;
-                const totalSeconds = oneWaySeconds * 2;
-                
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                
-                let durationStr = "";
-                if (hours > 0) durationStr += `${hours} hr `;
-                durationStr += `${minutes} mins`;
-                
-                $("#travelTime").text("Approx. " + durationStr);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            
+            let durationStr = "";
+            if (hours > 0) durationStr += `${hours} hr `;
+            durationStr += `${minutes} mins`;
+            
+            $("#travelTime").text("Approx. " + durationStr);
+
+            $("#range_km").val(oneWayKm.toFixed(2));      // Pickup → Drop (via stops)
+            $("#billable_km").val(totalKm.toFixed(2));   // Full distance
+
+            let tripDetailsHtml = `
+                <div class="font-semibold text-xs text-gray-800 mb-1.5 flex items-center justify-between">
+                    <span>Trip Distance Details</span>
+                    ${stops.length > 0 ? `<span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">${stops.length} stop(s)</span>` : ''}
+                </div>
+            `;
+            if (stops.length > 0) {
+                tripDetailsHtml += `<div class="bg-white border rounded-lg p-2 mb-1.5 shadow-2xs space-y-0.5">${legsHtml}</div>`;
             }
-
-            $("#range_km").val(oneWayKm.toFixed(2));      // Pickup → Drop
-            $("#billable_km").val(totalKm.toFixed(2));   // A → B → A
-
-            $("#tripDetails").removeClass("hidden").html(`
-                <div class="font-semibold mb-1">Trip Distance Details</div>
-                <div class="flex justify-between">
-                    <span>Pickup → Drop</span>
+            tripDetailsHtml += `
+                <div class="flex justify-between text-xs">
+                    <span>Pickup → Drop ${stops.length > 0 ? '(via stops)' : ''}</span>
                     <strong>${oneWayKm.toFixed(2)} km</strong>
                 </div>
-                <div class="flex justify-between">
+                <div class="flex justify-between text-xs">
                     <span>Return → Pickup ${!isRound ? '(Car Return)' : ''}</span>
                     <strong>${oneWayKm.toFixed(2)} km</strong>
                 </div>
-                <hr class="my-2">
-                <div class="flex justify-between font-semibold">
+                <hr class="my-1.5 border-gray-200">
+                <div class="flex justify-between font-semibold text-xs text-gray-900">
                     <span>Total Distance</span>
                     <span>${oneWayKm.toFixed(2)} * 2 = ${totalKm.toFixed(2)} km</span>
                 </div>
-            `);
+            `;
+
+            $("#tripDetails").removeClass("hidden").html(tripDetailsHtml);
 
             if (window.CAR_DATA) {
                 renderFareBreakdown(window.CAR_DATA);
@@ -502,11 +684,8 @@ $(document).ready(function () {
         });
     }
 
-
-
-
     /* =====================================================
-       DRAW FULL ROUND TRIP (A → B → C → D → A)
+       DRAW FULL ROUND TRIP (A → STOPS → B → C → D → A)
     ===================================================== */
     function drawFullRoundTrip() {
 
@@ -521,6 +700,19 @@ $(document).ready(function () {
 
         if (!A_lat || !B_lat || !C_lat || !D_lat) return;
 
+        const stops = getActiveFrontendStops();
+        let waypoints = [];
+        stops.forEach(s => {
+            if (s.lat && s.lng) {
+                waypoints.push({ location: new google.maps.LatLng(s.lat, s.lng), stopover: true });
+            } else if (s.address) {
+                waypoints.push({ location: s.address, stopover: true });
+            }
+        });
+        waypoints.push({ location: { lat: B_lat, lng: B_lng }, stopover: true });
+        waypoints.push({ location: { lat: C_lat, lng: C_lng }, stopover: true });
+        waypoints.push({ location: { lat: D_lat, lng: D_lng }, stopover: true });
+
         // Show loading state
         $("#distanceKm").html('<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i> Calculating...');
         $("#travelTime").html('<i class="fa-solid fa-spinner fa-spin text-xs mr-1"></i> Calculating...');
@@ -529,11 +721,7 @@ $(document).ready(function () {
         directionsService.route({
             origin: { lat: A_lat, lng: A_lng },
             destination: { lat: A_lat, lng: A_lng },
-            waypoints: [
-                { location: { lat: B_lat, lng: B_lng }, stopover: true },
-                { location: { lat: C_lat, lng: C_lng }, stopover: true },
-                { location: { lat: D_lat, lng: D_lng }, stopover: true }
-            ],
+            waypoints: waypoints,
             travelMode: google.maps.TravelMode.DRIVING
         }, function (result, status) {
 
@@ -546,65 +734,51 @@ $(document).ready(function () {
 
             directionsRenderer.setDirections(result);
 
-            const labels = [
-                "Pickup → Drop",
-                "Drop → Return Pickup",
-                "Return Pickup → Return Drop",
-                "Return Drop → Pickup"
-            ];
-
             let totalKm = 0;
-            let html = `<div class="font-semibold mb-1">Trip Distance Details</div>`;
+            let totalSeconds = 0;
+            let html = `<div class="font-semibold text-xs mb-1">Trip Distance Details</div>`;
 
             result.routes[0].legs.forEach((leg, i) => {
-
                 const km = leg.distance.value / 1000;
-                if (km <= 0.1) return;
-
                 totalKm += km;
+                totalSeconds += leg.duration.value;
 
                 html += `
-            <div class="flex justify-between">
-              <span>${labels[i]}</span>
-              <strong>${km.toFixed(2)} km</strong>
-            </div>
-          `;
+                    <div class="flex justify-between text-xs py-0.5 text-gray-600">
+                      <span>Leg ${i + 1}</span>
+                      <strong>${km.toFixed(2)} km</strong>
+                    </div>
+                `;
             });
 
             html += `
-          <hr class="my-2">
-          <div class="flex justify-between font-semibold">
-            <span>Total Distance</span>
-            <span>${totalKm.toFixed(2)} km</span>
-          </div>
-        `;
+              <hr class="my-1.5 border-gray-200">
+              <div class="flex justify-between font-semibold text-xs text-gray-900">
+                <span>Total Distance</span>
+                <span>${totalKm.toFixed(2)} km</span>
+              </div>
+            `;
 
-            // 🔥 PRICING LOGIC
-            const pickupDropKm = result.routes[0].legs[0].distance.value / 1000;
+            // Forward legs count (stops + drop)
+            const forwardLegsCount = stops.length + 1;
+            let pickupDropKm = 0;
+            for (let i = 0; i < Math.min(forwardLegsCount, result.routes[0].legs.length); i++) {
+                pickupDropKm += result.routes[0].legs[i].distance.value / 1000;
+            }
 
             $("#distanceKm").text(totalKm.toFixed(2));
             $("#distance_value").val(totalKm.toFixed(2));
 
-            // ✅ Update Travel Time (Duration)
-            if (result.routes[0].legs.length > 0) {
-                // For round trip, we sum the durations of all legs
-                let totalSeconds = 0;
-                result.routes[0].legs.forEach(leg => {
-                    totalSeconds += leg.duration.value;
-                });
-                
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                
-                let durationStr = "";
-                if (hours > 0) durationStr += `${hours} hr `;
-                durationStr += `${minutes} mins`;
-                
-                $("#travelTime").text("Approx. " + durationStr);
-            }
+            // Travel Time
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            let durationStr = "";
+            if (hours > 0) durationStr += `${hours} hr `;
+            durationStr += `${minutes} mins`;
+            $("#travelTime").text("Approx. " + durationStr);
 
-            $("#range_km").val(pickupDropKm.toFixed(2)); // range check
-            $("#billable_km").val(totalKm.toFixed(2));   // full round km
+            $("#range_km").val(pickupDropKm.toFixed(2));
+            $("#billable_km").val(totalKm.toFixed(2));
 
             $("#tripDetails").removeClass("hidden").html(html);
 
@@ -1962,6 +2136,9 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
         const oneWayKm = parseFloat($("#range_km").val() || 0);
         const isAcChecked = $("#acToggle").length > 0 ? ($("#acToggle").is(":checked") ? 1 : 0) : (window.CAR_DATA.is_ac ? 1 : 0);
 
+        // Collect all active multi-location stops
+        const stops = (typeof getActiveFrontendStops === "function") ? getActiveFrontendStops() : [];
+
         const payload = {
             car_id: window.CAR_DATA.id,
             trip_type: tripType,
@@ -1972,6 +2149,9 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
             pickup_address: pickup,
             pickup_lat: $("#pickup_lat").val(),
             pickup_lng: $("#pickup_lng").val(),
+
+            // Multi-location intermediate stops
+            stops: stops.length > 0 ? stops : null,
 
             // Drop details
             drop_address: drop,
@@ -2051,6 +2231,7 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
         const urlDrop = urlParams.get('destination');
         const urlDate = urlParams.get('date');
         const urlTime = urlParams.get('pickup_time');
+        const urlStops = urlParams.get('stops');
 
         if (urlPickup && $("#pickup").length > 0) $("#pickup").val(urlPickup);
         if (urlDrop && $("#drop").length > 0) $("#drop").val(urlDrop);
@@ -2066,6 +2247,26 @@ if (typeof executeWhenGoogleMapsReady === 'function') {
         }
         if (urlTime && $("#pickupTime").length > 0) {
             $("#pickupTime").val(urlTime);
+        }
+
+        // Pre-fill intermediate stops from URL if present
+        if (urlStops) {
+            try {
+                const parsedStops = JSON.parse(urlStops);
+                if (Array.isArray(parsedStops)) {
+                    parsedStops.forEach(s => {
+                        if (typeof s === 'string' && s.trim()) {
+                            addStopRow(s.trim());
+                        } else if (s && s.address) {
+                            addStopRow(s.address, s.lat || 0, s.lng || 0);
+                        }
+                    });
+                }
+            } catch (e) {
+                urlStops.split('||').forEach(s => {
+                    if (s.trim()) addStopRow(s.trim());
+                });
+            }
         }
 
         // 🚀 Auto-trigger routing if both locations are present

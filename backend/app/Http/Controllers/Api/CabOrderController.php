@@ -56,6 +56,7 @@ class CabOrderController extends Controller
             'drop_address' => 'required|string',
             'drop_lat' => 'required|numeric|between:-90,90',
             'drop_lng' => 'required|numeric|between:-180,180',
+            'stops' => 'nullable',
 
             // Return (only for round_trip)
             'return_pickup_address' => 'nullable|string',
@@ -258,6 +259,17 @@ class CabOrderController extends Controller
             // $oneWayKm and $returnKm already calculated above
             $totalKm = $oneWayKm + $returnKm;
 
+            // Multi-location stops
+            $stops = null;
+            if ($request->filled('stops')) {
+                $rawStops = is_string($request->stops) ? json_decode($request->stops, true) : $request->stops;
+                if (is_array($rawStops)) {
+                    $stops = array_values(array_filter($rawStops, function($s) {
+                        return !empty($s['address']);
+                    }));
+                }
+            }
+
             // ─── Create order ──────────────────────────────────────
             $order = CabOrder::create([
                 'order_number' => CabOrder::generateOrderNumber(),
@@ -279,6 +291,9 @@ class CabOrderController extends Controller
                 'pickup_address' => $request->pickup_address,
                 'pickup_lat' => $request->pickup_lat,
                 'pickup_lng' => $request->pickup_lng,
+
+                // Multi-location stops
+                'stops' => (!empty($stops) ? $stops : null),
 
                 // Drop
                 'drop_address' => $request->drop_address,
@@ -713,6 +728,8 @@ class CabOrderController extends Controller
                 'lat' => $order->drop_lat,
                 'lng' => $order->drop_lng,
             ],
+
+            'stops' => $order->stops ?? [],
 
             'return' => $order->trip_type === 'round_trip' ? [
                 'pickup' => [

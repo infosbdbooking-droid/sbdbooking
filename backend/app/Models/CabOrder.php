@@ -40,6 +40,9 @@ class CabOrder extends Model
         'drop_lat',
         'drop_lng',
 
+        // Multi-location stops / via locations
+        'stops',
+
         // Return
         'return_pickup_address',
         'return_pickup_lat',
@@ -102,6 +105,7 @@ class CabOrder extends Model
 
     protected $casts = [
         'charges_breakdown' => 'array',
+        'stops'             => 'array',
         'is_ac'             => 'boolean',
         'pickup_lat'        => 'float',
         'pickup_lng'        => 'float',

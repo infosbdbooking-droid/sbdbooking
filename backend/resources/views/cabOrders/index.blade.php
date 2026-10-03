@@ -56,6 +56,11 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="capitalize">{{ str_replace('_', ' ', $order->trip_type) }}</div>
+                                @if(!empty($order->stops))
+                                    <span class="inline-block mt-0.5 px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[10px] font-bold rounded border border-amber-200">
+                                        <i class="fas fa-map-marker-alt text-[9px] mr-0.5"></i>{{ count($order->stops) }} {{ count($order->stops) === 1 ? 'Stop' : 'Stops' }}
+                                    </span>
+                                @endif
                                 <div class="text-xs text-gray-500">{{ $order->total_km }} km</div>
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900">

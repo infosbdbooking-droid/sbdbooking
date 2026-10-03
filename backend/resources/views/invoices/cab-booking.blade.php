@@ -455,6 +455,29 @@
             <div class="clear"></div>
         </div>
 
+        @php
+            $rawStops = $order->stops;
+            if (is_string($rawStops)) {
+                $rawStops = json_decode($rawStops, true) ?: [];
+            }
+            $stopsList = [];
+            if (is_array($rawStops)) {
+                foreach ($rawStops as $s) {
+                    $addr = is_array($s) ? ($s['address'] ?? '') : (is_string($s) ? $s : '');
+                    if (!empty(trim($addr))) {
+                        $stopsList[] = trim($addr);
+                    }
+                }
+            }
+            $hasStops = count($stopsList) > 0;
+            
+            $breakdownList = $order->charges_breakdown;
+            if (is_string($breakdownList)) {
+                $breakdownList = json_decode($breakdownList, true) ?: [];
+            }
+            $isBreakdownValid = is_array($breakdownList) && count($breakdownList) > 0;
+        @endphp
+
         <!-- Trip Details Card -->
         <div class="card" style="margin-top: 2px;">
             <h3 class="card-title">Trip Details</h3>
@@ -462,7 +485,14 @@
                 <tr>
                     <td style="width: 33.3%; vertical-align: top;">
                         <div class="trip-label">Trip Type</div>
-                        <div class="trip-val">{{ str_replace('_', ' ', strtoupper($order->trip_type)) }}</div>
+                        <div class="trip-val">
+                            {{ str_replace('_', ' ', strtoupper($order->trip_type)) }}
+                            @if($hasStops)
+                                <div style="font-size: 8px; color: #b45309; font-weight: 700; margin-top: 1px;">
+                                    ({{ count($stopsList) }} VIA {{ count($stopsList) === 1 ? 'STOP' : 'STOPS' }})
+                                </div>
+                            @endif
+                        </div>
                     </td>
                     <td style="width: 33.3%; vertical-align: top;">
                         <div class="trip-label">Pickup Date & Time</div>
@@ -478,24 +508,27 @@
                         <div class="trip-val">{{ $order->total_km }} KM</div>
                         <div style="font-size: 8px; color: #64748b; font-weight: 500; margin-top: 1px;">
                             ({{ $order->one_way_km }} km Run + {{ $order->return_km }} km Return)
+                            @if($hasStops)
+                                <br><span style="color: #b45309; font-weight: 700;">• {{ count($stopsList) }} Via {{ count($stopsList) === 1 ? 'Stop' : 'Stops' }}</span>
+                            @endif
                         </div>
                     </td>
                 </tr>
                 @if($order->trip_type === 'round_trip')
                 <tr>
-                    <td colspan="3" style="padding-top: 6px; border-top: 1px solid #f1f5f9; margin-top: 6px;">
+                    <td colspan="3" style="padding-top: 5px; border-top: 1px solid #f1f5f9; margin-top: 5px;">
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr>
                                 <td style="width: 50%; padding: 0;">
                                     <div class="trip-label">Return Date & Time</div>
-                                    <div class="trip-val" style="font-size: 10px;">
+                                    <div class="trip-val" style="font-size: 9.5px;">
                                         {{ \Carbon\Carbon::parse($order->return_date)->format('d M Y') }} at 
                                         {{ strpos($order->return_time, ' to ') !== false ? $order->return_time : \Carbon\Carbon::parse($order->return_time)->format('h:i A') }}
                                     </div>
                                 </td>
                                 <td style="width: 50%; padding: 0;">
                                     <div class="trip-label">Passengers & Bags</div>
-                                    <div class="trip-val" style="font-size: 10px;">
+                                    <div class="trip-val" style="font-size: 9.5px;">
                                         {{ $order->passengers }} Passengers | {{ $order->bags }} Bags
                                     </div>
                                 </td>
@@ -505,34 +538,93 @@
                 </tr>
                 @else
                 <tr>
-                    <td colspan="3" style="padding-top: 6px; border-top: 1px solid #f1f5f9; margin-top: 6px;">
+                    <td colspan="3" style="padding-top: 5px; border-top: 1px solid #f1f5f9; margin-top: 5px;">
                         <div class="trip-label">Passengers & Bags</div>
-                        <div class="trip-val" style="font-size: 10px;">
+                        <div class="trip-val" style="font-size: 9.5px;">
                             {{ $order->passengers }} Passengers | {{ $order->bags }} Bags
                         </div>
                     </td>
                 </tr>
                 @endif
+
+                <!-- Route & Multiple Stops Itinerary -->
                 <tr>
-                    <td colspan="3" style="padding-top: 6px; border-top: 1px solid #f1f5f9; margin-top: 6px;">
-                        <div class="trip-label">Route Details</div>
-                        <div class="trip-val" style="font-size: 10px; line-height: 1.4; font-weight: normal;">
-                            <strong style="color: #1e3a8a;">Pickup:</strong> {{ $order->pickup_address }}<br>
-                            <strong style="color: #b59410;">Drop-off:</strong> {{ $order->drop_address }}
+                    <td colspan="3" style="padding-top: 6px; border-top: 1px solid #f1f5f9; margin-top: 5px;">
+                        <div style="margin-bottom: 3px;">
+                            <span class="trip-label" style="display: inline-block;">Route & Itinerary Details</span>
+                            @if($hasStops)
+                                <span style="display: inline-block; background-color: #fef3c7; color: #92400e; font-size: 8px; font-weight: 700; padding: 1px 6px; border-radius: 4px; border: 1px solid #fde68a; margin-left: 6px; text-transform: uppercase;">
+                                    {{ count($stopsList) }} Intermediate {{ count($stopsList) === 1 ? 'Stop' : 'Stops' }} (Via Locations)
+                                </span>
+                            @endif
                         </div>
+                        
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 2px; font-size: 9px; line-height: 1.35;">
+                            <!-- Pickup Location -->
+                            <tr>
+                                <td style="width: 16px; vertical-align: top; padding: 2px 0;">
+                                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #1e3a8a; border: 1px solid #93c5fd;"></span>
+                                </td>
+                                <td style="vertical-align: top; padding: 2px 0;">
+                                    <strong style="color: #1e3a8a; text-transform: uppercase; font-size: 8px;">Pickup:</strong> 
+                                    <span style="color: #0f172a; font-weight: 600;">{{ $order->pickup_address }}</span>
+                                </td>
+                            </tr>
+                            
+                            <!-- Multiple Stops if added -->
+                            @if($hasStops)
+                                @foreach($stopsList as $sIdx => $stopAddress)
+                                <tr>
+                                    <td style="width: 16px; vertical-align: top; padding: 2px 0;">
+                                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #d97706; border: 1px solid #fde68a;"></span>
+                                    </td>
+                                    <td style="vertical-align: top; padding: 2px 0;">
+                                        <strong style="color: #b45309; text-transform: uppercase; font-size: 8px;">Via Stop {{ $sIdx + 1 }}:</strong> 
+                                        <span style="color: #0f172a; font-weight: 600;">{{ $stopAddress }}</span>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            @endif
+                            
+                            <!-- Drop Destination -->
+                            <tr>
+                                <td style="width: 16px; vertical-align: top; padding: 2px 0;">
+                                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #16a34a; border: 1px solid #86efac;"></span>
+                                </td>
+                                <td style="vertical-align: top; padding: 2px 0;">
+                                    <strong style="color: #166534; text-transform: uppercase; font-size: 8px;">Drop-off:</strong> 
+                                    <span style="color: #0f172a; font-weight: 600;">{{ $order->drop_address }}</span>
+                                </td>
+                            </tr>
+
+                            <!-- Round Trip Return Route (if applicable) -->
+                            @if($order->trip_type === 'round_trip' && ($order->return_pickup_address || $order->return_drop_address))
+                            <tr>
+                                <td style="width: 16px; vertical-align: top; padding: 3px 0 0 0; border-top: 1px dashed #e2e8f0;">
+                                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #4f46e5; border: 1px solid #c7d2fe;"></span>
+                                </td>
+                                <td style="vertical-align: top; padding: 3px 0 0 0; border-top: 1px dashed #e2e8f0;">
+                                    <strong style="color: #4338ca; text-transform: uppercase; font-size: 8px;">Return Route:</strong> 
+                                    <span style="color: #0f172a; font-weight: 600;">
+                                        {{ $order->return_pickup_address ?: $order->drop_address }} &rarr; {{ $order->return_drop_address ?: $order->pickup_address }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endif
+                        </table>
                     </td>
                 </tr>
             </table>
         </div>
 
-        <div class="card w-full"    style="margin-top: 2px;">
+        <div class="card w-full" style="margin-top: 2px;">
             <!-- Fare Summary Card -->
             <div>
-                <div style="min-height: 185px; padding-bottom: 5px;">
+                <div style="min-height: 180px; padding-bottom: 4px;">
                     <h3 class="card-title">Fare Summary</h3>
                     <table class="fare-table">
-                        @if(is_array($order->charges_breakdown) || is_object($order->charges_breakdown))
-                            @foreach($order->charges_breakdown as $item)
+                        @if($isBreakdownValid)
+                            @foreach($breakdownList as $item)
                                 @php
                                     $amount = isset($item['amount']) ? (float)$item['amount'] : 0;
                                     $item_name = isset($item['type']) ? $item['type'] : (isset($item['charge_type']) ? $item['charge_type'] : 'Charge');
@@ -605,7 +697,7 @@
                         @endif
                         
                         <tr>
-                            <td style="font-size: 10.5px; font-weight: 800; color: #1e3a8a;">Final Amount</td>
+                            <td style="font-size: 10px; font-weight: 800; color: #1e3a8a;">Final Amount</td>
                             <td><span class="currency"> {{ $currencySymbol }}</span>{{ number_format($order->total_amount, 2) }}</td>
                         </tr>
                         
@@ -613,10 +705,34 @@
                             <td style="color: #166534; font-weight: 600;">Advance Paid</td>
                             <td>- <span class="currency">{{ $currencySymbol }}</span>{{ number_format($order->advance_payment ?? 0, 2) }}</td>
                         </tr>
+
+                        <!-- Multiple Payments Breakdown (if recorded) -->
+                        @if($order->payments && $order->payments->count() > 0)
+                        <tr>
+                            <td colspan="2" style="padding-top: 3px; padding-bottom: 2px;">
+                                <div style="font-size: 7.5px; font-weight: 700; color: #166534; text-transform: uppercase; margin-bottom: 2px;">
+                                    Payment Record ({{ $order->payments->count() }} {{ $order->payments->count() === 1 ? 'Transaction' : 'Transactions' }}):
+                                </div>
+                                <table style="width: 100%; border-collapse: collapse; font-size: 7.5px;">
+                                    @foreach($order->payments as $pIdx => $p)
+                                    <tr>
+                                        <td style="padding: 1px 0; color: #64748b;">
+                                            • {{ $p->receipt_number ?: ('Pmt #' . ($pIdx + 1)) }}
+                                            ({{ $p->created_at ? $p->created_at->format('d M') : '' }} | {{ ucfirst($p->payment_method ?: 'Payment') }})
+                                        </td>
+                                        <td style="padding: 1px 0; text-align: right; color: #166534; font-weight: 700;">
+                                            <span class="currency">{{ $currencySymbol }}</span>{{ number_format($p->amount, 2) }}
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </table>
+                            </td>
+                        </tr>
+                        @endif
                         
                         <tr class="fare-final">
                             <td>Remaining Amount</td>
-                            <td><span class="currency">{{ $currencySymbol }}</span>{{ number_format($order->total_amount - ($order->advance_payment ?? 0), 2) }}</td>
+                            <td><span class="currency">{{ $currencySymbol }}</span>{{ number_format(max(0, $order->total_amount - ($order->advance_payment ?? 0)), 2) }}</td>
                         </tr>
                     </table>
                 </div>

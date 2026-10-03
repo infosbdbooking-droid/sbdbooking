@@ -200,13 +200,13 @@
                         <!-- Passengers Count -->
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Passengers <span class="text-red-500">*</span></label>
-                            <input type="number" name="passengers" x-model="passengers" min="1" max="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                            <input type="number" name="passengers" x-model="passengers" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
                         </div>
 
                         <!-- Bags Count -->
                         <div>
                             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Luggage Bags</label>
-                            <input type="number" name="bags" x-model="bags" min="0" max="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+                            <input type="number" name="bags" x-model="bags" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
                         </div>
                     </div>
 
@@ -226,12 +226,24 @@
 
                 <!-- 3. Pick / Drop Route & Address -->
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm transition hover:shadow-md duration-300">
-                    <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
-                        <span class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">3</span>
-                        <h2 class="text-lg font-bold text-gray-800">Route & Distance Details</h2>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-2 border-b border-gray-100">
+                        <div class="flex items-center gap-2">
+                            <span class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">3</span>
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-800">Route & Distance Details</h2>
+                                <p class="text-xs text-gray-400">Pickup, drop destination & optional multiple stops (like Uber)</p>
+                            </div>
+                        </div>
+                        <!-- Uber-style + Add Stop button -->
+                        <button type="button" @click="addStop()" :disabled="stops.length >= 5" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg text-xs font-bold transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-plus-circle text-blue-600"></i>
+                            <span>Add Stop / Via Location</span>
+                            <span class="bg-blue-600 text-white rounded-full px-1.5 py-0.2 text-[10px]" x-show="stops.length > 0" x-text="stops.length"></span>
+                        </button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="space-y-3 mb-4">
+                        <!-- Pickup Address -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Pickup Address <span class="text-red-500">*</span></label>
                             <div class="relative">
@@ -239,6 +251,33 @@
                                 <i class="fas fa-map-marker-alt absolute left-3 top-3 text-red-500"></i>
                             </div>
                         </div>
+
+                        <!-- Intermediate Stops List (Uber Style) -->
+                        <div x-show="stops.length > 0" x-transition class="space-y-2.5 pt-1">
+                            <template x-for="(stop, index) in stops" :key="stop.id">
+                                <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl relative transition hover:border-amber-300 shadow-xs">
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold" x-text="index + 1"></span>
+                                            <span class="text-xs font-bold text-amber-900" x-text="'Stop ' + (index + 1) + ' (Via Location)'"></span>
+                                        </div>
+                                        <button type="button" @click="removeStop(index)" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-0.5 rounded hover:bg-red-50 transition flex items-center gap-1">
+                                            <i class="fas fa-trash-alt text-[10px]"></i> Remove
+                                        </button>
+                                    </div>
+                                    <div class="relative">
+                                        <input type="text" 
+                                               :id="'stop_address_' + index" 
+                                               x-model="stop.address" 
+                                               placeholder="Enter intermediate stop or via destination..." 
+                                               class="w-full pl-9 pr-4 py-2 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm bg-white">
+                                        <i class="fas fa-map-pin absolute left-3 top-3 text-amber-500"></i>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Drop Address -->
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Drop Address <span class="text-red-500">*</span></label>
                             <div class="relative">
@@ -247,6 +286,9 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Hidden input for stops JSON data -->
+                    <input type="hidden" name="stops" :value="JSON.stringify(stops.filter(s => s.address && s.address.trim()))">
 
                     <!-- Return Trip Location Option (visible for round trip) -->
                     <div x-show="tripType === 'round_trip'" x-transition class="mb-4">
@@ -304,9 +346,26 @@
 
                     <!-- Trip Distance Details -->
                     <div class="mt-4 bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700 space-y-2 mb-4" x-show="totalKm > 0 && !loadingRoute">
-                        <div class="font-bold text-gray-800 mb-2">Trip Distance Details</div>
+                        <div class="font-bold text-gray-800 mb-2 flex items-center justify-between">
+                            <span>Trip Distance Details</span>
+                            <span class="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full" x-show="stops.length > 0" x-text="stops.length + ' intermediate stop(s) included'"></span>
+                        </div>
+
+                        <!-- Multi-stop leg breakdown when intermediate stops exist -->
+                        <template x-if="routeLegs && routeLegs.length > 1">
+                            <div class="bg-white p-3 rounded-lg border border-gray-200 text-xs space-y-1.5 mb-2 shadow-xs">
+                                <div class="font-bold text-gray-500 text-[10px] uppercase tracking-wider mb-1">Route Leg Breakdown</div>
+                                <template x-for="(leg, lIdx) in routeLegs" :key="lIdx">
+                                    <div class="flex justify-between items-center text-gray-600 py-0.5 border-b border-gray-50 last:border-b-0">
+                                        <span class="truncate max-w-[260px] font-medium" x-text="leg.from + ' → ' + leg.to"></span>
+                                        <strong class="text-gray-800 font-bold" x-text="leg.km + ' km'"></strong>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+
                         <div class="flex justify-between items-center pb-2 border-b border-gray-200">
-                            <span>Pickup &rarr; Drop</span>
+                            <span>Pickup &rarr; Drop <span x-show="stops.length > 0" class="text-xs text-amber-600 font-semibold">(via all stops)</span></span>
                             <strong><span x-text="oneWayKm"></span> km</strong>
                         </div>
                         <div class="flex justify-between items-center pb-2 border-b border-gray-200">
@@ -643,6 +702,42 @@
             returnPickupAddress: '',
             returnDropAddress: '',
             
+            // Multi-stop state (like Uber)
+            stops: [],
+            routeLegs: [],
+
+            addStop() {
+                if (this.stops.length >= 5) {
+                    alert('Maximum 5 intermediate stops allowed.');
+                    return;
+                }
+                const newId = Date.now() + Math.floor(Math.random() * 1000);
+                this.stops.push({
+                    id: newId,
+                    address: '',
+                    lat: 0,
+                    lng: 0
+                });
+
+                this.$nextTick(() => {
+                    if (window.initAllStopAutocompletes) {
+                        window.initAllStopAutocompletes();
+                    }
+                });
+            },
+
+            removeStop(index) {
+                this.stops.splice(index, 1);
+                this.$nextTick(() => {
+                    if (window.initAllStopAutocompletes) {
+                        window.initAllStopAutocompletes();
+                    }
+                    if (window.drawFullRoute) {
+                        window.drawFullRoute();
+                    }
+                });
+            },
+            
             // Distance
             oneWayKm: 0,
             returnKm: 0,
@@ -749,10 +844,7 @@
                 this.selectedCarMinAmount = car.min_trip_amount || 0;
                 this.selectedCarMaxPassengers = car.max_passengers || 4;
                 this.selectedCarMaxBags = car.max_bags || 2;
-                
-                // Set default capacities
-                this.passengers = Math.min(this.passengers, this.selectedCarMaxPassengers);
-                this.bags = Math.min(this.bags, this.selectedCarMaxBags);
+                // Keep user-entered capacities without clamping
 
                 // Fetch charges configuration for pre-filling manual input
                 fetch(`/api/v1/car/${this.carId}/charges`)
@@ -804,6 +896,7 @@
                 this.oneWayKm = data.oneWayKm;
                 this.returnKm = data.returnKm;
                 this.travelTime = data.travelTime;
+                this.routeLegs = data.legs || [];
                 
                 // Update hidden coordinates inputs dynamically
                 const form = document.querySelector('form');
@@ -1000,6 +1093,15 @@
                     return;
                 }
 
+                // Check intermediate stops if added
+                for (let i = 0; i < this.stops.length; i++) {
+                    if (!this.stops[i].address || !this.stops[i].address.trim()) {
+                        alert(`Stop ${i + 1} address is empty. Please enter an address or remove the stop.`);
+                        event.preventDefault();
+                        return;
+                    }
+                }
+
                 if (this.oneWayKm <= 0) {
                     alert('Distance must be greater than 0.');
                     event.preventDefault();
@@ -1160,6 +1262,53 @@
         });
     }
 
+    function initAllStopAutocompletes() {
+        const appEl = document.querySelector('[x-data="manualBookingApp()"]');
+        if (!appEl || !window.google || !google.maps || !google.maps.places) return;
+        const appData = Alpine.$data(appEl);
+        if (!appData || !appData.stops) return;
+
+        appData.stops.forEach((stop, index) => {
+            const inputEl = document.getElementById('stop_address_' + index);
+            if (!inputEl) return;
+            if (inputEl._autoAttached) return;
+            inputEl._autoAttached = true;
+
+            const auto = new google.maps.places.Autocomplete(inputEl, { componentRestrictions: { country: "in" } });
+            auto.addListener("place_changed", function() {
+                const place = auto.getPlace();
+                if (place && place.geometry) {
+                    stop.lat = place.geometry.location.lat();
+                    stop.lng = place.geometry.location.lng();
+                    stop.address = inputEl.value;
+                    window.drawFullRoute();
+                } else {
+                    geocodeAddress(inputEl.value, function(lat, lng) {
+                        stop.lat = lat;
+                        stop.lng = lng;
+                        stop.address = inputEl.value;
+                        window.drawFullRoute();
+                    });
+                }
+            });
+
+            inputEl.addEventListener("blur", function() {
+                const val = this.value;
+                setTimeout(function() {
+                    if (val && !stop.lat) {
+                        geocodeAddress(val, function(lat, lng) {
+                            stop.lat = lat;
+                            stop.lng = lng;
+                            stop.address = val;
+                            window.drawFullRoute();
+                        });
+                    }
+                }, 300);
+            });
+        });
+    }
+    window.initAllStopAutocompletes = initAllStopAutocompletes;
+
     window.drawFullRoute = function(overrideTripType = null) {
         const A_lat = parseFloat(document.querySelector('input[name="pickup_lat"]').value) || 0;
         const A_lng = parseFloat(document.querySelector('input[name="pickup_lng"]').value) || 0;
@@ -1177,20 +1326,37 @@
         const D_lat = parseFloat(document.querySelector('input[name="return_drop_lat"]').value) || 0;
         const D_lng = parseFloat(document.querySelector('input[name="return_drop_lng"]').value) || 0;
 
+        // Retrieve intermediate stops from Alpine
+        const appEl = document.querySelector('[x-data="manualBookingApp()"]');
+        const appData = appEl && window.Alpine ? Alpine.$data(appEl) : null;
+        const activeStops = (appData && appData.stops) ? appData.stops.filter(s => s.address && s.address.trim()) : [];
+
+        let waypoints = [];
+        activeStops.forEach(s => {
+            if (s.lat && s.lng) {
+                waypoints.push({ location: new google.maps.LatLng(s.lat, s.lng), stopover: true });
+            } else if (s.address) {
+                waypoints.push({ location: s.address, stopover: true });
+            }
+        });
+
         let request = {
             origin: { lat: A_lat, lng: A_lng },
             destination: { lat: B_lat, lng: B_lng },
+            waypoints: waypoints,
+            optimizeWaypoints: false,
             travelMode: google.maps.TravelMode.DRIVING
         };
 
         if (tripType === 'round_trip') {
             request.destination = { lat: A_lat, lng: A_lng }; // Return to pickup
-            const waypoints = [ { location: { lat: B_lat, lng: B_lng }, stopover: true } ];
+            // Drop location becomes a waypoint
+            request.waypoints.push({ location: { lat: B_lat, lng: B_lng }, stopover: true });
+
             if (returnLocationType === 'custom' && C_lat && D_lat) {
-                waypoints.push({ location: { lat: C_lat, lng: C_lng }, stopover: true });
-                waypoints.push({ location: { lat: D_lat, lng: D_lng }, stopover: true });
+                request.waypoints.push({ location: { lat: C_lat, lng: C_lng }, stopover: true });
+                request.waypoints.push({ location: { lat: D_lat, lng: D_lng }, stopover: true });
             }
-            request.waypoints = waypoints;
         }
 
         directionsService.route(request, function(result, status) {
@@ -1202,10 +1368,29 @@
 
             let totalKm = 0;
             let totalSeconds = 0;
+            let legsData = [];
+            const numLegs = result.routes[0].legs.length;
             
-            result.routes[0].legs.forEach(leg => {
-                totalKm += leg.distance.value / 1000;
+            result.routes[0].legs.forEach((leg, idx) => {
+                const legKm = leg.distance.value / 1000;
+                totalKm += legKm;
                 totalSeconds += leg.duration.value;
+
+                let fromName = idx === 0 ? "Pickup" : ("Stop " + idx);
+                let toName = "";
+                if (idx < activeStops.length) {
+                    toName = "Stop " + (idx + 1);
+                } else if (idx === activeStops.length) {
+                    toName = "Drop Destination";
+                } else {
+                    toName = "Return Journey";
+                }
+
+                legsData.push({
+                    from: fromName,
+                    to: toName,
+                    km: legKm.toFixed(1)
+                });
             });
 
             // Format travel time
@@ -1215,7 +1400,16 @@
             if (hours > 0) travelTime += `${hours} hr `;
             travelTime += `${minutes} mins`;
 
-            const oneWayKm = tripType === 'one_way' ? totalKm : (result.routes[0].legs[0].distance.value / 1000);
+            // Calculate one-way KM (all legs up to the drop destination)
+            const forwardLegsCount = activeStops.length + 1;
+            let oneWayKm = 0;
+            if (tripType === 'one_way') {
+                oneWayKm = totalKm;
+            } else {
+                for (let i = 0; i < Math.min(forwardLegsCount, numLegs); i++) {
+                    oneWayKm += result.routes[0].legs[i].distance.value / 1000;
+                }
+            }
             const returnKm = tripType === 'round_trip' ? (totalKm - oneWayKm) : 0;
 
             // Dispatch event to Alpine
@@ -1228,6 +1422,7 @@
                     oneWayKm: oneWayKm.toFixed(2),
                     returnKm: returnKm.toFixed(2),
                     travelTime: travelTime,
+                    legs: legsData,
                     coords: {
                         pickup_lat: A_lat, pickup_lng: A_lng,
                         drop_lat: B_lat, drop_lng: B_lng,
