@@ -499,37 +499,46 @@ $(document).ready(function () {
 
         // Attach Google Autocomplete
         const inputEl = document.getElementById(inputId);
-        if (inputEl && typeof google !== 'undefined' && google.maps && google.maps.places) {
-            const auto = new google.maps.places.Autocomplete(inputEl, { componentRestrictions: { country: "in" } });
-            auto.addListener("place_changed", function () {
-                const place = auto.getPlace();
-                const row = $(`#${rowId}`);
-                if (place && place.geometry) {
-                    row.find(".stop-lat").val(place.geometry.location.lat());
-                    row.find(".stop-lng").val(place.geometry.location.lng());
-                    drawRoute();
-                } else {
-                    geocodeAddress(inputEl.value, function(lat, lng) {
-                        row.find(".stop-lat").val(lat);
-                        row.find(".stop-lng").val(lng);
+        function initStopAutocomplete() {
+            if (!inputEl) return;
+            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                const auto = new google.maps.places.Autocomplete(inputEl, { componentRestrictions: { country: "in" } });
+                auto.addListener("place_changed", function () {
+                    const place = auto.getPlace();
+                    const row = $(`#${rowId}`);
+                    if (place && place.geometry) {
+                        row.find(".stop-lat").val(place.geometry.location.lat());
+                        row.find(".stop-lng").val(place.geometry.location.lng());
                         drawRoute();
-                    });
-                }
-            });
-
-            $(inputEl).on("blur", function () {
-                const val = $(this).val();
-                const row = $(`#${rowId}`);
-                setTimeout(function() {
-                    if (val && !row.find(".stop-lat").val()) {
-                        geocodeAddress(val, function(lat, lng) {
+                    } else {
+                        geocodeAddress(inputEl.value, function(lat, lng) {
                             row.find(".stop-lat").val(lat);
                             row.find(".stop-lng").val(lng);
                             drawRoute();
                         });
                     }
-                }, 300);
-            });
+                });
+
+                $(inputEl).on("blur", function () {
+                    const val = $(this).val();
+                    const row = $(`#${rowId}`);
+                    setTimeout(function() {
+                        if (val && !row.find(".stop-lat").val()) {
+                            geocodeAddress(val, function(lat, lng) {
+                                row.find(".stop-lat").val(lat);
+                                row.find(".stop-lng").val(lng);
+                                drawRoute();
+                            });
+                        }
+                    }, 300);
+                });
+            }
+        }
+
+        if (typeof executeWhenGoogleMapsReady === 'function') {
+            executeWhenGoogleMapsReady(initStopAutocomplete);
+        } else {
+            initStopAutocomplete();
         }
 
         // Focus newly added stop

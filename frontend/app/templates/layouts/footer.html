@@ -127,7 +127,7 @@
   window.API_BASE_URL = "{{ api_base_url }}";
 </script>
 
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}?v={{ asset_version }}"></script>
 
 </body>
 
