@@ -581,6 +581,37 @@ def seo_page_detail(slug):
 
 
 # ======================
+# INVOICE DOWNLOAD PROXY
+# ======================
+@app.route('/invoice/<order_id>')
+def download_invoice(order_id):
+    clean_id = order_id.strip().replace(' ', '-')
+    stream = request.args.get('stream', '1')
+
+    # Query API backend
+    api_url = f"{API_BASE_URL}/invoice/{clean_id}"
+    if stream:
+        api_url += f"?stream={stream}"
+
+    try:
+        res = requests.get(api_url, timeout=20, stream=True)
+
+        if res.status_code == 200:
+            from flask import Response
+            return Response(
+                res.iter_content(chunk_size=4096),
+                content_type=res.headers.get('content-type', 'application/pdf'),
+                headers={
+                    'Content-Disposition': res.headers.get('content-disposition', f'inline; filename="Invoice-{clean_id}.pdf"')
+                }
+            )
+        return render_template('404.html', api_base_url=API_BASE_URL), 404
+    except Exception as e:
+        print("INVOICE PROXY ERROR:", e)
+        return render_template('404.html', api_base_url=API_BASE_URL), 500
+
+
+# ======================
 # 404 PAGE
 # ======================
 @app.errorhandler(404)

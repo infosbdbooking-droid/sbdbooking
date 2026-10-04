@@ -218,7 +218,7 @@
                         <div class="pb-3 border-b border-gray-50 last:border-0 last:pb-0">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-gray-800">{{ $comment->name }}</span>
-                                <span class="text-[10px] text-gray-400">{{ $comment->created_at ? $comment->created_at->diffForHumans() : '' }}</span>
+                                <span class="text-[10px] text-gray-400">{{ $comment->created_at ? \Carbon\Carbon::parse($comment->created_at)->diffForHumans() : '' }}</span>
                             </div>
                             <p class="text-[11px] text-gray-500 mt-1 italic line-clamp-2">"{{ $comment->comment }}"</p>
                             <div class="flex items-center justify-between mt-2">

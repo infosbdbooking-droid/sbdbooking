@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\SliderController;
 use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\SeoPageController;
+use App\Http\Controllers\CabOrderWebController;
 
 
 
@@ -60,6 +61,7 @@ Route::prefix('v1')->group(function () {
 
     // Order detail (public read, ownership checked if token present)
     Route::get('/cab-orders/{orderNumber}', [CabOrderController::class, 'orderDetail']);
+    Route::get('/invoice/{id}', [CabOrderWebController::class, 'downloadInvoice']);
 
     // Authenticated customer routes
     Route::middleware('auth:sanctum')->group(function () {

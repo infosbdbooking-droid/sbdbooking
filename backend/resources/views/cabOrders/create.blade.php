@@ -652,9 +652,22 @@
                 </div>
                 
                 <div class="w-full md:w-auto flex gap-3">
-                    <button type="submit" class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-black rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-2 text-[13px] uppercase tracking-wider">
-                        <i class="fas fa-check-circle text-xl drop-shadow-md"></i>
-                        Confirm & Book Trip
+                    <button type="submit" 
+                        :disabled="isSubmitting"
+                        :class="isSubmitting ? 'opacity-75 cursor-not-allowed pointer-events-none' : 'hover:scale-[1.02]'"
+                        class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-black rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] transition-all duration-200 flex items-center justify-center gap-2 text-[13px] uppercase tracking-wider">
+                        <template x-if="!isSubmitting">
+                            <span class="inline-flex items-center gap-2">
+                                <i class="fas fa-check-circle text-xl drop-shadow-md"></i>
+                                <span>Confirm & Book Trip</span>
+                            </span>
+                        </template>
+                        <template x-if="isSubmitting">
+                            <span class="inline-flex items-center gap-2">
+                                <i class="fas fa-circle-notch fa-spin text-xl drop-shadow-md"></i>
+                                <span>Processing Trip...</span>
+                            </span>
+                        </template>
                     </button>
                 </div>
             </div>
@@ -670,6 +683,9 @@
             // Data injected from backend
             cars: @json($cars),
             customers: @json($customers),
+
+            // Form submission state
+            isSubmitting: false,
 
             // Customer selection state
             customerType: 'existing',
@@ -1113,6 +1129,9 @@
                     event.preventDefault();
                     return;
                 }
+
+                // Show processing spinner & disable duplicate submissions
+                this.isSubmitting = true;
             }
         };
     }

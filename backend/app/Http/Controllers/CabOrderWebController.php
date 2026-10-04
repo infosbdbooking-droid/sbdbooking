@@ -720,9 +720,16 @@ class CabOrderWebController extends Controller
      */
     public function downloadInvoice($id)
     {
+        $decoded = trim(urldecode($id));
+        $withHyphens = str_replace(' ', '-', $decoded);
+        $withSpaces  = str_replace('-', ' ', $decoded);
+
         $order = CabOrder::with(['customer', 'car', 'payments'])
             ->where('id', $id)
             ->orWhere('order_number', $id)
+            ->orWhere('order_number', $decoded)
+            ->orWhere('order_number', $withHyphens)
+            ->orWhere('order_number', $withSpaces)
             ->firstOrFail();
         
         // Using fully qualified class name to ensure it resolves

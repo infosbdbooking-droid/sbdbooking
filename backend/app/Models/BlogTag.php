@@ -16,6 +16,15 @@ class BlogTag extends Model
     // Table only has created_at
     public $timestamps = false;
 
+    protected $appends = [
+        'name',
+    ];
+
+    public function getNameAttribute()
+    {
+        return $this->tag_name;
+    }
+
     protected static function boot()
     {
         parent::boot();

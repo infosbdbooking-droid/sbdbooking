@@ -19,6 +19,10 @@ class BlogComment extends Model
     // Table only has created_at
     public $timestamps = false;
 
+    protected $casts = [
+        'created_at' => 'datetime',
+    ];
+
     protected static function boot()
     {
         parent::boot();

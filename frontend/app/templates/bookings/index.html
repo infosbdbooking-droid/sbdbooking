@@ -263,7 +263,7 @@
 
         <!-- Actions -->
         <div class="flex flex-wrap items-center gap-2 pt-1">
-          <a href="http://localhost:8000/invoice/${o.order_number}?stream=1" target="_blank"
+          <a href="/invoice/${encodeURIComponent(o.order_number)}?stream=1" target="_blank"
             class="inline-flex items-center gap-1.5 border border-blue-200 text-blue-600 hover:bg-blue-50 text-sm font-semibold px-3.5 py-1.5 rounded-xl transition-colors shadow-sm">
             <i class="fa-solid fa-file-invoice text-xs"></i> Invoice
           </a>
@@ -434,7 +434,7 @@
               <span class="text-slate-300 text-xs">${o.distance?.total_km || o.distance?.one_way_km || 0} km</span>
               ${(o.stops && o.stops.length > 0) ? `<span class="bg-amber-400 text-slate-900 text-xs font-bold px-2 py-0.5 rounded">${o.stops.length} Via Stop${o.stops.length > 1 ? 's' : ''}</span>` : ''}
             </div>
-            <a href="http://localhost:8000/invoice/${o.order_number}?stream=1" target="_blank"
+            <a href="/invoice/${encodeURIComponent(o.order_number)}?stream=1" target="_blank"
               class="inline-flex items-center gap-1.5 bg-white text-slate-800 hover:bg-slate-100 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition">
               <i class="fa-solid fa-file-invoice text-blue-600"></i> Invoice PDF
             </a>
